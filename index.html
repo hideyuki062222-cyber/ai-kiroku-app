@@ -127,7 +127,7 @@ window.AI_KIROKU_CONFIG = {
 <div class="wrap">
   <header>
     <h1>障害福祉 AI記録作成</h1>
-    <div class="sub">クラウド共有版 v24 ― 職員名登録対応</div>
+    <div class="sub">クラウド共有版 v25 ― メール確認URL修正版</div>
   </header>
 
   <section class="card install-card">
@@ -1476,7 +1476,13 @@ refreshUserSelect();
         return;
       }
       setStatus("アカウントを作成しています…");
-      const { data, error } = await client.auth.signUp({ email, password });
+      const { data, error } = await client.auth.signUp({
+        email,
+        password,
+        options:{
+          emailRedirectTo:"https://hideyuki062222-cyber.github.io/ai-kiroku-app/"
+        }
+      });
       if(error) throw error;
       if(data.session){
         session = data.session;
