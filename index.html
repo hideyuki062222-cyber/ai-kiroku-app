@@ -59,6 +59,14 @@
   .auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
   .setup-note{margin-top:12px;padding:12px;border-radius:12px;background:#f8fafc;font-size:12px;line-height:1.7;color:#475467}
   .cloud-danger{color:#b42318}
+  .staff-list{display:grid;gap:8px;margin-top:12px}
+  .staff-row{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#f8fafc}
+  .staff-meta{min-width:0;flex:1}
+  .staff-email{font-weight:700;word-break:break-all}
+  .staff-role{font-size:12px;color:#667085;margin-top:3px}
+  .code-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .code-row input{flex:1;min-width:220px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.04em}
+  .danger{background:#fee4e2;color:#b42318}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -142,6 +150,24 @@ window.AI_KIROKU_CONFIG = {
         <button class="secondary" id="logoutBtn" onclick="window.cloudLogout && window.cloudLogout()">ログアウト</button>
       </div>
     </div>
+  </section>
+
+  <section class="card hidden" id="staffAdminCard">
+    <label>職員管理</label>
+    <div class="notice">管理者専用です。参加コードのコピー、所属職員の確認、一般職員の所属解除ができます。</div>
+    <div class="field-group" style="margin-top:16px">
+      <label for="staffJoinCode">事業所参加コード</label>
+      <div class="code-row">
+        <input id="staffJoinCode" type="text" readonly>
+        <button class="secondary" onclick="window.copyJoinCode && window.copyJoinCode()">参加コードをコピー</button>
+      </div>
+      <div class="notice">このコードを受け取った職員は、ログイン後に同じ事業所へ参加できます。社外には共有しないでください。</div>
+    </div>
+    <div class="actions">
+      <button class="secondary" onclick="window.cloudLoadStaff && window.cloudLoadStaff()">職員一覧を更新</button>
+    </div>
+    <div id="staffStatus" class="notice"></div>
+    <div id="staffList" class="staff-list"></div>
   </section>
 
   <section class="card">
@@ -1119,6 +1145,10 @@ refreshUserSelect();
   const orgStatus = () => document.getElementById("orgStatus");
   const stateEl = () => document.getElementById("cloudState");
   const orgInfoEl = () => document.getElementById("cloudOrgInfo");
+  const staffAdminCard = () => document.getElementById("staffAdminCard");
+  const staffStatusEl = () => document.getElementById("staffStatus");
+  const staffListEl = () => document.getElementById("staffList");
+  const staffJoinCodeEl = () => document.getElementById("staffJoinCode");
 
   let client = null;
   let session = null;
@@ -1222,6 +1252,92 @@ refreshUserSelect();
     }
   }
 
+  function renderStaffRows(rows){
+    const box = staffListEl();
+    if(!box) return;
+    box.innerHTML = "";
+    for(const row of (rows || [])){
+      const wrap = document.createElement("div");
+      wrap.className = "staff-row";
+      const meta = document.createElement("div");
+      meta.className = "staff-meta";
+      const email = document.createElement("div");
+      email.className = "staff-email";
+      email.textContent = row.email || "メールアドレス未設定";
+      const sub = document.createElement("div");
+      sub.className = "staff-role";
+      const roleLabel = row.role === "admin" ? "管理者" : "一般職員";
+      const selfLabel = session && row.user_id === session.user.id ? " / あなた" : "";
+      const joined = row.joined_at ? new Date(row.joined_at).toLocaleString("ja-JP") : "";
+      sub.textContent = roleLabel + selfLabel + (joined ? " / 参加: "+joined : "");
+      meta.appendChild(email);
+      meta.appendChild(sub);
+      wrap.appendChild(meta);
+      if(row.role !== "admin" && session && row.user_id !== session.user.id){
+        const btn = document.createElement("button");
+        btn.className = "danger";
+        btn.textContent = "所属を解除";
+        btn.addEventListener("click", () => window.cloudRemoveStaff && window.cloudRemoveStaff(row.user_id, row.email || "この職員"));
+        wrap.appendChild(btn);
+      }
+      box.appendChild(wrap);
+    }
+  }
+
+  async function loadCloudStaff(){
+    if(!membership || membership.role !== "admin"){
+      hide(staffAdminCard());
+      return;
+    }
+    show(staffAdminCard());
+    if(staffJoinCodeEl()) staffJoinCodeEl().value = organization?.join_code || "";
+    if(staffStatusEl()) staffStatusEl().textContent = "職員一覧を読み込んでいます…";
+    const { data, error } = await client.rpc("list_organization_staff");
+    if(error) throw error;
+    renderStaffRows(data || []);
+    if(staffStatusEl()) staffStatusEl().textContent = `${(data || []).length}名が所属しています。`;
+  }
+
+  window.copyJoinCode = async () => {
+    const code = organization?.join_code || staffJoinCodeEl()?.value || "";
+    if(!code) return;
+    try{
+      await navigator.clipboard.writeText(code);
+      if(staffStatusEl()) staffStatusEl().textContent = "参加コードをコピーしました。";
+    }catch(e){
+      const el = staffJoinCodeEl();
+      if(el){
+        el.focus();
+        el.select();
+        try{ document.execCommand("copy"); }catch(_e){}
+      }
+      if(staffStatusEl()) staffStatusEl().textContent = "参加コードを選択しました。コピーしてください。";
+    }
+  };
+
+  window.cloudLoadStaff = async () => {
+    try{
+      await loadCloudStaff();
+    }catch(e){
+      console.error(e);
+      if(staffStatusEl()) staffStatusEl().textContent = "職員一覧を読み込めませんでした。";
+    }
+  };
+
+  window.cloudRemoveStaff = async (userId,email) => {
+    if(!membership || membership.role !== "admin") return;
+    if(!confirm(`${email} の事業所所属を解除しますか？\nアカウント自体は削除されません。`)) return;
+    try{
+      if(staffStatusEl()) staffStatusEl().textContent = "所属を解除しています…";
+      const { error } = await client.rpc("remove_organization_staff", { p_user_id:userId });
+      if(error) throw error;
+      await loadCloudStaff();
+      if(staffStatusEl()) staffStatusEl().textContent = "職員の所属を解除しました。";
+    }catch(e){
+      console.error(e);
+      if(staffStatusEl()) staffStatusEl().textContent = "所属を解除できませんでした。";
+    }
+  };
   async function migrateLocalDataIfEmpty(){
     if(!membership) return;
     const countRes = await client
@@ -1268,6 +1384,11 @@ refreshUserSelect();
     hide(overlay());
     await loadCloudUsers();
     await loadCloudHistory();
+    if(membership.role === "admin"){
+      await loadCloudStaff();
+    }else{
+      hide(staffAdminCard());
+    }
 
     if(stateEl()) stateEl().textContent = "接続中";
     if(orgInfoEl()){
@@ -1357,6 +1478,7 @@ refreshUserSelect();
       if(stateEl()) stateEl().textContent = "同期中";
       await loadCloudUsers();
       await loadCloudHistory();
+      if(membership?.role === "admin") await loadCloudStaff();
       if(stateEl()) stateEl().textContent = "接続中";
     }catch(e){
       console.error(e);
