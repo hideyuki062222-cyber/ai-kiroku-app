@@ -127,7 +127,7 @@ window.AI_KIROKU_CONFIG = {
 <div class="wrap">
   <header>
     <h1>障害福祉 AI記録作成</h1>
-    <div class="sub">クラウド共有版 v20 ― 安定配信版</div>
+    <div class="sub">クラウド共有版 v24 ― 職員名登録対応</div>
   </header>
 
   <section class="card install-card">
@@ -150,6 +150,16 @@ window.AI_KIROKU_CONFIG = {
         <button class="secondary" id="logoutBtn" onclick="window.cloudLogout && window.cloudLogout()">ログアウト</button>
       </div>
     </div>
+  </section>
+
+  <section class="card" id="myStaffCard">
+    <label>自分の職員名</label>
+    <div class="notice">記録作成を利用する職員名を登録してください。管理者の職員一覧にもこの名前が表示されます。</div>
+    <div class="code-row" style="margin-top:12px">
+      <input id="myStaffName" type="text" maxlength="80" placeholder="例：西本 英之">
+      <button class="primary" onclick="window.saveMyStaffName && window.saveMyStaffName()">職員名を保存</button>
+    </div>
+    <div id="myStaffNameStatus" class="notice"></div>
   </section>
 
   <section class="card hidden" id="staffAdminCard">
@@ -1149,6 +1159,8 @@ refreshUserSelect();
   const staffStatusEl = () => document.getElementById("staffStatus");
   const staffListEl = () => document.getElementById("staffList");
   const staffJoinCodeEl = () => document.getElementById("staffJoinCode");
+  const myStaffNameEl = () => document.getElementById("myStaffName");
+  const myStaffNameStatusEl = () => document.getElementById("myStaffNameStatus");
 
   let client = null;
   let session = null;
@@ -1173,7 +1185,7 @@ refreshUserSelect();
   async function getMembership(){
     const { data, error } = await client
       .from("organization_members")
-      .select("organization_id, role")
+      .select("organization_id, role, staff_name")
       .eq("user_id", session.user.id)
       .limit(1)
       .maybeSingle();
@@ -1263,7 +1275,9 @@ refreshUserSelect();
       meta.className = "staff-meta";
       const email = document.createElement("div");
       email.className = "staff-email";
-      email.textContent = row.email || "メールアドレス未設定";
+      email.textContent = row.staff_name
+        ? row.staff_name + "（" + (row.email || "メールアドレス未設定") + "）"
+        : (row.email || "メールアドレス未設定") + "（職員名未登録）";
       const sub = document.createElement("div");
       sub.className = "staff-role";
       const roleLabel = row.role === "admin" ? "管理者" : "一般職員";
@@ -1283,6 +1297,44 @@ refreshUserSelect();
       box.appendChild(wrap);
     }
   }
+
+  function loadMyStaffName(){
+    if(myStaffNameEl()) myStaffNameEl().value = membership?.staff_name || "";
+    if(myStaffNameStatusEl()){
+      myStaffNameStatusEl().textContent = membership?.staff_name
+        ? "現在の職員名：" + membership.staff_name
+        : "職員名がまだ登録されていません。";
+    }
+  }
+
+  window.saveMyStaffName = async () => {
+    try{
+      if(!membership || !session) return;
+      const name = (myStaffNameEl()?.value || "").trim();
+      if(!name){
+        if(myStaffNameStatusEl()) myStaffNameStatusEl().textContent = "職員名を入力してください。";
+        return;
+      }
+      if(name.length > 80){
+        if(myStaffNameStatusEl()) myStaffNameStatusEl().textContent = "職員名は80文字以内で入力してください。";
+        return;
+      }
+      if(myStaffNameStatusEl()) myStaffNameStatusEl().textContent = "保存しています…";
+      const { error } = await client
+        .from("organization_members")
+        .update({ staff_name:name })
+        .eq("organization_id", membership.organization_id)
+        .eq("user_id", session.user.id);
+      if(error) throw error;
+      membership.staff_name = name;
+      loadMyStaffName();
+      if(membership.role === "admin") await loadCloudStaff();
+      if(myStaffNameStatusEl()) myStaffNameStatusEl().textContent = "職員名を保存しました。";
+    }catch(e){
+      console.error(e);
+      if(myStaffNameStatusEl()) myStaffNameStatusEl().textContent = "職員名を保存できませんでした。";
+    }
+  };
 
   async function loadCloudStaff(){
     if(!membership || membership.role !== "admin"){
@@ -1382,6 +1434,7 @@ refreshUserSelect();
     }
 
     hide(overlay());
+    loadMyStaffName();
     await loadCloudUsers();
     await loadCloudHistory();
     if(membership.role === "admin"){
