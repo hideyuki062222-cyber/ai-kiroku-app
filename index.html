@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AI記録">
+<meta name="application-name" content="AI記録作成">
+<meta name="mobile-web-app-capable" content="yes">
+<title>障害福祉 AI記録作成</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:#f5f7fb;color:#222}
+  .wrap{max-width:900px;margin:0 auto;padding:28px 18px 60px}
+  header{background:#fff;border-radius:18px;padding:24px 26px;margin-bottom:18px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+  h1{font-size:24px;margin:0 0 7px}
+  .sub{color:#667085;font-size:14px}
+  .card{background:#fff;border-radius:18px;padding:24px;margin-bottom:18px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+  label{display:block;font-weight:700;font-size:14px;margin:0 0 8px}
+  select,textarea,input{width:100%;border:1px solid #d8dee9;border-radius:10px;padding:12px;font-size:15px;background:#fff}
+  textarea{min-height:170px;resize:vertical;line-height:1.7}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  button{border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;font-size:14px}
+  .primary{background:#111827;color:#fff}
+  .secondary{background:#eef2f7;color:#273142}
+  .result{white-space:pre-wrap;background:#f8fafc;border:1px solid #e3e8f0;border-radius:12px;padding:18px;line-height:1.8;min-height:110px}
+  .count{font-size:12px;color:#667085;text-align:right;margin-top:5px}
+  .notice{font-size:12px;color:#667085;line-height:1.6;margin-top:12px}
+  .field-group{margin-bottom:18px}
+  .checks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .checks label{font-weight:500;background:#f8fafc;border:1px solid #e3e8f0;border-radius:9px;padding:9px 10px;margin:0;cursor:pointer}
+  .checks input{width:auto;margin-right:6px}
+  @media(max-width:650px){.checks{grid-template-columns:1fr 1fr}}
+  .history-item{padding:12px 0;border-bottom:1px solid #edf0f4}
+  .history-item:last-child{border-bottom:0}
+  .tag{display:inline-block;background:#eef2ff;border-radius:999px;padding:3px 8px;font-size:11px;margin-right:6px}
+  @media(max-width:650px){.grid{grid-template-columns:1fr}.wrap{padding:16px 12px}header,.card{padding:18px}}
+.user-settings{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .user-settings button{padding:7px 10px;font-size:12px}
+  .user-list{margin-top:10px}
+  .user-list input{width:auto}
+
+  body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  .wrap{padding-bottom:calc(60px + env(safe-area-inset-bottom))}
+  .pwa-note{font-size:12px;color:#667085;line-height:1.65;margin-top:10px}
+  @media (display-mode: standalone){.install-card{display:none}}
+
+
+  .hidden{display:none!important}
+  .cloud-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .cloud-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3}
+  .auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(245,247,251,.97);overflow:auto;padding:24px 12px calc(24px + env(safe-area-inset-bottom))}
+  .auth-box{max-width:620px;margin:24px auto;background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:22px;box-shadow:0 18px 50px rgba(17,24,39,.12)}
+  .auth-box h2{margin:0 0 8px;font-size:22px}
+  .auth-box p{color:#667085;font-size:13px;line-height:1.7}
+  .auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .setup-note{margin-top:12px;padding:12px;border-radius:12px;background:#f8fafc;font-size:12px;line-height:1.7;color:#475467}
+  .cloud-danger{color:#b42318}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.AI_KIROKU_CONFIG = {
+  supabaseUrl: "https://pagamoaxhqszojxrpxyu.supabase.co",
+  supabasePublishableKey: "sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT"
+};
+
+</script>
+</head>
+<body>
+
+<div id="authOverlay" class="auth-overlay hidden">
+  <div class="auth-box">
+    <h2>障害福祉 AI記録作成</h2>
+    <p id="authLead">職員アカウントでログインしてください。ログイン後、同じ事業所の利用者情報・プロフィール・記録履歴を共有できます。</p>
+
+    <div id="loginPanel">
+      <label for="authEmail">メールアドレス</label>
+      <input id="authEmail" type="email" autocomplete="username" placeholder="staff@example.com">
+      <label for="authPassword" style="margin-top:10px">パスワード</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="8文字以上を推奨">
+      <div class="auth-actions">
+        <button class="primary" onclick="window.cloudLogin && window.cloudLogin()">ログイン</button>
+        <button class="secondary" onclick="window.cloudSignUp && window.cloudSignUp()">新規登録</button>
+      </div>
+      <div id="authStatus" class="setup-note"></div>
+    </div>
+
+    <div id="orgPanel" class="hidden">
+      <h3 style="margin-top:22px">事業所を設定</h3>
+      <p>最初の1人は「新しい事業所を作成」。2人目以降は、管理者から共有された参加コードで参加します。</p>
+
+      <label for="orgName">新しい事業所名</label>
+      <input id="orgName" type="text" placeholder="例：〇〇ケアセンター">
+      <div class="auth-actions">
+        <button class="primary" onclick="window.cloudCreateOrganization && window.cloudCreateOrganization()">新しい事業所を作成</button>
+      </div>
+
+      <div style="height:12px"></div>
+      <label for="joinCode">既存事業所の参加コード</label>
+      <input id="joinCode" type="text" inputmode="text" placeholder="例：A1B2C3D4">
+      <div class="auth-actions">
+        <button class="secondary" onclick="window.cloudJoinOrganization && window.cloudJoinOrganization()">参加コードで参加</button>
+        <button class="secondary" onclick="window.cloudLogout && window.cloudLogout()">ログアウト</button>
+      </div>
+      <div id="orgStatus" class="setup-note"></div>
+    </div>
+
+    <div id="configPanel" class="hidden">
+      <h3>クラウド設定が必要です</h3>
+      <p>このアプリの <b>config.js</b> にSupabaseのProject URLとPublishable Keyを設定してください。手順は同梱の「SETUP_GUIDE.txt」にあります。</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1>障害福祉 AI記録作成</h1>
+    <div class="sub">クラウド共有版 v20 ― 安定配信版</div>
+  </header>
+
+  <section class="card install-card">
+    <label>スマホアプリとして使う</label>
+    <div class="pwa-note">
+      まずはこのWebアプリをそのままお使いください。公開動作確認後にホーム画面追加機能を再度有効にします。
+    </div>
+  </section>
+
+
+  <section class="card" id="cloudBar">
+    <div class="cloud-bar">
+      <div>
+        <label>社内共有クラウド</label>
+        <span class="cloud-badge" id="cloudState">設定確認中</span>
+        <div class="pwa-note" id="cloudOrgInfo">クラウド接続を確認しています。</div>
+      </div>
+      <div class="actions">
+        <button class="secondary" id="reloadCloudBtn" onclick="window.cloudReloadAll && window.cloudReloadAll()">再読み込み</button>
+        <button class="secondary" id="logoutBtn" onclick="window.cloudLogout && window.cloudLogout()">ログアウト</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="grid">
+      <div>
+        <label for="user">利用者</label>
+        <select id="user">
+          <option value="">利用者を選択してください</option>
+          <option>101</option>
+          <option>201</option>
+          <option>202</option>
+          <option>203</option>
+          <option>204</option>
+          <option>205</option>
+          <option>206</option>
+          <option>301</option>
+          <option>302</option>
+          <option>303</option>
+          <option>304</option>
+          <option>305</option>
+          <option>306</option>
+          <option>401</option>
+          <option>402</option>
+          <option>403</option>
+          <option>404</option>
+          <option>405</option>
+          <option>シーク203</option>
+        </select>
+        <div class="notice">利用者名・居室番号などは、あとから設定画面で簡単に変更できます。</div>
+      </div>
+      <div>
+        <label for="service">サービス種別</label>
+        <select id="service">
+          <option>居宅介護</option>
+          <option>重度訪問介護</option>
+          <option>同行援護</option>
+          <option>行動援護</option>
+          <option>通院等介助</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label for="length">希望文字数</label>
+        <select id="length">
+          <option value="short">短め</option>
+          <option value="normal" selected>標準</option>
+          <option value="long">詳しく</option>
+        </select>
+        <div class="notice">文章は途中で切らず、内容を保ったまま文字数を調整します。複数のサービスを選んだ場合は、記録内容を優先して目安文字数を超えることがあります。</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>サービス内容（複数選択可）※実施したサービス名は作成結果に重複記載しません</label>
+      <div class="checks">
+        <label><input type="checkbox" name="serviceContent" value="起床介助"> 起床介助</label>
+        <label><input type="checkbox" name="serviceContent" value="就寝介助"> 就寝介助</label>
+        <label><input type="checkbox" name="serviceContent" value="トイレ介助"> トイレ介助</label>
+        <label><input type="checkbox" name="serviceContent" value="食事介助"> 食事介助</label>
+        <label><input type="checkbox" name="serviceContent" value="入浴準備"> 入浴準備</label>
+        <label><input type="checkbox" name="serviceContent" value="入浴介助"> 入浴介助</label>
+        <label><input type="checkbox" name="serviceContent" value="更衣介助"> 更衣介助</label>
+        <label><input type="checkbox" name="serviceContent" value="服薬介助・確認"> 服薬介助・確認</label>
+        <label><input type="checkbox" name="serviceContent" value="口腔ケア"> 口腔ケア</label>
+        <label><input type="checkbox" name="serviceContent" value="清容・保清"> 清容・保清</label>
+        <label><input type="checkbox" name="serviceContent" value="移動介助"> 移動介助</label>
+        <label><input type="checkbox" name="serviceContent" value="買い物・外出支援"> 買い物・外出支援</label>
+        <label><input type="checkbox" name="serviceContent" value="通院等介助"> 通院等介助</label>
+        <label><input type="checkbox" name="serviceContent" value="家事援助"> 家事援助</label>
+        <label><input type="checkbox" name="serviceContent" value="その他"> その他</label>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="visitScene">訪問時の姿勢・過ごし方</label>
+        <select id="visitScene">
+          <option value="">選択してください</option>
+          <option>ベッド上で仰臥位で寝ていた</option>
+          <option>ベッド上で仰臥位で休んでいた</option>
+          <option>ベッド上で側臥位で休んでいた</option>
+          <option>ベッド上で上体を起こしていた</option>
+          <option>ベッド端に座っていた</option>
+          <option>椅子・座椅子に座っていた</option>
+          <option>座ってテレビを見ていた</option>
+          <option>ベッド上でテレビを見ていた</option>
+          <option>スマートフォンを操作していた</option>
+          <option>音楽を聴いて過ごしていた</option>
+          <option>食事をしていた</option>
+          <option>飲み物を飲んでいた</option>
+          <option>室内を歩いていた</option>
+          <option>身の回りの物を整理していた</option>
+          <option>横になって休んでいた</option>
+          <option>入眠していた</option>
+          <option>起床直後だった</option>
+          <option>テレビをつけて静かに過ごしていた</option>
+          <option>何もせずゆっくり過ごしていた</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label for="condition">訪問時の表情・反応・様子</label>
+        <select id="condition">
+          <option value="">選択してください</option>
+          <option>普段と変わりなく過ごされていた</option>
+          <option>落ち着いて過ごされていた</option>
+          <option>笑顔が見られた</option>
+          <option>眠そうな様子が見られた</option>
+          <option>疲れた様子が見られた</option>
+          <option>不安そうな様子が見られた</option>
+          <option>会話が多く見られた</option>
+          <option>会話は少なめだった</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label for="health">訪問時の利用者の体調</label>
+        <select id="health">
+          <option value="">選択してください</option>
+          <option>体調に変化なし</option>
+          <option>体調良好</option>
+          <option>疲労感の訴えなし</option>
+          <option>疲れた様子があった</option>
+          <option>痛みの訴えなし</option>
+          <option>痛みの訴えがあった</option>
+          <option>発熱なし</option>
+          <option>食欲あり</option>
+          <option>食欲低下が見られた</option>
+          <option>睡眠不足の訴えがあった</option>
+          <option>体調不良の訴えがあった</option>
+          <option>その他</option>
+        </select>
+      </div>
+    </div>
+
+    <label>介護者が実施したこと・その時の様子（補足）</label>
+    <textarea id="input" placeholder="例：ソファからトイレまで移動を介助し、排泄後の清拭と衣類の調整を行った。必要な声かけを行い、安全確認を実施した。"></textarea>
+    <div class="count" id="inputCount">0文字</div>
+
+    <div class="actions">
+      <button class="primary" onclick="generate()">AIで記録作成</button>
+      <button class="secondary" onclick="clearAll()">クリア</button>
+    </div>
+    <div class="notice">
+      ※この試作品はブラウザ内で動くデモです。実際のAI APIには接続していません。
+      実運用では個人情報・利用者情報の取り扱い、安全管理、出力内容の確認が必要です。
+    </div>
+  </section>
+
+  <section class="card">
+    <label>① 訪問時の利用者の状態・様子・体調</label>
+    <div class="notice">訪問時に確認した本人の状態、表情・様子、体調をまとめます。サービス内容はここには記載しません。</div>
+    <div id="visitResult" class="result">ここに訪問時の記録文が表示されます。</div>
+    <div class="count" id="visitResultCount">0文字</div>
+    <div class="actions">
+      <button class="secondary" onclick="copyVisitResult()">①をコピー</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <label>② 介護者が実施したこと・その時の様子</label>
+    <div class="notice">選択したサービスを単純に繰り返さず、支援中の本人の反応・様子、介護者の対応、支援後の状態をまとめます。</div>
+    <div id="careResult" class="result">ここに支援中の記録文が表示されます。</div>
+    <div class="count" id="careResultCount">0文字</div>
+    <div class="actions">
+      <button class="secondary" onclick="copyCareResult()">②をコピー</button>
+      <button class="secondary" onclick="generate()">別の文章を作る</button>
+      <button class="secondary" onclick="shortenCareResult()">②をもっと短く</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <label>利用者登録・変更</label>
+    <div class="notice">利用者を追加・変更・削除できます。クラウド接続時は同じ事業所の職員間で共有されます。</div>
+    <div class="user-settings">
+      <input id="newUser" type="text" placeholder="例：207" style="flex:1;min-width:180px">
+      <button class="secondary" onclick="addUser()">利用者を追加</button>
+    </div>
+    <div id="userList" class="user-list"></div>
+  </section>
+
+  <section class="card">
+    <label>利用者プロフィール</label>
+    <div class="notice">選択した利用者ごとに、普段の様子・障害特性・支援時の注意点などを登録できます。登録内容は利用者を選ぶだけで記録文の作成時に自動的に参照されます。</div>
+    <div class="grid">
+      <div>
+        <label for="profileUser">プロフィールを編集する利用者</label>
+        <select id="profileUser" onchange="loadProfile()"></select>
+      </div>
+      <div>
+        <label for="profileCommunication">コミュニケーション方法</label>
+        <input id="profileCommunication" type="text" placeholder="例：短い言葉で声かけすると理解しやすい">
+      </div>
+    </div>
+    <div class="grid">
+      <div>
+        <label for="profileUsual">普段の様子</label>
+        <textarea id="profileUsual" placeholder="例：普段は穏やかで、ゆっくりした声かけには笑顔で応じられる"></textarea>
+      </div>
+      <div>
+        <label for="profileTrait">障害特性・本人の特性</label>
+        <textarea id="profileTrait" placeholder="例：予定変更があると不安が強くなりやすい"></textarea>
+      </div>
+    </div>
+    <label for="profileCaution">支援時に注意すること</label>
+    <textarea id="profileCaution" placeholder="例：急な声かけを避け、次に行うことを事前に伝える"></textarea>
+    <div class="actions">
+      <button class="primary" onclick="saveProfile()">プロフィールを保存</button>
+      <button class="secondary" onclick="clearProfile()">入力をクリア</button>
+    </div>
+    <div id="profileStatus" class="notice"></div>
+  </section>
+
+  <section class="card">
+    <label>作成履歴（クラウド共有）</label>
+    <div id="history"><div class="sub">まだ履歴はありません。</div></div>
+  </section>
+</div>
+
+<script>
+const input=document.getElementById("input");
+input.addEventListener("input",()=>document.getElementById("inputCount").textContent=input.value.length+"文字");
+
+const DEFAULT_USERS=["101","201","202","203","204","205","206","301","302","303","304","305","306","401","402","403","404","405","シーク203"];
+let users=JSON.parse(localStorage.getItem("aiKirokuUsers")||"null")||DEFAULT_USERS.slice();
+let profiles=JSON.parse(localStorage.getItem("aiKirokuProfiles")||"{}");
+
+function saveUsers(){ localStorage.setItem("aiKirokuUsers",JSON.stringify(users)); }
+function saveProfiles(){ localStorage.setItem("aiKirokuProfiles",JSON.stringify(profiles)); }
+
+function refreshUserSelect(){
+  const sel=document.getElementById("user");
+  const profileSel=document.getElementById("profileUser");
+  const current=sel?sel.value:""; const pcurrent=profileSel?profileSel.value:"";
+  if(sel){
+    sel.innerHTML='<option value="">利用者を選択してください</option>';
+    users.forEach(u=>{const o=document.createElement("option");o.value=u;o.textContent=u;sel.appendChild(o);});
+    if(users.includes(current)) sel.value=current;
+    sel.onchange=()=>{ if(profileSel){profileSel.value=sel.value;loadProfile();} };
+  }
+  if(profileSel){
+    profileSel.innerHTML='<option value="">利用者を選択してください</option>';
+    users.forEach(u=>{const o=document.createElement("option");o.value=u;o.textContent=u;profileSel.appendChild(o);});
+    if(users.includes(pcurrent)) profileSel.value=pcurrent;
+  }
+  renderUserList();
+  if(profileSel && profileSel.value) loadProfile();
+}
+
+function renderUserList(){
+  const box=document.getElementById("userList"); if(!box)return; box.innerHTML="";
+  users.forEach((u,i)=>{
+    const row=document.createElement("div"); row.className="user-settings";
+    row.innerHTML=`<input id="editUser${i}" value="${escapeHtml(u)}" style="flex:1;min-width:180px">
+      <button class="secondary" onclick="renameUser(${i})">変更</button>
+      <button class="secondary" onclick="deleteUser(${i})">削除</button>`;
+    box.appendChild(row);
+  });
+}
+
+async function addUser(){
+  const el=document.getElementById("newUser"),name=el.value.trim();
+  if(!name){alert("利用者名・番号を入力してください。");return;}
+  if(users.includes(name)){alert("同じ利用者が登録されています。");return;}
+  if(window.cloudAddUser){
+    const ok=await window.cloudAddUser(name);
+    if(ok) el.value="";
+    return;
+  }
+  users.push(name);saveUsers();el.value="";refreshUserSelect();
+  document.getElementById("user").value=name;document.getElementById("profileUser").value=name;loadProfile();
+}
+async function renameUser(i){
+  const name=document.getElementById("editUser"+i).value.trim();
+  if(!name){alert("利用者名・番号を入力してください。");return;}
+  if(users.some((u,j)=>j!==i&&u===name)){alert("同じ利用者が登録されています。");return;}
+  const old=users[i];
+  if(window.cloudRenameUser){
+    await window.cloudRenameUser(old,name);
+    return;
+  }
+  users[i]=name;
+  if(profiles[old]&&!profiles[name]){profiles[name]=profiles[old];delete profiles[old];saveProfiles();}
+  saveUsers();refreshUserSelect();document.getElementById("user").value=name;document.getElementById("profileUser").value=name;loadProfile();
+}
+async function deleteUser(i){
+  const old=users[i];
+  if(!confirm("「"+old+"」を利用者一覧から削除しますか？"))return;
+  if(window.cloudDeleteUser){
+    await window.cloudDeleteUser(old);
+    return;
+  }
+  users.splice(i,1);delete profiles[old];saveUsers();saveProfiles();refreshUserSelect();
+}
+
+function loadProfile(){
+  const u=document.getElementById("profileUser").value;
+  const p=profiles[u]||{};
+  document.getElementById("profileUsual").value=p.usual||"";
+  document.getElementById("profileTrait").value=p.trait||"";
+  document.getElementById("profileCaution").value=p.caution||"";
+  document.getElementById("profileCommunication").value=p.communication||"";
+  document.getElementById("profileStatus").textContent=u?((p.usual||p.trait||p.caution||p.communication)?"登録済みのプロフィールを読み込みました。":"まだプロフィールは登録されていません。"):"";
+}
+async function saveProfile(){
+  const u=document.getElementById("profileUser").value;
+  if(!u){alert("プロフィールを編集する利用者を選択してください。");return;}
+  const p={usual:document.getElementById("profileUsual").value.trim(),trait:document.getElementById("profileTrait").value.trim(),caution:document.getElementById("profileCaution").value.trim(),communication:document.getElementById("profileCommunication").value.trim()};
+  if(window.cloudSaveProfile){
+    await window.cloudSaveProfile(u,p);
+    return;
+  }
+  profiles[u]=p;
+  saveProfiles();document.getElementById("profileStatus").textContent="「"+u+"」のプロフィールを保存しました。";
+}
+function clearProfile(){
+  ["profileUsual","profileTrait","profileCaution","profileCommunication"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("profileStatus").textContent="入力をクリアしました。保存前なので登録内容は変更されていません。";
+}
+
+
+function cleanText(s){
+  return s.replace(/^(今日の支援内容|支援内容)[:：]?/,"").trim();
+}
+function getCheckedServices(){
+  return [...document.querySelectorAll('input[name="serviceContent"]:checked')].map(x=>x.value);
+}
+function normalizeSentence(s){
+  s=(s||"").trim().replace(/^[。\s]+|[。\s]+$/g,"");
+  return s ? s+"。" : "";
+}
+function splitSentences(s){
+  return (s||"").split("。").map(x=>x.trim()).filter(Boolean).map(normalizeSentence);
+}
+
+const serviceTemplates={
+  "服薬介助・確認":{
+    short:["薬を確認してから落ち着いて服用され、飲み込みにも問題は見られなかった"],
+    normal:["薬を手渡すと内容を確認してから落ち着いて服用された","飲み込みを確認し、その後も普段と変わりなく過ごされた"],
+    long:["服用前に体調と本人の様子を確認し、分かりやすく声をかけた","薬を手渡すと内容を確認してから落ち着いて服用された","飲み込みを確認し、その後も体調の変化なく普段どおり過ごされた"]
+  },
+  "トイレ介助":{
+    short:["移動時のふらつきに注意して見守り、排泄後は落ち着いて過ごされた"],
+    normal:["足元を確認しながら安全に移動できるよう見守った","排泄後は清拭と衣類を整え、落ち着いた様子で戻られた"],
+    long:["声かけ後に本人のペースで移動され、足元の安全を確認しながら必要な介助を行った","排泄後は清拭と衣類の調整を行った","終了後は表情も落ち着いており、普段と変わりなく過ごされた"]
+  },
+  "入浴介助":{
+    short:["入浴前後に体調を確認し、終了後はさっぱりした様子で過ごされた"],
+    normal:["入浴前に体調を確認し、本人のペースに合わせて安全面に配慮した","終了後はさっぱりした表情が見られ、体調変化はなかった"],
+    long:["入浴前に表情や体調を確認し、無理のないペースで進められるよう声をかけた","浴室内では足元に注意しながら必要な見守りと介助を行った","終了後はさっぱりした様子で、体調の変化なく過ごされた"]
+  },
+  "更衣介助":{
+    short:["本人のペースで着替えられるよう支援し、更衣後は身だしなみを整えられた"],
+    normal:["衣類を準備して声をかけると、本人のペースで着替えを進められた","必要な部分を支援し、更衣後は身だしなみを整えた"],
+    long:["衣類を本人と確認して準備し、次の動作が分かるよう順に声をかけた","本人ができる部分は見守り、難しい部分のみ必要な支援を行った","更衣後は身だしなみを整え、落ち着いて過ごされた"]
+  },
+  "食事介助":{
+    short:["本人のペースで摂取され、むせ込みなく落ち着いて食事を終えられた"],
+    normal:["本人のペースに合わせて声をかけながら摂取状況を確認した","むせ込みなく食事を進められ、落ち着いて食事を終えられた"],
+    long:["食事前に姿勢と体調を確認し、本人が食べやすいよう準備を整えた","本人のペースに合わせて声をかけ、摂取量やむせ込みの有無を確認した","無理なく食事を終えられ、食後も落ち着いて過ごされた"]
+  },
+  "口腔ケア":{
+    short:["本人の様子を確認しながら進め、終了後は口腔内に目立った異常は見られなかった"],
+    normal:["必要物品を準備し、本人の様子を確認しながらゆっくり進めた","終了後に口腔内を確認し、目立った異常は見られなかった"],
+    long:["本人にこれから行うことを伝えてから必要物品を準備した","本人の反応を確認しながら無理のないペースで進めた","終了後は口腔内を確認し、目立った異常なく落ち着いて過ごされた"]
+  },
+  "起床介助":{
+    short:["声かけに反応され、覚醒状態を確認しながら安全に起き上がられた"],
+    normal:["声かけに反応があり、覚醒状態を確認しながらゆっくり起き上がられた","足元に注意して移動を支援し、その後は落ち着いて過ごされた"],
+    long:["起床時に声をかけると反応があり、表情と覚醒状態を確認した","急がせず本人のペースで起き上がれるよう見守り、必要な部分を支援した","移動後もふらつきは見られず、落ち着いて過ごされた"]
+  },
+  "就寝介助":{
+    short:["本人のペースで就寝準備を進められ、落ち着いた様子で休まれた"],
+    normal:["就寝前の様子を確認し、本人のペースで準備を進められるよう声をかけた","安全を確認すると、落ち着いた様子で休まれた"],
+    long:["就寝前に体調と本人の様子を確認し、必要な準備を順に案内した","本人のペースに合わせて必要な部分のみ支援し、安全な姿勢を整えた","その後は落ち着いた様子で休まれた"]
+  },
+  "清容・保清":{
+    short:["本人の様子に合わせて身だしなみを整え、終了後は落ち着いて過ごされた"],
+    normal:["本人の希望を確認しながら身だしなみを整えた","終了後は清潔が保たれ、落ち着いた様子で過ごされた"],
+    long:["本人の希望と体調を確認してから必要な物品を準備した","本人ができる部分は見守りながら、必要な部分のみ支援した","終了後は身だしなみが整い、落ち着いて過ごされた"]
+  },
+  "移動介助":{
+    short:["足元を確認しながら本人のペースで移動され、ふらつきなく到着された"],
+    normal:["移動前に周囲と足元を確認し、本人のペースに合わせて見守った","ふらつきなく安全に移動され、到着後も落ち着いていた"],
+    long:["移動前に体調と周囲の状況を確認し、安全に進めるよう声をかけた","本人のペースを保ちながら足元に注意して必要な介助を行った","大きなふらつきなく到着され、その後も落ち着いて過ごされた"]
+  },
+  "通院等介助":{
+    short:["移動中は体調と安全を確認し、落ち着いた様子で目的地まで移動された"],
+    normal:["移動中は足元と周囲の安全を確認しながら付き添った","本人の様子に大きな変化はなく、落ち着いて目的地まで移動された"],
+    long:["外出前に体調と持ち物を確認し、予定を分かりやすく伝えた","移動中は足元や周囲の安全に注意し、本人の様子を確認しながら付き添った","大きな体調変化なく、落ち着いて目的地まで移動された"]
+  },
+  "買い物・外出支援":{
+    short:["本人の希望を確認しながら外出し、落ち着いた様子で行動された"],
+    normal:["本人の希望を確認し、分かりやすく予定を伝えて外出した","移動中は安全に注意し、落ち着いた様子で行動された"],
+    long:["外出前に本人の希望と当日の体調を確認し、予定を分かりやすく伝えた","移動中は周囲の安全に注意しながら、本人が選択できるよう必要な声かけを行った","外出中は大きな体調変化なく、落ち着いて過ごされた"]
+  },
+  "家事援助":{
+    short:["本人の希望を確認しながら必要な家事を行い、終了後は室内を整えた"],
+    normal:["本人の希望を確認してから必要な家事を進めた","作業中も本人の様子を確認し、終了後は室内を整えた"],
+    long:["本人の希望と優先してほしい内容を確認してから家事を進めた","作業中も必要に応じて声をかけ、本人の様子に変化がないか確認した","終了後は室内を整え、本人にも確認してもらった"]
+  },
+  "入浴準備":{
+    short:["体調を確認して必要物品を準備し、安全に入浴できる環境を整えた"],
+    normal:["本人の体調を確認し、必要物品と浴室内の安全を確認した","無理なく入浴を始められるよう環境を整えた"],
+    long:["入浴前に本人の表情や体調を確認し、無理がないことを確認した","必要物品をそろえ、浴室内の温度や足元など安全面を確認した","本人が安心して入浴を始められるよう準備を整えた"]
+  },
+  "その他":{
+    short:["本人の様子を確認しながら必要な支援を行い、終了後も落ち着いて過ごされた"],
+    normal:["本人の希望と様子を確認しながら必要な支援を行った","終了後の状態を確認し、落ち着いて過ごされていた"],
+    long:["支援前に本人の希望と当日の様子を確認した","本人の反応を見ながら無理のないペースで必要な支援を行った","終了後の状態を確認し、大きな変化なく落ち着いて過ごされた"]
+  }
+};
+
+function buildActionSentences(services, raw, len){
+  const out=[];
+  services.forEach(name=>{
+    const item=serviceTemplates[name];
+    if(item){
+      const arr=item[len] || item.normal;
+      arr.forEach(s=>out.push(normalizeSentence(s)));
+    }
+  });
+  const rawSentences=splitSentences(raw);
+  if(rawSentences.length){
+    const limit=len==="short" ? 1 : (len==="normal" ? 2 : rawSentences.length);
+    rawSentences.slice(0,limit).forEach(s=>out.push(s));
+  }
+  return out;
+}
+
+function pushUnique(arr, sentence){
+  const s=normalizeSentence(sentence);
+  if(!s) return;
+  const core=s.replace(/。$/,'');
+  if(!arr.some(x=>x.replace(/。$/,'')===core)) arr.push(s);
+}
+
+
+const VARIANT_COUNTER_KEY="aiKirokuVariantCountersV12";
+const VARIANT_SPACE=160000; // 20×20×20×20。5,000回を大きく超える文型組み合わせ。
+
+function hashString(s){
+  let h=2166136261;
+  for(let i=0;i<s.length;i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h,16777619);
+  }
+  return (h>>>0).toString(36);
+}
+
+function nextVariantSeed(signature){
+  let counters={};
+  try{ counters=JSON.parse(localStorage.getItem(VARIANT_COUNTER_KEY)||"{}")||{}; }catch(e){ counters={}; }
+  const key=hashString(signature);
+  const current=Number(counters[key]||0);
+  counters[key]=current+1;
+
+  // カウンタだけを保存するので容量は小さい。古いキーが増えすぎた場合だけ整理。
+  const keys=Object.keys(counters);
+  if(keys.length>1000){
+    keys.slice(0,keys.length-800).forEach(k=>delete counters[k]);
+  }
+  try{ localStorage.setItem(VARIANT_COUNTER_KEY,JSON.stringify(counters)); }catch(e){}
+  return current % VARIANT_SPACE;
+}
+
+function variantDigits(seed){
+  return {
+    a: seed % 20,
+    b: Math.floor(seed/20) % 20,
+    c: Math.floor(seed/400) % 20,
+    d: Math.floor(seed/8000) % 20
+  };
+}
+
+const visitVariantPrefix=[
+  "あわせて、","その際、","訪問時の確認として、","全体の様子として、","状態確認の一環として、",
+  "当日の様子については、","訪問時点の確認では、","本人の状態確認では、","体調確認とあわせて、","普段との比較も含め、",
+  "訪問時の観察では、","当日の状態把握として、","訪問直後の確認では、","その時点の様子として、","訪問時の全体確認では、",
+  "本人の様子を把握するため、","当日の状態をみる中で、","訪問時の状態確認時には、","普段の様子との違いも意識し、","訪問時の確認を進める中で、"
+];
+
+const visitVariantObject=[
+  "表情や受け答えの様子を","表情と反応の変化を","受け答えや動作の様子を","表情・反応・動作の状態を","顔色や受け答えの様子を",
+  "表情と会話時の反応を","本人の反応や動作の様子を","普段との表情の違いを","会話時の反応と全体の様子を","表情や声かけへの反応を",
+  "受け答えと行動の様子を","本人の表情と動きの様子を","表情や会話の様子を","反応の仕方や動作の様子を","本人の様子と受け答えを",
+  "顔色・表情・反応の様子を","表情と普段との違いを","声かけへの反応や表情を","全体的な反応と動作を","本人の表情や状態の変化を"
+];
+
+const visitVariantVerb=[
+  "確認し","確認したうえで","見ながら","把握し","確認しつつ",
+  "丁寧に確認し","あわせて確認し","継続して確認し","注意して確認し","様子を見ながら確認し",
+  "全体的に確認し","一つずつ確認し","普段と比べながら確認し","変化に注意して確認し","状態を見ながら確認し",
+  "本人の反応を見つつ確認し","無理のない範囲で確認し","会話を交えながら確認し","様子の変化に留意して確認し","全体の状態とあわせて確認し"
+];
+
+const visitVariantClose=[
+  "、普段との違いがないか見守った。","、全体の状態を把握した。","、目立った変化がないか様子を見た。","、普段の状態との違いに注意した。","、体調面の変化にも注意した。",
+  "、状態の変化がないか見守った。","、いつもと異なる点がないか注意した。","、本人の状態を継続して把握した。","、体調や様子の変化がないか見守った。","、普段との違いがないか確認を続けた。",
+  "、全身状態に大きな変化がないか注意した。","、表情や体調の推移を見守った。","、本人の状態変化に注意した。","、普段と異なる反応がないか見守った。","、状態全体に変化がないか注意した。",
+  "、体調を含めた全体の様子を把握した。","、いつもとの違いがないか見守った。","、本人の状態を総合的に把握した。","、訪問時点の状態を確認した。","、その時点での状態を丁寧に把握した。"
+];
+
+const careVariantPrefix=[
+  "支援中は、","介助中は、","対応中は、","支援を進める中で、","介助の際は、",
+  "支援時には、","対応を行う中で、","本人への支援中は、","必要な介助を行う際は、","支援の各場面で、",
+  "介助を進めながら、","対応の際には、","支援場面では、","本人と関わる中で、","支援を行っている間は、",
+  "介助を行う中では、","必要な対応を進める中で、","支援の途中でも、","介助場面ごとに、","支援全体を通して、"
+];
+
+const careVariantObject=[
+  "本人の表情や反応を","本人の動作や反応を","本人の表情と動きを","本人の反応や様子を","本人の動きと受け答えを",
+  "本人の表情と受け答えを","本人の様子や動作を","本人の反応と動作の変化を","本人の表情や動作の様子を","声かけへの反応を",
+  "本人の様子と反応を","本人の表情・反応・動作を","本人の受け答えや動きを","本人の反応の仕方を","本人の動作と表情を",
+  "本人の状態や反応を","本人の様子の変化を","本人の表情と行動を","本人の動作時の様子を","本人の反応と全体の様子を"
+];
+
+const careVariantVerb=[
+  "確認しながら","見ながら","確認したうえで","把握しながら","注意して確認しながら",
+  "様子を見つつ","適宜確認しながら","継続して確認しながら","状態を見ながら","反応を確かめながら",
+  "全体的に確認しながら","必要に応じて確認しながら","変化に注意しながら","本人の様子を見つつ","反応を確認しつつ",
+  "動作を見ながら","無理がないか確認しながら","本人の反応を見ながら","状態変化に留意しながら","支援の進み具合とあわせて確認しながら"
+];
+
+const careVariantClose=[
+  "、本人のペースに合わせて対応した。","、無理のないよう対応した。","、必要な声かけを行った。","、状況に応じて必要な支援を行った。","、安全面に配慮して対応した。",
+  "、急がせないよう支援した。","、必要な部分を支援した。","、本人の様子に応じて対応した。","、本人が取り組みやすいよう支援した。","、適宜声かけを行った。",
+  "、本人の負担にならないよう対応した。","、必要に応じて見守りと介助を行った。","、本人の反応に合わせて支援した。","、本人の状態に合わせて対応した。","、無理のない範囲で支援を進めた。",
+  "、本人の動きに合わせて対応した。","、必要なタイミングで声をかけた。","、本人の様子を優先して対応した。","、本人の反応を踏まえて支援を進めた。","、その時の状態に合わせて支援を行った。"
+];
+
+function buildVisitVariantSentence(seed){
+  const v=variantDigits(seed);
+  return visitVariantPrefix[v.a]+visitVariantObject[v.b]+visitVariantVerb[v.c]+visitVariantClose[v.d];
+}
+
+function buildCareVariantSentence(seed){
+  const v=variantDigits(seed);
+  return careVariantPrefix[v.a]+careVariantObject[v.b]+careVariantVerb[v.c]+careVariantClose[v.d];
+}
+
+function buildRecordByLength(len, condition, health, actionSentences, profile){
+  const out=[];
+
+  // 短め：当日の要点＋支援中の様子を中心にする
+  if(len==="short"){
+    if(condition) pushUnique(out, condition);
+    else if(health) pushUnique(out, health);
+    actionSentences.forEach(s=>pushUnique(out,s));
+    // サービスが少なく短すぎるときだけ体調を補足
+    if(out.join('').length<40 && health && !out.some(x=>x.includes(health))) pushUnique(out,health);
+    return out.join('');
+  }
+
+  // 標準：当日の様子・体調・支援中の反応をバランスよく記録
+  if(condition) pushUnique(out,condition);
+  if(health) pushUnique(out,health);
+  actionSentences.forEach(s=>pushUnique(out,s));
+  if(profile.communication && out.join('').length<85){
+    let c=profile.communication.replace(/^[「『]?|[」』]$/g,"").replace(/[。]+$/,"");
+    c=c.replace(/声かけする$/,"声をかけた").replace(/する$/,"した");
+    pushUnique(out, "本人には"+c.replace(/^本人には/,""));
+  }
+  return out.join('');
+
+  // 詳しく：支援方法や本人特性への配慮まで含める
+}
+
+function buildLongRecord(condition, health, actionSentences, profile){
+  const out=[];
+  const max=160;
+  if(condition) pushUnique(out,condition);
+  if(health) pushUnique(out,health);
+  actionSentences.forEach(s=>pushUnique(out,s));
+
+  // プロフィール情報は「完成した一文」の単位で追加し、途中では切らない
+  const optional=[];
+  if(profile.trait){
+    optional.push(normalizeSentence("本人の特性として"+profile.trait.replace(/[。]+$/,"")+"ことに配慮した"));
+  }
+  if(profile.communication){
+    let c=profile.communication.replace(/[。]+$/,"");
+    c=c.replace(/声かけする$/,"声をかけた").replace(/する$/,"した");
+    optional.push(normalizeSentence("本人には"+c.replace(/^本人には/,"")));
+  }
+  if(profile.caution){
+    optional.push(normalizeSentence("支援時は"+profile.caution.replace(/^支援時は/,"").replace(/[。]+$/,"")+"よう配慮した"));
+  }
+  optional.forEach(s=>{
+    if(out.join('').length+s.length<=max) pushUnique(out,s);
+  });
+  return out.join('');
+}
+
+function buildVisitRecord(len, scene, condition, health, profile, seed){
+  const out=[];
+
+  const sceneMap={
+    "ベッド上で仰臥位で寝ていた":[
+      "訪問時はベッド上で仰臥位となり、入眠されていた。",
+      "声かけ前は安静に休まれており、室内は落ち着いた様子であった。"
+    ],
+    "ベッド上で仰臥位で休んでいた":[
+      "訪問時はベッド上で仰臥位となり、ゆっくり休まれていた。",
+      "大きな動きはなく、安静に過ごされていた。"
+    ],
+    "ベッド上で側臥位で休んでいた":[
+      "訪問時はベッド上で側臥位となり、休まれていた。",
+      "落ち着いた姿勢で、無理なく身体を休めている様子であった。"
+    ],
+    "ベッド上で上体を起こしていた":[
+      "訪問時はベッド上で上体を起こして過ごされていた。",
+      "周囲を見ながら、ゆっくりと過ごされている様子であった。"
+    ],
+    "ベッド端に座っていた":[
+      "訪問時はベッド端に座って過ごされていた。",
+      "姿勢を保ちながら、落ち着いて過ごされている様子であった。"
+    ],
+    "椅子・座椅子に座っていた":[
+      "訪問時は室内の椅子・座椅子に座って過ごされていた。",
+      "座位を保ち、ゆったりとした様子で過ごされていた。"
+    ],
+    "座ってテレビを見ていた":[
+      "訪問時は座った状態でテレビを見て過ごされていた。",
+      "画面に注意を向けながら、落ち着いた様子で過ごされていた。"
+    ],
+    "ベッド上でテレビを見ていた":[
+      "訪問時はベッド上でテレビを見ながら過ごされていた。",
+      "楽な姿勢を取り、ゆっくりと視聴されていた。"
+    ],
+    "スマートフォンを操作していた":[
+      "訪問時はスマートフォンを操作しながら過ごされていた。",
+      "画面を見ながら、自分のペースで操作されていた。"
+    ],
+    "音楽を聴いて過ごしていた":[
+      "訪問時は室内で音楽を聴きながら過ごされていた。",
+      "落ち着いた環境の中で、ゆったり過ごされている様子であった。"
+    ],
+    "食事をしていた":[
+      "訪問時は室内で食事をされていた。",
+      "自分のペースで食事を進めながら過ごされていた。"
+    ],
+    "飲み物を飲んでいた":[
+      "訪問時は飲み物を飲みながら過ごされていた。",
+      "落ち着いた様子で水分を摂られていた。"
+    ],
+    "室内を歩いていた":[
+      "訪問時はワンルーム内を歩いて過ごされていた。",
+      "室内を移動しながら、普段の生活動作をされている様子であった。"
+    ],
+    "身の回りの物を整理していた":[
+      "訪問時は身の回りの物を整理しながら過ごされていた。",
+      "室内で自分のペースで作業されていた。"
+    ],
+    "横になって休んでいた":[
+      "訪問時はベッド上で横になり、休まれていた。",
+      "身体を休めながら、静かに過ごされている様子であった。"
+    ],
+    "入眠していた":[
+      "訪問時はベッド上で入眠されていた。",
+      "安静に休まれており、訪問直後は睡眠中であった。"
+    ],
+    "起床直後だった":[
+      "訪問時は起床直後の様子であった。",
+      "まだ身体を休めながら、ゆっくりと覚醒されている様子であった。"
+    ],
+    "テレビをつけて静かに過ごしていた":[
+      "訪問時はテレビをつけた状態で、室内で静かに過ごされていた。",
+      "特に慌ただしい様子はなく、ゆっくり過ごされていた。"
+    ],
+    "何もせずゆっくり過ごしていた":[
+      "訪問時は室内で特に作業をせず、ゆっくり過ごされていた。",
+      "落ち着いた環境の中で、自分のペースで過ごされていた。"
+    ],
+    "その他":[
+      "訪問時の姿勢や過ごし方を確認した。",
+      "ワンルーム内での本人の位置や動作を確認しながら様子を把握した。"
+    ]
+  };
+
+  const conditionMap={
+    "普段と変わりなく過ごされていた":[
+      "訪問時は普段と変わらない様子で過ごされていた。",
+      "表情や受け答えにも大きな変化は見られず、落ち着いて過ごされていた。"
+    ],
+    "落ち着いて過ごされていた":[
+      "訪問時は落ち着いた様子で過ごされていた。",
+      "表情も穏やかで、声かけに対して無理のない範囲で応じられていた。"
+    ],
+    "笑顔が見られた":[
+      "訪問時は表情が穏やかで、笑顔が見られた。",
+      "声かけにも自然に反応され、落ち着いた雰囲気で過ごされていた。"
+    ],
+    "眠そうな様子が見られた":[
+      "訪問時は眠そうな様子が見られた。",
+      "覚醒状態を確認しながら声かけを行うと、ゆっくりと反応されていた。"
+    ],
+    "疲れた様子が見られた":[
+      "訪問時はやや疲れた様子が見られた。",
+      "表情や動作を確認したが、声かけには応じられており、無理のない様子で過ごされていた。"
+    ],
+    "不安そうな様子が見られた":[
+      "訪問時はやや不安そうな様子が見られた。",
+      "表情や受け答えを確認しながら声をかけると、徐々に落ち着かれる様子が見られた。"
+    ],
+    "会話が多く見られた":[
+      "訪問時は会話が多く見られた。",
+      "声かけにもよく応じられ、やり取りをしながら落ち着いて過ごされていた。"
+    ],
+    "会話は少なめだった":[
+      "訪問時は会話は少なめであった。",
+      "必要な声かけには反応があり、表情や動作に大きな変化は見られなかった。"
+    ],
+    "その他":[
+      "訪問時の表情、受け答え、動作などを確認した。",
+      "普段と異なる様子がないか注意しながら状態を確認した。"
+    ]
+  };
+
+  const healthMap={
+    "体調に変化なし":[
+      "体調面についても確認したが、大きな変化は見られなかった。",
+      "痛みや強い疲労などの訴えもなく、普段と大きく変わらない状態であった。"
+    ],
+    "体調良好":[
+      "体調は良好で、本人からも特に不調の訴えは聞かれなかった。",
+      "表情や動作にも大きな問題は見られず、安定した様子であった。"
+    ],
+    "疲労感の訴えなし":[
+      "疲労感の訴えはなく、表情や動作にも強い疲れは見られなかった。",
+      "体調はおおむね安定している様子であった。"
+    ],
+    "疲れた様子があった":[
+      "疲れた様子が見られたため、表情や動作を確認した。",
+      "強い体調不良の訴えはなく、無理のない範囲で過ごされていた。"
+    ],
+    "痛みの訴えなし":[
+      "痛みの訴えはなく、動作時にも強い苦痛の様子は見られなかった。",
+      "体調はおおむね安定している様子であった。"
+    ],
+    "痛みの訴えがあった":[
+      "本人より痛みの訴えがあったため、部位や程度、動作時の様子を確認した。",
+      "その後も表情や体調の変化に注意して様子を確認した。"
+    ],
+    "発熱なし":[
+      "発熱は見られず、顔色や表情にも大きな変化はなかった。",
+      "全身状態はおおむね安定している様子であった。"
+    ],
+    "食欲あり":[
+      "食欲は保たれており、本人からも食事に関する大きな不調の訴えはなかった。",
+      "体調はおおむね安定している様子であった。"
+    ],
+    "食欲低下が見られた":[
+      "食欲の低下が見られたため、本人の訴えや表情を確認した。",
+      "体調の変化がないか、その後も注意して様子を確認した。"
+    ],
+    "睡眠不足の訴えがあった":[
+      "本人より睡眠不足の訴えがあり、やや眠そうな様子も見られた。",
+      "表情や反応を確認しながら、体調に大きな変化がないか確認した。"
+    ],
+    "体調不良の訴えがあった":[
+      "本人より体調不良の訴えがあったため、表情や受け答え、動作の様子を確認した。",
+      "無理をしないよう配慮しながら、その後の状態変化にも注意した。"
+    ],
+    "その他":[
+      "体調について本人の訴えや表情、動作の様子を確認した。",
+      "普段と異なる変化がないか注意して状態を確認した。"
+    ]
+  };
+
+  if(scene && sceneMap[scene]){
+    sceneMap[scene].forEach(s=>pushUnique(out,s));
+  }
+
+  if(condition && conditionMap[condition]){
+    conditionMap[condition].forEach(s=>pushUnique(out,s));
+  } else if(!condition && profile.usual){
+    pushUnique(out, "訪問時は"+profile.usual.replace(/[。]+$/,"")+"。");
+    pushUnique(out, "表情や受け答え、動作などを確認し、普段との違いがないか様子を確認した。");
+  }
+
+  if(health && healthMap[health]){
+    healthMap[health].forEach(s=>pushUnique(out,s));
+  } else if(!health){
+    pushUnique(out, "体調面についても本人の様子を確認し、普段と異なる変化がないか確認した。");
+  }
+
+  // 長め設定では、本人特性を踏まえた観察を追加
+  if(len==="long" && profile.trait){
+    pushUnique(out, "本人の特性も踏まえ、普段の状態と比べて表情や反応に変化がないか確認した。");
+  }
+
+  let result=out.join("");
+  if(!result){
+    result="訪問時の状態・様子・体調を選択してください。";
+  }
+
+  // 同じ選択条件でも生成回数に応じて表現を変える。
+  // 事実関係は変えず、観察・確認の言い回しを組み替える。
+  const variantSentence=buildVisitVariantSentence(seed);
+  const parts=splitSentences(result);
+  let picked=[];
+  const maxBaseSentences = len==="short" ? 2 : (len==="long" ? 5 : 4);
+  picked=parts.slice(0,maxBaseSentences);
+  picked.push(normalizeSentence(variantSentence));
+  return picked.join("") || result;
+}
+
+function buildCareRecord(len, actionSentences, profile, seed){
+  const out=["指示内容確認しました。"];
+  actionSentences.forEach(s=>pushUnique(out,s));
+
+  // 支援方法に関係するプロフィールだけを②へ反映
+  if(len!=="short" && profile.communication && out.join("").length<120){
+    let c=profile.communication.replace(/[。]+$/,"");
+    c=c.replace(/声かけする$/,"声をかけた").replace(/する$/,"した");
+    pushUnique(out, "本人には"+c.replace(/^本人には/,""));
+  }
+  if(len==="long" && profile.caution && out.join("").length<155){
+    pushUnique(out, "支援時は"+profile.caution.replace(/^支援時は/,"").replace(/[。]+$/,"")+"よう配慮した");
+  }
+
+  let result=out.join("");
+  if(result==="指示内容確認しました。"){
+    result+="サービス内容または介護者が実施したことを入力してください。";
+    return result;
+  }
+
+  // 冒頭の固定文は維持しつつ、支援中の観察表現を毎回組み替える。
+  result+=normalizeSentence(buildCareVariantSentence(seed));
+  return result;
+}
+
+async function generate(){
+  try {
+    const raw=cleanText(document.getElementById("input").value || "");
+    const user=document.getElementById("user").value;
+    const services=getCheckedServices();
+    const service=document.getElementById("service").value;
+    const scene=document.getElementById("visitScene").value;
+    const condition=document.getElementById("condition").value;
+    const health=document.getElementById("health").value;
+    const len=document.getElementById("length").value;
+
+    if(!user){ alert("利用者を選択してください。"); return; }
+    if(!scene && !condition && !health && !services.length && !raw){
+      alert("訪問時の様子・体調、またはサービス内容を入力してください。");
+      return;
+    }
+
+    const profile=profiles[user] || {};
+    const actions=buildActionSentences(services,raw,len);
+
+    const signature=[
+      user,service,services.join(","),scene,condition,health,len,raw,
+      profile.usual||"",profile.trait||"",profile.caution||"",profile.communication||""
+    ].join("||");
+    let seed;
+    if(window.cloudNextVariantSeed){
+      try{
+        seed=await window.cloudNextVariantSeed(signature);
+      }catch(e){
+        console.warn("クラウド連番取得失敗。端末内連番へ切替:",e);
+        seed=nextVariantSeed(signature);
+      }
+    }else{
+      seed=nextVariantSeed(signature);
+    }
+
+    let visitText=buildVisitRecord(len,scene,condition,health,profile,seed);
+    let careText=buildCareRecord(len,actions,profile,seed);
+
+    if(visitText && !visitText.endsWith("。") && !visitText.endsWith("ください。")) visitText+="。";
+    if(careText && !careText.endsWith("。") && !careText.endsWith("ください。")) careText+="。";
+
+    document.getElementById("visitResult").textContent=visitText;
+    document.getElementById("visitResultCount").textContent=
+      visitText.includes("選択してください") ? "0文字" : visitText.length+"文字";
+
+    document.getElementById("careResult").textContent=careText;
+    document.getElementById("careResultCount").textContent=
+      careText.includes("入力してください") ? "0文字" : careText.length+"文字";
+
+    const historyText="【訪問時】"+visitText+" 【支援中】"+careText;
+    addHistory(user+" / "+service,historyText);
+
+    if(window.cloudSaveRecord){
+      window.cloudSaveRecord({
+        userCode:user,
+        serviceType:service,
+        visitScene:scene,
+        condition:condition,
+        health:health,
+        lengthMode:len,
+        services:services,
+        careInput:raw,
+        visitNote:visitText,
+        careNote:careText
+      }).catch(e=>console.warn("クラウド履歴保存失敗:",e));
+    }
+  } catch(e) {
+    console.error(e);
+    alert("記録文の作成中にエラーが発生しました。ページを再読み込みして、もう一度お試しください。");
+  }
+}
+
+function shortenCareResult(){
+  const r=document.getElementById("careResult").textContent;
+  if(!r || r.includes("ここに") || r.includes("入力してください")) return;
+  const parts=splitSentences(r);
+  if(!parts.length) return;
+  const picked=[];
+  for(const s of parts){
+    if(picked.join("").length+s.length<=65 || picked.length===0){
+      picked.push(s);
+    }else{
+      break;
+    }
+  }
+  const t=picked.join("");
+  document.getElementById("careResult").textContent=t;
+  document.getElementById("careResultCount").textContent=t.length+"文字";
+}
+
+async function copyVisitResult(){
+  const t=document.getElementById("visitResult").textContent;
+  if(!t || t.includes("ここに") || t.includes("選択してください")) return;
+  try{await navigator.clipboard.writeText(t); alert("① 訪問時の記録をコピーしました。");}
+  catch(e){alert("コピーできませんでした。結果を選択してコピーしてください。");}
+}
+
+async function copyCareResult(){
+  const t=document.getElementById("careResult").textContent;
+  if(!t || t.includes("ここに") || t.includes("入力してください")) return;
+  try{await navigator.clipboard.writeText(t); alert("② 支援中の記録をコピーしました。");}
+  catch(e){alert("コピーできませんでした。結果を選択してコピーしてください。");}
+}
+
+function addHistory(service,text){
+  const h=document.getElementById("history");
+  if(h.querySelector(".sub")) h.innerHTML="";
+  const d=document.createElement("div");
+  d.className="history-item";
+  d.innerHTML='<span class="tag">'+service+'</span>'+escapeHtml(text);
+  h.prepend(d);
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function clearAll(){
+  document.getElementById("visitScene").value="";
+  input.value="";
+  document.getElementById("inputCount").textContent="0文字";
+  document.getElementById("visitResult").textContent="ここに訪問時の記録文が表示されます。";
+  document.getElementById("visitResultCount").textContent="0文字";
+  document.getElementById("careResult").textContent="ここに支援中の記録文が表示されます。";
+  document.getElementById("careResultCount").textContent="0文字";
+}
+refreshUserSelect();
+</script>
+
+<script>
+
+(() => {
+  const cfg = window.AI_KIROKU_CONFIG || {};
+  const configured =
+    cfg.supabaseUrl &&
+    cfg.supabasePublishableKey &&
+    !cfg.supabaseUrl.includes("YOUR_") &&
+    !cfg.supabasePublishableKey.includes("YOUR_");
+
+  const overlay = () => document.getElementById("authOverlay");
+  const loginPanel = () => document.getElementById("loginPanel");
+  const orgPanel = () => document.getElementById("orgPanel");
+  const configPanel = () => document.getElementById("configPanel");
+  const authStatus = () => document.getElementById("authStatus");
+  const orgStatus = () => document.getElementById("orgStatus");
+  const stateEl = () => document.getElementById("cloudState");
+  const orgInfoEl = () => document.getElementById("cloudOrgInfo");
+
+  let client = null;
+  let session = null;
+  let membership = null;
+  let organization = null;
+  let clientRows = [];
+
+  function show(el){ if(el) el.classList.remove("hidden"); }
+  function hide(el){ if(el) el.classList.add("hidden"); }
+  function setStatus(msg){ if(authStatus()) authStatus().textContent = msg || ""; }
+  function setOrgStatus(msg){ if(orgStatus()) orgStatus().textContent = msg || ""; }
+
+  function showConfigNeeded(){
+    show(overlay());
+    hide(loginPanel());
+    hide(orgPanel());
+    show(configPanel());
+    if(stateEl()) stateEl().textContent = "未設定";
+    if(orgInfoEl()) orgInfoEl().textContent = "config.js にSupabase接続情報を設定してください。";
+  }
+
+  async function getMembership(){
+    const { data, error } = await client
+      .from("organization_members")
+      .select("organization_id, role")
+      .eq("user_id", session.user.id)
+      .limit(1)
+      .maybeSingle();
+    if(error) throw error;
+    membership = data || null;
+    if(!membership){
+      organization = null;
+      return null;
+    }
+
+    const orgRes = await client
+      .from("organizations")
+      .select("id, name, join_code")
+      .eq("id", membership.organization_id)
+      .single();
+    if(orgRes.error) throw orgRes.error;
+    organization = orgRes.data;
+    return membership;
+  }
+
+  async function loadCloudUsers(){
+    if(!membership) return;
+    const { data, error } = await client
+      .from("clients")
+      .select("id, code, usual, trait, caution, communication")
+      .eq("organization_id", membership.organization_id)
+      .order("sort_order", { ascending:true })
+      .order("code", { ascending:true });
+    if(error) throw error;
+
+    clientRows = data || [];
+    users = clientRows.map(r => r.code);
+    profiles = {};
+    for(const r of clientRows){
+      profiles[r.code] = {
+        usual:r.usual || "",
+        trait:r.trait || "",
+        caution:r.caution || "",
+        communication:r.communication || ""
+      };
+    }
+
+    // オフライン時の参照用に端末にもキャッシュ
+    saveUsers();
+    saveProfiles();
+    refreshUserSelect();
+  }
+
+  async function loadCloudHistory(){
+    if(!membership) return;
+    const { data, error } = await client
+      .from("care_records")
+      .select("created_at, service_type, visit_note, care_note, clients(code)")
+      .eq("organization_id", membership.organization_id)
+      .order("created_at", { ascending:false })
+      .limit(30);
+    if(error) throw error;
+
+    const h = document.getElementById("history");
+    if(!h) return;
+    h.innerHTML = "";
+    if(!data || !data.length){
+      h.innerHTML = '<div class="sub">まだ履歴はありません。</div>';
+      return;
+    }
+    for(const r of data){
+      const d = document.createElement("div");
+      d.className = "history-item";
+      const code = r.clients?.code || "利用者";
+      const dt = new Date(r.created_at).toLocaleString("ja-JP");
+      d.innerHTML =
+        '<span class="tag">'+escapeHtml(code+" / "+(r.service_type||""))+'</span>'+
+        '<div class="sub">'+escapeHtml(dt)+'</div>'+
+        escapeHtml("【訪問時】"+(r.visit_note||"")+" 【支援中】"+(r.care_note||""));
+      h.appendChild(d);
+    }
+  }
+
+  async function migrateLocalDataIfEmpty(){
+    if(!membership) return;
+    const countRes = await client
+      .from("clients")
+      .select("id", { count:"exact", head:true })
+      .eq("organization_id", membership.organization_id);
+    if(countRes.error) throw countRes.error;
+    if((countRes.count || 0) > 0) return;
+
+    const localUsers = JSON.parse(localStorage.getItem("aiKirokuUsers") || "null") || DEFAULT_USERS.slice();
+    const localProfiles = JSON.parse(localStorage.getItem("aiKirokuProfiles") || "{}");
+
+    const rows = localUsers.map((code, i) => {
+      const p = localProfiles[code] || {};
+      return {
+        organization_id: membership.organization_id,
+        code,
+        usual:p.usual || "",
+        trait:p.trait || "",
+        caution:p.caution || "",
+        communication:p.communication || "",
+        sort_order:i
+      };
+    });
+    if(!rows.length) return;
+
+    const { error } = await client.from("clients").insert(rows);
+    if(error) throw error;
+  }
+
+  async function enterApp(){
+    await getMembership();
+    if(!membership){
+      show(overlay());
+      hide(loginPanel());
+      show(orgPanel());
+      hide(configPanel());
+      setOrgStatus("事業所を作成するか、参加コードを入力してください。");
+      if(stateEl()) stateEl().textContent = "事業所未設定";
+      if(orgInfoEl()) orgInfoEl().textContent = "ログイン済みですが、まだ事業所に所属していません。";
+      return;
+    }
+
+    hide(overlay());
+    await loadCloudUsers();
+    await loadCloudHistory();
+
+    if(stateEl()) stateEl().textContent = "接続中";
+    if(orgInfoEl()){
+      orgInfoEl().textContent =
+        `${organization.name} / ${session.user.email} / 参加コード: ${organization.join_code}`;
+    }
+  }
+
+  window.cloudLogin = async () => {
+    try{
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      if(!email || !password){ setStatus("メールアドレスとパスワードを入力してください。"); return; }
+      setStatus("ログインしています…");
+      const { data, error } = await client.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      session = data.session;
+      setStatus("");
+      await enterApp();
+    }catch(e){
+      console.error(e);
+      setStatus("ログインできませんでした。メールアドレス・パスワードを確認してください。");
+    }
+  };
+
+  window.cloudSignUp = async () => {
+    try{
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      if(!email || password.length < 8){
+        setStatus("メールアドレスと8文字以上のパスワードを入力してください。");
+        return;
+      }
+      setStatus("アカウントを作成しています…");
+      const { data, error } = await client.auth.signUp({ email, password });
+      if(error) throw error;
+      if(data.session){
+        session = data.session;
+        await enterApp();
+      }else{
+        setStatus("登録しました。確認メールが届く設定の場合は、メール内のリンクを開いてからログインしてください。");
+      }
+    }catch(e){
+      console.error(e);
+      setStatus("新規登録に失敗しました: "+(e.message || "エラー"));
+    }
+  };
+
+  window.cloudLogout = async () => {
+    try{ await client.auth.signOut(); }catch(e){}
+    location.reload();
+  };
+
+  window.cloudCreateOrganization = async () => {
+    try{
+      const name = document.getElementById("orgName").value.trim();
+      if(!name){ setOrgStatus("事業所名を入力してください。"); return; }
+      setOrgStatus("事業所を作成しています…");
+      const { data, error } = await client.rpc("create_organization", { p_name:name });
+      if(error) throw error;
+      await getMembership();
+      await migrateLocalDataIfEmpty();
+      setOrgStatus("");
+      await enterApp();
+    }catch(e){
+      console.error(e);
+      setOrgStatus("事業所を作成できませんでした: "+(e.message || "エラー"));
+    }
+  };
+
+  window.cloudJoinOrganization = async () => {
+    try{
+      const code = document.getElementById("joinCode").value.trim().toUpperCase();
+      if(!code){ setOrgStatus("参加コードを入力してください。"); return; }
+      setOrgStatus("事業所へ参加しています…");
+      const { data, error } = await client.rpc("join_organization", { p_join_code:code });
+      if(error) throw error;
+      await enterApp();
+    }catch(e){
+      console.error(e);
+      setOrgStatus("参加できませんでした。参加コードを確認してください。");
+    }
+  };
+
+  window.cloudReloadAll = async () => {
+    try{
+      if(stateEl()) stateEl().textContent = "同期中";
+      await loadCloudUsers();
+      await loadCloudHistory();
+      if(stateEl()) stateEl().textContent = "接続中";
+    }catch(e){
+      console.error(e);
+      if(stateEl()) stateEl().textContent = "同期エラー";
+      alert("クラウドの再読み込みに失敗しました。");
+    }
+  };
+
+  window.cloudAddUser = async (name) => {
+    try{
+      const row = {
+        organization_id:membership.organization_id,
+        code:name,
+        sort_order:clientRows.length
+      };
+      const { error } = await client.from("clients").insert(row);
+      if(error) throw error;
+      await loadCloudUsers();
+      document.getElementById("user").value=name;
+      document.getElementById("profileUser").value=name;
+      loadProfile();
+      return true;
+    }catch(e){
+      console.error(e);
+      alert("利用者を追加できませんでした。");
+      return false;
+    }
+  };
+
+  window.cloudRenameUser = async (oldCode,newCode) => {
+    try{
+      const row = clientRows.find(r => r.code === oldCode);
+      if(!row) throw new Error("利用者が見つかりません");
+      const { error } = await client
+        .from("clients")
+        .update({ code:newCode })
+        .eq("id", row.id)
+        .eq("organization_id", membership.organization_id);
+      if(error) throw error;
+      await loadCloudUsers();
+      document.getElementById("user").value=newCode;
+      document.getElementById("profileUser").value=newCode;
+      loadProfile();
+    }catch(e){
+      console.error(e);
+      alert("利用者名を変更できませんでした。");
+    }
+  };
+
+  window.cloudDeleteUser = async (code) => {
+    try{
+      const row = clientRows.find(r => r.code === code);
+      if(!row) throw new Error("利用者が見つかりません");
+      const { error } = await client
+        .from("clients")
+        .delete()
+        .eq("id", row.id)
+        .eq("organization_id", membership.organization_id);
+      if(error) throw error;
+      await loadCloudUsers();
+    }catch(e){
+      console.error(e);
+      alert("利用者を削除できませんでした。記録履歴がある利用者は削除できない場合があります。");
+    }
+  };
+
+  window.cloudSaveProfile = async (code,p) => {
+    try{
+      const row = clientRows.find(r => r.code === code);
+      if(!row) throw new Error("利用者が見つかりません");
+      const { error } = await client
+        .from("clients")
+        .update({
+          usual:p.usual || "",
+          trait:p.trait || "",
+          caution:p.caution || "",
+          communication:p.communication || ""
+        })
+        .eq("id", row.id)
+        .eq("organization_id", membership.organization_id);
+      if(error) throw error;
+      profiles[code] = {...p};
+      saveProfiles();
+      document.getElementById("profileStatus").textContent="「"+code+"」のプロフィールをクラウドへ保存しました。";
+      await loadCloudUsers();
+    }catch(e){
+      console.error(e);
+      alert("プロフィールを保存できませんでした。");
+    }
+  };
+
+  window.cloudSaveRecord = async (record) => {
+    if(!membership) return;
+    const row = clientRows.find(r => r.code === record.userCode);
+    if(!row) return;
+
+    const payload = {
+      organization_id:membership.organization_id,
+      client_id:row.id,
+      created_by:session.user.id,
+      service_type:record.serviceType || "",
+      visit_scene:record.visitScene || "",
+      condition:record.condition || "",
+      health:record.health || "",
+      length_mode:record.lengthMode || "normal",
+      services:record.services || [],
+      care_input:record.careInput || "",
+      visit_note:record.visitNote || "",
+      care_note:record.careNote || ""
+    };
+
+    const { error } = await client.from("care_records").insert(payload);
+    if(error) throw error;
+    await loadCloudHistory();
+  };
+
+  window.cloudNextVariantSeed = async (signature) => {
+    if(!membership) throw new Error("事業所未設定");
+    const { data, error } = await client.rpc("next_variant_seed", {
+      p_signature:signature
+    });
+    if(error) throw error;
+    const n = Number(data);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  async function boot(){
+    if(!configured || !window.supabase?.createClient){
+      showConfigNeeded();
+      return;
+    }
+
+    client = window.supabase.createClient(
+      cfg.supabaseUrl,
+      cfg.supabasePublishableKey,
+      {
+        auth:{
+          persistSession:true,
+          autoRefreshToken:true,
+          detectSessionInUrl:true
+        }
+      }
+    );
+
+    const { data } = await client.auth.getSession();
+    session = data.session || null;
+
+    client.auth.onAuthStateChange((_event,newSession) => {
+      session = newSession || null;
+    });
+
+    if(!session){
+      show(overlay());
+      show(loginPanel());
+      hide(orgPanel());
+      hide(configPanel());
+      if(stateEl()) stateEl().textContent = "未ログイン";
+      if(orgInfoEl()) orgInfoEl().textContent = "職員アカウントでログインすると社内共有が有効になります。";
+      return;
+    }
+
+    try{
+      await enterApp();
+    }catch(e){
+      console.error(e);
+      show(overlay());
+      show(loginPanel());
+      hide(orgPanel());
+      setStatus("クラウドの初期読み込みに失敗しました。SETUP_GUIDEのSQL設定を確認してください。");
+      if(stateEl()) stateEl().textContent = "接続エラー";
+    }
+  }
+
+  boot();
+})();
+
+</script>
+
+</body>
+</html>
