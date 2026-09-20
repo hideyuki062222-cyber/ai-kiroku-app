@@ -93,6 +93,7 @@ window.AI_KIROKU_CONFIG = {
       <div class="auth-actions">
         <button class="primary" onclick="window.cloudLogin && window.cloudLogin()">ログイン</button>
         <button class="secondary" onclick="window.cloudSignUp && window.cloudSignUp()">新規登録</button>
+        <button class="secondary" onclick="window.cloudResendConfirmation && window.cloudResendConfirmation()">確認メールを再送</button>
       </div>
       <div id="authStatus" class="setup-note"></div>
     </div>
@@ -127,7 +128,7 @@ window.AI_KIROKU_CONFIG = {
 <div class="wrap">
   <header>
     <h1>障害福祉 AI記録作成</h1>
-    <div class="sub">クラウド共有版 v26 ― 前回記録確認文追加</div>
+    <div class="sub">クラウド共有版 v27 ― 確認メール再送対応</div>
   </header>
 
   <section class="card install-card">
@@ -1493,6 +1494,34 @@ refreshUserSelect();
     }catch(e){
       console.error(e);
       setStatus("新規登録に失敗しました: "+(e.message || "エラー"));
+    }
+  };
+
+  window.cloudResendConfirmation = async () => {
+    try{
+      const email = document.getElementById("authEmail").value.trim();
+      if(!email){
+        setStatus("確認メールを再送するメールアドレスを入力してください。");
+        return;
+      }
+      setStatus("確認メールを再送しています…");
+      const { error } = await client.auth.resend({
+        type:"signup",
+        email,
+        options:{
+          emailRedirectTo:"https://hideyuki062222-cyber.github.io/ai-kiroku-app/"
+        }
+      });
+      if(error) throw error;
+      setStatus("確認メールを再送しました。新しく届いたメールのリンクを開いてください。古い確認メールは使用しないでください。");
+    }catch(e){
+      console.error(e);
+      const msg = e?.message || "エラー";
+      if(/rate|limit|too many/i.test(msg)){
+        setStatus("短時間に送信回数が多いため、少し時間を空けてから再送してください。");
+      }else{
+        setStatus("確認メールを再送できませんでした: "+msg);
+      }
     }
   };
 
