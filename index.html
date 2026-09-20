@@ -127,7 +127,7 @@ window.AI_KIROKU_CONFIG = {
 <div class="wrap">
   <header>
     <h1>障害福祉 AI記録作成</h1>
-    <div class="sub">クラウド共有版 v25 ― メール確認URL修正版</div>
+    <div class="sub">クラウド共有版 v26 ― 前回記録確認文追加</div>
   </header>
 
   <section class="card install-card">
@@ -987,7 +987,7 @@ function buildVisitRecord(len, scene, condition, health, profile, seed){
 }
 
 function buildCareRecord(len, actionSentences, profile, seed){
-  const out=["指示内容確認しました。"];
+  const out=["指示内容確認しました。前回のサービス記録確認しました。"];
   actionSentences.forEach(s=>pushUnique(out,s));
 
   // 支援方法に関係するプロフィールだけを②へ反映
@@ -1001,7 +1001,7 @@ function buildCareRecord(len, actionSentences, profile, seed){
   }
 
   let result=out.join("");
-  if(result==="指示内容確認しました。"){
+  if(result==="指示内容確認しました。前回のサービス記録確認しました。"){
     result+="サービス内容または介護者が実施したことを入力してください。";
     return result;
   }
