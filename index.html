@@ -93,10 +93,9 @@ window.AI_KIROKU_CONFIG = {
       <div class="auth-actions">
         <button class="primary" onclick="window.cloudLogin && window.cloudLogin()">ログイン</button>
         <button class="secondary" onclick="window.cloudSignUp && window.cloudSignUp()">新規登録</button>
-        <button class="secondary" onclick="window.cloudResendConfirmation && window.cloudResendConfirmation()">確認メールを再送</button>
       </div>
       <div id="authStatus" class="setup-note"></div>
-      <div class="setup-note" style="margin-top:8px">確認メールが届かない場合は、迷惑メールフォルダ・受信拒否設定を確認し、「確認メールを再送」を使用してください。</div>
+      <div class="setup-note" style="margin-top:8px">完全無料運用：確認メールは使用しません。新規登録後、事業所の参加コードを入力して参加してください。</div>
     </div>
 
     <div id="orgPanel" class="hidden">
@@ -129,7 +128,7 @@ window.AI_KIROKU_CONFIG = {
 <div class="wrap">
   <header>
     <h1>障害福祉 AI記録作成</h1>
-    <div class="sub">クラウド共有版 v28 ― メール送信案内強化</div>
+    <div class="sub">クラウド共有版 v29 ― 完全無料運用対応</div>
   </header>
 
   <section class="card install-card">
@@ -1490,43 +1489,15 @@ refreshUserSelect();
         session = data.session;
         await enterApp();
       }else{
-        setStatus("登録しました。確認メールが届く設定の場合は、メール内のリンクを開いてからログインしてください。");
+        setStatus("登録は作成されましたが、Supabase側のメール確認設定がまだONです。管理者がメール確認をOFFにすると、確認メールなしで登録できます。");
       }
     }catch(e){
       console.error(e);
       const msg = e?.message || "エラー";
       if(/rate|limit|too many|429/i.test(msg)){
-        setStatus("確認メールの送信上限に達しています。少し時間を空けて「確認メールを再送」を押してください。安定運用には独自SMTP設定を推奨します。");
+        setStatus("メール送信制限が発生しています。完全無料運用ではメール確認を使用しない設定へ切り替えてください。");
       }else{
         setStatus("新規登録に失敗しました: "+msg);
-      }
-    }
-  };
-
-  window.cloudResendConfirmation = async () => {
-    try{
-      const email = document.getElementById("authEmail").value.trim();
-      if(!email){
-        setStatus("確認メールを再送するメールアドレスを入力してください。");
-        return;
-      }
-      setStatus("確認メールを再送しています…");
-      const { error } = await client.auth.resend({
-        type:"signup",
-        email,
-        options:{
-          emailRedirectTo:"https://hideyuki062222-cyber.github.io/ai-kiroku-app/"
-        }
-      });
-      if(error) throw error;
-      setStatus("確認メールを再送しました。新しく届いたメールのリンクを開いてください。古い確認メールは使用しないでください。");
-    }catch(e){
-      console.error(e);
-      const msg = e?.message || "エラー";
-      if(/rate|limit|too many/i.test(msg)){
-        setStatus("短時間に送信回数が多いため、少し時間を空けてから再送してください。");
-      }else{
-        setStatus("確認メールを再送できませんでした: "+msg);
       }
     }
   };
