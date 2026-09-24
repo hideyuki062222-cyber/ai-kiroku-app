@@ -96,6 +96,7 @@ window.AI_KIROKU_CONFIG = {
         <button class="secondary" onclick="window.cloudResendConfirmation && window.cloudResendConfirmation()">確認メールを再送</button>
       </div>
       <div id="authStatus" class="setup-note"></div>
+      <div class="setup-note" style="margin-top:8px">確認メールが届かない場合は、迷惑メールフォルダ・受信拒否設定を確認し、「確認メールを再送」を使用してください。</div>
     </div>
 
     <div id="orgPanel" class="hidden">
@@ -128,7 +129,7 @@ window.AI_KIROKU_CONFIG = {
 <div class="wrap">
   <header>
     <h1>障害福祉 AI記録作成</h1>
-    <div class="sub">クラウド共有版 v27 ― 確認メール再送対応</div>
+    <div class="sub">クラウド共有版 v28 ― メール送信案内強化</div>
   </header>
 
   <section class="card install-card">
@@ -1493,7 +1494,12 @@ refreshUserSelect();
       }
     }catch(e){
       console.error(e);
-      setStatus("新規登録に失敗しました: "+(e.message || "エラー"));
+      const msg = e?.message || "エラー";
+      if(/rate|limit|too many|429/i.test(msg)){
+        setStatus("確認メールの送信上限に達しています。少し時間を空けて「確認メールを再送」を押してください。安定運用には独自SMTP設定を推奨します。");
+      }else{
+        setStatus("新規登録に失敗しました: "+msg);
+      }
     }
   };
 
