@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#17365d">
+<title>事業所管理</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{--navy:#17365d;--blue:#2d6cdf;--bg:#f3f6fa;--line:#dbe3ed;--muted:#6b7788;--text:#172033;--red:#a7253a;--green:#16683f}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:var(--bg);color:var(--text)}
+.hidden{display:none!important}.top{background:#fff;border-bottom:1px solid var(--line);padding:10px 12px;position:sticky;top:0;z-index:20}.topline{max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:19px;font-weight:900}.sub,.small{font-size:12px;color:var(--muted);line-height:1.5}
+.app-nav{display:grid;grid-template-columns:repeat(3,auto);gap:3px;background:#eef2f7;border-radius:12px;padding:3px}.app-tab{text-decoration:none;color:#506078;padding:8px 10px;border-radius:9px;font-size:13px;font-weight:850;white-space:nowrap}.app-tab:hover{background:#fff}
+.wrap{max-width:900px;margin:auto;padding:14px 12px 70px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:0 2px 10px #00000008}.title{font-size:17px;font-weight:950;margin-bottom:9px}
+label{display:block;font-size:13px;font-weight:900;margin:0 0 5px}.field{margin:10px 0}.field input,.field select{width:100%;border:1px solid #cbd6e3;border-radius:10px;padding:10px 11px;font-size:15px;background:#fff}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>.field{flex:1;min-width:170px}.btn{border:1px solid var(--line);background:#fff;color:#2b3b51;border-radius:10px;padding:9px 11px;font-weight:850;cursor:pointer}.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}.btn.red{background:#fff0f2;color:var(--red);border-color:#f0c6ce}.btn.green{background:#eaf7ef;color:var(--green);border-color:#c0e3ce}.status{font-size:12px;color:#5f6f84;min-height:18px;margin-top:7px}
+.org-switch{width:100%;min-height:48px;border:2px solid #88a8d2;border-radius:11px;padding:9px 11px;font-size:16px;font-weight:900;color:var(--navy);background:#f5f9ff}.badge{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:900}.badge.admin{background:#fff0d4;color:#8f5700}.badge.staff{background:#eef2f7;color:#526175}.badge.off{background:#fee7eb;color:#9f2438}
+.manage-row{display:flex;justify-content:space-between;gap:9px;align-items:center;padding:10px 0;border-top:1px solid #e8edf3}.manage-row:first-child{border-top:0}.manage-main{min-width:0}.manage-name{font-weight:900}.manage-sub{font-size:12px;color:#68778a;margin-top:3px}.manage-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.mini-select{border:1px solid #cbd6e3;border-radius:8px;padding:6px 7px;background:#fff;font-size:12px}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 8px;font-size:12px;font-weight:800}.empty{text-align:center;color:var(--muted);padding:20px 8px}
+.auth{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:18px}.authbox{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}.authbox input{width:100%;border:1px solid #cbd6e3;border-radius:10px;padding:11px;margin:6px 0;font-size:16px}
+.divider{height:1px;background:#e7ecf2;margin:16px 0}
+@media(max-width:680px){.topline{display:block}.brand{margin-bottom:7px}.app-nav{grid-template-columns:repeat(3,1fr);width:100%}.app-tab{text-align:center;padding:8px 4px}.wrap{padding:10px}.card{padding:13px}.manage-row{align-items:flex-start}.manage-actions{max-width:48%}}
+</style>
+</head>
+<body>
+<div id="auth" class="auth hidden">
+ <div class="authbox">
+  <h2 style="margin-top:0">事業所管理</h2>
+  <div class="small">AI記録・申し送り・出納帳と同じアカウントです。</div>
+  <input id="email" type="email" placeholder="メールアドレス">
+  <input id="password" type="password" placeholder="パスワード">
+  <div class="row"><button class="btn primary" onclick="login()">ログイン</button><button class="btn" onclick="logout()">閉じる</button></div>
+  <div id="authStatus" class="status"></div>
+ </div>
+</div>
+
+<header class="top">
+ <div class="topline">
+  <div><div class="brand">事業所管理</div><div class="sub">事業所・職員・利用者をまとめて管理</div></div>
+  <nav class="app-nav" aria-label="アプリ切替">
+   <a class="app-tab" href="../handoff/">申し送り</a>
+   <a class="app-tab" href="../">AI記録</a>
+   <a class="app-tab" href="../cashbook/">出納帳</a>
+  </nav>
+ </div>
+</header>
+
+<main id="app" class="wrap hidden">
+ <section class="card">
+  <div class="title">現在の事業所</div>
+  <select id="orgSwitch" class="org-switch" onchange="switchOrg(this.value)"></select>
+  <div id="currentRole" class="status"></div>
+ </section>
+
+ <section class="card">
+  <div class="title">事業所を追加・参加</div>
+  <div class="field"><label>新しい事業所名</label><input id="newOrgName" maxlength="120" placeholder="例：COZY〇〇"></div>
+  <button class="btn primary" onclick="createOrg()">新しい事業所を作成</button>
+  <div class="divider"></div>
+  <div class="field"><label>既存事業所の参加コード</label><input id="joinCode" maxlength="16" placeholder="16文字の参加コード"></div>
+  <button class="btn" onclick="joinOrg()">参加コードで参加</button>
+  <div id="orgActionStatus" class="status"></div>
+ </section>
+
+ <section id="orgSettings" class="card hidden">
+  <div class="title">選択中の事業所設定</div>
+  <div class="field"><label>事業所名</label><input id="editOrgName" maxlength="120"></div>
+  <div class="row">
+   <button class="btn primary" onclick="saveOrgName()">名称を保存</button>
+   <button id="toggleOrgBtn" class="btn red" onclick="toggleOrgActive()">事業所を停止</button>
+  </div>
+  <div class="field" style="margin-top:14px"><label>職員参加コード</label>
+   <div class="row"><input id="orgJoinCode" readonly style="flex:1;min-width:180px"><button class="btn" onclick="copyJoinCode()">コピー</button></div>
+  </div>
+  <div id="orgSettingsStatus" class="status"></div>
+ </section>
+
+ <section id="staffCard" class="card hidden">
+  <div class="title">職員管理</div>
+  <div class="small">管理者・一般職員の変更、所属解除ができます。自分自身の権限はここでは変更しません。</div>
+  <div id="staffList" style="margin-top:8px"></div>
+  <div id="staffStatus" class="status"></div>
+ </section>
+
+ <section id="clientsCard" class="card hidden">
+  <div class="title">利用者管理</div>
+  <div class="small">ここで追加した利用者は、選択中の事業所のAI記録・申し送り・出納帳に表示されます。</div>
+  <div class="row" style="margin-top:9px">
+   <div class="field"><label>利用者コード</label><input id="newClientCode" maxlength="80" placeholder="例：501"></div>
+   <div class="field"><label>表示名（任意）</label><input id="newClientName" maxlength="80" placeholder="例：〇〇 〇〇"></div>
+  </div>
+  <button class="btn primary" onclick="addClient()">利用者を追加</button>
+  <div id="clientStatus" class="status"></div>
+  <div id="clientList" style="margin-top:10px"></div>
+ </section>
+</main>
+
+<script>
+const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
+const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const ACTIVE_KEY="activeOrganizationId";
+let session=null,memberships=[],orgs=[],activeOrg=null,activeMembership=null,clients=[];
+
+function show(id){document.getElementById(id).classList.remove("hidden")}
+function hide(id){document.getElementById(id).classList.add("hidden")}
+function esc(v=""){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+async function init(){
+ const {data:{session:s}}=await db.auth.getSession();session=s;
+ if(!session){show("auth");return}
+ hide("auth");show("app");await loadOrganizations();
+}
+async function login(){
+ const {error}=await db.auth.signInWithPassword({email:document.getElementById("email").value.trim(),password:document.getElementById("password").value});
+ document.getElementById("authStatus").textContent=error?error.message:"";
+ if(!error)location.reload();
+}
+async function logout(){await db.auth.signOut();location.href="../"}
+
+async function loadOrganizations(preferId){
+ const {data:m,error}=await db.from("organization_members").select("organization_id,role,staff_name,created_at").eq("user_id",session.user.id).order("created_at");
+ if(error){alert(error.message);return}
+ memberships=m||[];
+ const ids=memberships.map(x=>x.organization_id);
+ if(!ids.length){
+   orgs=[];activeOrg=null;activeMembership=null;
+   document.getElementById("orgSwitch").innerHTML='<option>まだ事業所に所属していません</option>';
+   hide("orgSettings");hide("staffCard");hide("clientsCard");
+   document.getElementById("currentRole").textContent="新しい事業所を作成するか、参加コードで参加してください。";
+   return;
+ }
+ const {data:o,error:oe}=await db.from("organizations").select("id,name,join_code,is_active,created_at").in("id",ids).order("created_at");
+ if(oe){alert(oe.message);return}
+ orgs=o||[];
+ const saved=preferId||localStorage.getItem(ACTIVE_KEY);
+ const picked=orgs.find(x=>x.id===saved) || orgs.find(x=>x.is_active) || orgs[0];
+ activeOrg=picked;activeMembership=memberships.find(x=>x.organization_id===picked.id)||null;
+ localStorage.setItem(ACTIVE_KEY,picked.id);
+ document.getElementById("orgSwitch").innerHTML=orgs.map(x=>'<option value="'+x.id+'">'+esc(x.name)+(x.is_active?"":"（停止中）")+'</option>').join("");
+ document.getElementById("orgSwitch").value=picked.id;
+ await loadCurrentOrg();
+}
+async function switchOrg(id){localStorage.setItem(ACTIVE_KEY,id);activeOrg=orgs.find(x=>x.id===id);activeMembership=memberships.find(x=>x.organization_id===id);await loadCurrentOrg()}
+async function loadCurrentOrg(){
+ if(!activeOrg||!activeMembership)return;
+ document.getElementById("currentRole").innerHTML='権限：<span class="badge '+(activeMembership.role==="admin"?"admin":"staff")+'">'+(activeMembership.role==="admin"?"管理者":"一般職員")+'</span>'+(activeOrg.is_active?'':' <span class="badge off">停止中</span>');
+ if(activeMembership.role==="admin"){
+   show("orgSettings");show("staffCard");show("clientsCard");
+   document.getElementById("editOrgName").value=activeOrg.name;
+   document.getElementById("orgJoinCode").value=activeOrg.join_code||"";
+   document.getElementById("toggleOrgBtn").textContent=activeOrg.is_active?"事業所を停止":"事業所を再開";
+   document.getElementById("toggleOrgBtn").className=activeOrg.is_active?"btn red":"btn green";
+   await Promise.all([loadStaff(),loadClients()]);
+ }else{
+   hide("orgSettings");hide("staffCard");hide("clientsCard");
+ }
+}
+
+async function createOrg(){
+ const name=document.getElementById("newOrgName").value.trim(),st=document.getElementById("orgActionStatus");
+ if(!name){st.textContent="事業所名を入力してください。";return}
+ st.textContent="作成中…";
+ const {data,error}=await db.rpc("create_organization",{p_name:name});
+ if(error){st.textContent="作成できませんでした: "+error.message;return}
+ document.getElementById("newOrgName").value="";st.textContent="事業所を追加しました。";
+ localStorage.setItem(ACTIVE_KEY,data);await loadOrganizations(data);
+}
+async function joinOrg(){
+ const code=document.getElementById("joinCode").value.trim().toUpperCase(),st=document.getElementById("orgActionStatus");
+ if(!code){st.textContent="参加コードを入力してください。";return}
+ st.textContent="参加中…";
+ const {data,error}=await db.rpc("join_organization",{p_join_code:code});
+ if(error){st.textContent=error.message==="already_member"?"すでに参加しています。":"参加できませんでした。参加コードを確認してください。";return}
+ document.getElementById("joinCode").value="";st.textContent="事業所に参加しました。";
+ localStorage.setItem(ACTIVE_KEY,data);await loadOrganizations(data);
+}
+async function saveOrgName(){
+ const name=document.getElementById("editOrgName").value.trim(),st=document.getElementById("orgSettingsStatus");
+ if(!name){st.textContent="事業所名を入力してください。";return}
+ const {error}=await db.rpc("update_organization",{p_org:activeOrg.id,p_name:name,p_is_active:activeOrg.is_active});
+ if(error){st.textContent="保存できませんでした: "+error.message;return}
+ st.textContent="事業所名を保存しました。";await loadOrganizations(activeOrg.id);
+}
+async function toggleOrgActive(){
+ const next=!activeOrg.is_active,st=document.getElementById("orgSettingsStatus");
+ const msg=next?"この事業所を再開しますか？":"この事業所を停止しますか？ 記録データは削除されません。";
+ if(!confirm(msg))return;
+ const {error}=await db.rpc("update_organization",{p_org:activeOrg.id,p_name:activeOrg.name,p_is_active:next});
+ if(error){st.textContent="変更できませんでした: "+error.message;return}
+ st.textContent=next?"事業所を再開しました。":"事業所を停止しました。";await loadOrganizations(activeOrg.id);
+}
+async function copyJoinCode(){
+ const v=activeOrg?.join_code||"";if(!v)return;
+ try{await navigator.clipboard.writeText(v);document.getElementById("orgSettingsStatus").textContent="参加コードをコピーしました。"}
+ catch(e){document.getElementById("orgJoinCode").select();document.getElementById("orgSettingsStatus").textContent="コードを選択しました。コピーしてください。"}
+}
+
+async function loadStaff(){
+ const st=document.getElementById("staffStatus");st.textContent="読み込み中…";
+ const {data,error}=await db.rpc("list_organization_staff",{p_org:activeOrg.id});
+ if(error){st.textContent="職員一覧を読み込めませんでした: "+error.message;return}
+ const box=document.getElementById("staffList"),rows=data||[];
+ box.innerHTML=rows.map(x=>{
+   const self=x.user_id===session.user.id;
+   return '<div class="manage-row"><div class="manage-main"><div class="manage-name">'+esc(x.staff_name||x.email||"職員")+(self?"（あなた）":"")+'</div><div class="manage-sub">'+esc(x.email||"")+'</div></div><div class="manage-actions">'+
+     '<span class="badge '+(x.role==="admin"?"admin":"staff")+'">'+(x.role==="admin"?"管理者":"一般職員")+'</span>'+
+     (!self?'<select class="mini-select" onchange="changeRole(\''+x.user_id+'\',this.value)"><option value="staff" '+(x.role==="staff"?"selected":"")+'>一般職員</option><option value="admin" '+(x.role==="admin"?"selected":"")+'>管理者</option></select>':'')+
+     (!self&&x.role!=="admin"?'<button class="mini" onclick="removeStaff(\''+x.user_id+'\',\''+encodeURIComponent(x.staff_name||x.email||"職員")+'\')">所属解除</button>':'')+
+     '</div></div>';
+ }).join("")||'<div class="empty">職員はいません。</div>';
+ st.textContent=rows.length+"名が所属しています。";
+}
+async function changeRole(userId,role){
+ if(!confirm(role==="admin"?"この職員を管理者にしますか？":"この職員を一般職員に変更しますか？")){await loadStaff();return}
+ const {error}=await db.rpc("set_organization_member_role",{p_org:activeOrg.id,p_user_id:userId,p_role:role});
+ if(error){document.getElementById("staffStatus").textContent="変更できませんでした: "+error.message}
+ await loadStaff();
+}
+async function removeStaff(userId,labelEnc){
+ const label=decodeURIComponent(labelEnc);
+ if(!confirm(label+" のこの事業所への所属を解除しますか？"))return;
+ const {error}=await db.rpc("remove_organization_staff",{p_org:activeOrg.id,p_user_id:userId});
+ document.getElementById("staffStatus").textContent=error?"解除できませんでした: "+error.message:"所属を解除しました。";
+ if(!error)await loadStaff();
+}
+
+async function loadClients(){
+ const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",activeOrg.id).order("sort_order").order("code");
+ if(error){document.getElementById("clientStatus").textContent="利用者を読み込めませんでした。";return}
+ clients=data||[];
+ document.getElementById("clientList").innerHTML=clients.map(x=>'<div class="manage-row"><div class="manage-main"><div class="manage-name">'+esc(x.code)+(x.display_name?" "+esc(x.display_name):"")+'</div></div><div class="manage-actions"><span class="badge staff">所属中</span></div></div>').join("")||'<div class="empty">利用者はまだ登録されていません。</div>';
+ document.getElementById("clientStatus").textContent=clients.length+"名を登録しています。";
+}
+async function addClient(){
+ if(activeMembership?.role!=="admin")return;
+ const code=document.getElementById("newClientCode").value.trim(),name=document.getElementById("newClientName").value.trim(),st=document.getElementById("clientStatus");
+ if(!code){st.textContent="利用者コードを入力してください。";return}
+ const maxSort=clients.reduce((m,x)=>Math.max(m,Number(x.sort_order)||0),0);
+ const {error}=await db.from("clients").insert({organization_id:activeOrg.id,code,display_name:name,sort_order:maxSort+10});
+ if(error){st.textContent=error.code==="23505"?"同じ利用者コードがすでにあります。":"追加できませんでした: "+error.message;return}
+ document.getElementById("newClientCode").value="";document.getElementById("newClientName").value="";st.textContent="利用者を追加しました。";await loadClients();
+}
+init();
+</script>
+</body>
+</html>
