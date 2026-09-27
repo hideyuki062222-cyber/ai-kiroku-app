@@ -10,9 +10,10 @@
 :root{--navy:#16345b;--blue:#2d6cdf;--red:#df4a67;--green:#16804a;--amber:#b76a00;--bg:#f4f6f9;--line:#dfe4ea;--text:#172033;--muted:#677489}
 *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}
 button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display:none!important}
-.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 12px}
-.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:980px;margin:auto}
-.brand{font-weight:800;font-size:18px}.sub{font-size:12px;color:var(--muted)}.top-actions{display:flex;gap:6px}
+.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:9px 12px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:980px;margin:auto}
+.top-brand{min-width:0}.brand{font-weight:900;font-size:19px;letter-spacing:.01em}.sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-right{display:flex;align-items:center;gap:8px}.app-nav{display:grid;grid-template-columns:repeat(3,auto);gap:3px;background:#eef2f7;border-radius:12px;padding:3px}.app-tab{display:block;text-decoration:none!important;color:#506078;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:850;white-space:nowrap}.app-tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px #00000014}.utility-actions{display:flex;gap:4px}.utility-actions .btn{padding:8px 9px;font-size:12px;white-space:nowrap}
 .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:700;background:#e9eef5;color:var(--navy)}
 .btn.primary{background:var(--navy);color:#fff}.btn.danger{background:#fee7eb;color:#a91d39}.btn.amber{background:#fff0d4;color:#945400}
 .wrap{max-width:980px;margin:auto;padding:12px 12px 80px}
@@ -61,6 +62,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .client-history-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.client-history-head select{flex:1;min-width:180px;border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff}
 .range-switch{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.range-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}.range-btn.active{background:#e8f0ff;border-color:#9ebaf0;color:#164fa8}
 .timeline-day{margin:12px 0 16px}.timeline-date{position:sticky;top:64px;z-index:5;background:#eef3f8;color:#223958;font-weight:900;border-radius:10px;padding:8px 10px;margin-bottom:7px}.timeline-empty{border:1px dashed #d7dee8;border-radius:10px;padding:11px;color:var(--muted);font-size:13px;background:#fafbfc}
+@media(max-width:680px){.top{padding:8px 10px}.topline{display:block}.top-brand{margin-bottom:7px}.brand{font-size:18px}.header-right{display:block}.app-nav{grid-template-columns:repeat(3,1fr);width:100%}.app-tab{text-align:center;padding:8px 5px;font-size:13px}.utility-actions{justify-content:flex-end;margin-top:5px}.utility-actions .btn{padding:6px 8px;font-size:11px}.sub{max-width:100%}}
 @media(max-width:430px){.vital-line{grid-template-columns:76px 1fr;gap:7px}.vital-line>label{font-size:13px}.vital-input{min-height:58px;font-size:21px!important}.bp-inputs{gap:5px}.bp-slash{font-size:18px}}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
 @media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
@@ -89,12 +91,18 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 
 <header class="top">
   <div class="topline">
-    <div><div class="brand">申し送り <span class="small">v2</span></div><div id="orgLabel" class="sub">読み込み中…</div></div>
-    <div class="top-actions">
-      <a class="btn" href="../" style="text-decoration:none">AI記録</a>\n      <a class="btn" href="../cashbook/" style="text-decoration:none">💰 出納帳</a>
-      <button id="adminTopBtn" class="btn amber hidden" onclick="openAdminSettings()">⚙ 管理</button>
-      <button class="btn" onclick="printPdf()">PDF/印刷</button>
-      <button class="btn" onclick="logout()">退出</button>
+    <div class="top-brand"><div class="brand">申し送り</div><div id="orgLabel" class="sub">読み込み中…</div></div>
+    <div class="header-right">
+      <nav class="app-nav" aria-label="アプリ切替">
+        <a class="app-tab active" href="./">申し送り</a>
+        <a class="app-tab" href="../">AI記録</a>
+        <a class="app-tab" href="../cashbook/">出納帳</a>
+      </nav>
+      <div class="utility-actions">
+        <button id="adminTopBtn" class="btn amber hidden" onclick="openAdminSettings()">管理</button>
+        <button class="btn" onclick="printPdf()">印刷</button>
+        <button class="btn" onclick="logout()">退出</button>
+      </div>
     </div>
   </div>
 </header>
