@@ -53,7 +53,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .setup{position:fixed;inset:0;z-index:90;background:#f4f6f9;display:flex;align-items:center;justify-content:center;padding:20px}.setupbox{background:#fff;border-radius:18px;padding:20px;width:min(460px,100%);border:1px solid var(--line)}.setupbox input{width:100%;padding:12px;border:1px solid #ccd4df;border-radius:10px;margin:8px 0}
 .status{font-size:12px;color:var(--muted);margin-top:6px}.small{font-size:12px;color:var(--muted)}
 .adminline{display:flex;gap:8px;margin-top:10px}.adminline select,.adminline input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:9px}
-.admin-divider{height:1px;background:#e6ebf1;margin:18px 0}.quick-manage-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.quick-manage-item{display:flex;align-items:center;gap:5px;border:1px solid #d5deea;background:#f8fafc;border-radius:999px;padding:5px 7px 5px 10px;font-size:13px;font-weight:700}.quick-delete{border:0;background:#fee7eb;color:#a91d39;border-radius:999px;width:27px;height:27px;font-weight:900;padding:0}.quick-add-row{display:flex;gap:8px;margin-top:10px}.quick-add-row input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:10px;min-width:0}
+.admin-divider{height:1px;background:#e6ebf1;margin:18px 0}.client-manage-add{display:grid;grid-template-columns:120px 1fr auto;gap:7px;margin-top:10px}.client-manage-add input{min-width:0;border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff}.client-manage-list{margin-top:10px;border:1px solid #e3e9f0;border-radius:12px;overflow:hidden}.client-manage-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-top:1px solid #edf1f5}.client-manage-row:first-child{border-top:0}.client-manage-name{font-weight:850;min-width:0}.client-manage-sub{font-size:11px;color:#6b7788}.client-restore{background:#eaf7ef!important;color:#16683f!important}.quick-manage-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.quick-manage-item{display:flex;align-items:center;gap:5px;border:1px solid #d5deea;background:#f8fafc;border-radius:999px;padding:5px 7px 5px 10px;font-size:13px;font-weight:700}.quick-delete{border:0;background:#fee7eb;color:#a91d39;border-radius:999px;width:27px;height:27px;font-weight:900;padding:0}.quick-add-row{display:flex;gap:8px;margin-top:10px}.quick-add-row input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:10px;min-width:0}
 .generalbox{border:1px solid #f0c36b;background:#fffaf0;border-radius:14px;padding:12px;margin-bottom:12px}
 .general-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .duebox{display:grid;grid-template-columns:1fr 1fr;gap:8px}.due-over{background:#ffe3e8!important;color:#a81434!important}.due-today{background:#fff0ce!important;color:#8e5500!important}
@@ -62,7 +62,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .client-history-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.client-history-head select{flex:1;min-width:180px;border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff}
 .range-switch{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.range-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}.range-btn.active{background:#e8f0ff;border-color:#9ebaf0;color:#164fa8}
 .timeline-day{margin:12px 0 16px}.timeline-date{position:sticky;top:64px;z-index:5;background:#eef3f8;color:#223958;font-weight:900;border-radius:10px;padding:8px 10px;margin-bottom:7px}.timeline-empty{border:1px dashed #d7dee8;border-radius:10px;padding:11px;color:var(--muted);font-size:13px;background:#fafbfc}
-@media(max-width:680px){.top{padding:8px 10px}.topline{display:block}.top-brand{margin-bottom:7px}.org-switch{max-width:100%;width:100%}.brand{font-size:18px}.header-right{display:block}.app-nav{grid-template-columns:repeat(3,1fr);width:100%}.app-tab{text-align:center;padding:8px 5px;font-size:13px}.utility-actions{justify-content:flex-end;margin-top:5px}.utility-actions .btn{padding:6px 8px;font-size:11px}.sub{max-width:100%}}
+@media(max-width:680px){.client-manage-add{grid-template-columns:1fr 1fr}.client-manage-add .btn{grid-column:1/-1}.top{padding:8px 10px}.topline{display:block}.top-brand{margin-bottom:7px}.org-switch{max-width:100%;width:100%}.brand{font-size:18px}.header-right{display:block}.app-nav{grid-template-columns:repeat(3,1fr);width:100%}.app-tab{text-align:center;padding:8px 5px;font-size:13px}.utility-actions{justify-content:flex-end;margin-top:5px}.utility-actions .btn{padding:6px 8px;font-size:11px}.sub{max-width:100%}}
 @media(max-width:430px){.vital-line{grid-template-columns:76px 1fr;gap:7px}.vital-line>label{font-size:13px}.vital-input{min-height:58px;font-size:21px!important}.bp-inputs{gap:5px}.bp-slash{font-size:18px}}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
 @media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
@@ -163,8 +163,18 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   <section id="adminCard" class="card hidden">
     <div class="row between"><div><strong style="font-size:18px">⚙ 管理者設定</strong><div class="small">管理者だけに表示されます</div></div><button class="btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">上へ戻る</button></div>
     <div class="admin-divider"></div>
+    <strong>利用者の追加・削除</strong>
+    <div class="small">追加した利用者はこの事業所の申し送り・AI記録・出納帳で使えます。削除しても過去の記録は消さず、一覧から非表示にします。</div>
+    <div class="client-manage-add">
+      <input id="newClientCode" maxlength="80" placeholder="利用者コード 例：501">
+      <input id="newClientDisplayName" maxlength="80" placeholder="表示名（任意）">
+      <button class="btn primary" onclick="addClientFromHandoff()">＋ 追加</button>
+    </div>
+    <div id="clientManageStatus" class="status"></div>
+    <div id="clientManageList" class="client-manage-list"></div>
+    <div class="admin-divider"></div>
     <strong>利用者表示名</strong>
-    <div class="small">申し送り画面だけに使う表示名です。空欄なら利用者コードだけ表示します。</div>
+    <div class="small">各アプリで表示する名前です。空欄なら利用者コードだけ表示します。</div>
     <div class="adminline"><select id="adminClient"></select><input id="adminName" maxlength="80" placeholder="表示名"><button class="btn" onclick="saveClientName()">保存</button></div>
     <div id="adminStatus" class="status"></div>
     <div class="admin-divider"></div>
@@ -268,7 +278,7 @@ const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物品","家族連絡","予定","コール","その他"];
 let quickInputs=[];
-let session=null,membership=null,memberships=[],organization=null,organizations=[],clients=[],staffMap={},entries=[],confirmations=new Set();
+let session=null,membership=null,memberships=[],organization=null,organizations=[],clients=[],allClients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
 let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[],selectedQuickCategory="すべて";
 
@@ -314,11 +324,11 @@ async function loadMembership(){
  historyClientId=null;selectedClientId=null;
  await Promise.all([loadClients(),loadStaff(),loadQuickInputs()]);
  await loadEntries();
- if(membership.role==="admin"){show("adminCard");show("adminTopBtn");}
+ if(membership.role==="admin"){show("adminCard");show("adminTopBtn");await loadClientManagement();}
 }
 function switchOrganization(id){localStorage.setItem("activeOrganizationId",id);location.reload()}
 async function loadClients(){
- const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",membership.organization_id).order("sort_order").order("code");
+ const {data,error}=await db.from("clients").select("id,code,display_name,sort_order,is_active").eq("organization_id",membership.organization_id).eq("is_active",true).order("sort_order").order("code");
  if(error) throw error; clients=data||[];
  const opts=clients.map(c=>'<option value="'+c.id+'">'+esc(clientLabel(c))+'</option>').join("");
  document.getElementById("entryClient").innerHTML='<option value="__general__">【全体申し送り・備考】</option>'+opts;
@@ -656,6 +666,54 @@ function openAdminSettings(){
  card.scrollIntoView({behavior:"smooth",block:"start"});
  setTimeout(()=>document.getElementById("newQuickInput")?.focus(),450);
 }
+
+async function loadClientManagement(){
+ if(membership?.role!=="admin")return;
+ const {data,error}=await db.from("clients").select("id,code,display_name,sort_order,is_active").eq("organization_id",membership.organization_id).order("is_active",{ascending:false}).order("sort_order").order("code");
+ const st=document.getElementById("clientManageStatus"),box=document.getElementById("clientManageList");
+ if(error){st.textContent="利用者一覧を読み込めませんでした。";return}
+ allClients=data||[];
+ if(!allClients.length){box.innerHTML='<div class="small" style="padding:12px">利用者はまだ登録されていません。</div>';return}
+ box.innerHTML=allClients.map(c=>{
+   const label=esc(c.code+(c.display_name?" "+c.display_name:""));
+   return '<div class="client-manage-row"><div><div class="client-manage-name">'+label+'</div><div class="client-manage-sub">'+(c.is_active?"利用中":"削除済み（過去記録は保持）")+'</div></div><div>'+
+     (c.is_active?'<button class="mini danger" onclick="setClientActive(\''+c.id+'\',false)">削除</button>':'<button class="mini client-restore" onclick="setClientActive(\''+c.id+'\',true)">復元</button>')+
+     '</div></div>';
+ }).join("");
+}
+async function addClientFromHandoff(){
+ if(membership?.role!=="admin")return;
+ const code=document.getElementById("newClientCode").value.trim(),name=document.getElementById("newClientDisplayName").value.trim(),st=document.getElementById("clientManageStatus");
+ if(!code){st.textContent="利用者コードを入力してください。";return}
+ st.textContent="追加中…";
+ const existing=allClients.find(x=>x.code===code);
+ if(existing){
+   if(existing.is_active){st.textContent="同じ利用者コードがすでに登録されています。";return}
+   const {error}=await db.from("clients").update({is_active:true,display_name:name||existing.display_name||"",updated_at:new Date().toISOString()}).eq("id",existing.id).eq("organization_id",membership.organization_id);
+   if(error){st.textContent="復元できませんでした: "+error.message;return}
+ }else{
+   const maxSort=allClients.reduce((m,x)=>Math.max(m,Number(x.sort_order)||0),0);
+   const {error}=await db.from("clients").insert({organization_id:membership.organization_id,code,display_name:name,sort_order:maxSort+10,is_active:true});
+   if(error){st.textContent="追加できませんでした: "+error.message;return}
+ }
+ document.getElementById("newClientCode").value="";document.getElementById("newClientDisplayName").value="";
+ st.textContent="利用者を追加しました。";
+ await loadClients();await loadClientManagement();render();
+}
+async function setClientActive(id,active){
+ if(membership?.role!=="admin")return;
+ const c=allClients.find(x=>x.id===id);if(!c)return;
+ const msg=active?"「"+clientLabel(c)+"」を一覧に戻しますか？":"「"+clientLabel(c)+"」を削除しますか？\n過去の申し送り・記録・出納帳データは消えません。";
+ if(!confirm(msg))return;
+ const st=document.getElementById("clientManageStatus");st.textContent=active?"復元中…":"削除中…";
+ const {error}=await db.from("clients").update({is_active:active,updated_at:new Date().toISOString()}).eq("id",id).eq("organization_id",membership.organization_id);
+ if(error){st.textContent="変更できませんでした: "+error.message;return}
+ st.textContent=active?"利用者を復元しました。":"利用者を一覧から削除しました。";
+ if(selectedClientId===id)selectedClientId=null;
+ if(historyClientId===id)historyClientId=null;
+ await loadClients();await loadClientManagement();await loadEntries();
+}
+
 async function saveClientName(){
  const id=document.getElementById("adminClient").value,name=document.getElementById("adminName").value.trim();
  const {error}=await db.from("clients").update({display_name:name,updated_at:new Date().toISOString()}).eq("id",id).eq("organization_id",membership.organization_id);
