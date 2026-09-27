@@ -13,7 +13,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:9px 12px}
 .topline{display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:980px;margin:auto}
 .top-brand{min-width:0}.brand{font-weight:900;font-size:19px;letter-spacing:.01em}.sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.header-right{display:flex;align-items:center;gap:8px}.app-nav{display:grid;grid-template-columns:repeat(3,auto);gap:3px;background:#eef2f7;border-radius:12px;padding:3px}.app-tab{display:block;text-decoration:none!important;color:#506078;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:850;white-space:nowrap}.app-tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px #00000014}.utility-actions{display:flex;gap:4px}.utility-actions .btn{padding:8px 9px;font-size:12px;white-space:nowrap}
+.header-right{display:flex;align-items:center;gap:8px}.org-switch{max-width:240px;border:1px solid #cad5e3;border-radius:8px;padding:5px 8px;background:#fff;color:var(--navy);font-size:12px;font-weight:850;margin-top:3px}.app-nav{display:grid;grid-template-columns:repeat(3,auto);gap:3px;background:#eef2f7;border-radius:12px;padding:3px}.app-tab{display:block;text-decoration:none!important;color:#506078;padding:8px 11px;border-radius:9px;font-size:13px;font-weight:850;white-space:nowrap}.app-tab.active{background:#fff;color:var(--navy);box-shadow:0 1px 4px #00000014}.utility-actions{display:flex;gap:4px}.utility-actions .btn{padding:8px 9px;font-size:12px;white-space:nowrap}
 .btn{border:0;border-radius:10px;padding:10px 13px;font-weight:700;background:#e9eef5;color:var(--navy)}
 .btn.primary{background:var(--navy);color:#fff}.btn.danger{background:#fee7eb;color:#a91d39}.btn.amber{background:#fff0d4;color:#945400}
 .wrap{max-width:980px;margin:auto;padding:12px 12px 80px}
@@ -62,7 +62,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .client-history-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.client-history-head select{flex:1;min-width:180px;border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff}
 .range-switch{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.range-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}.range-btn.active{background:#e8f0ff;border-color:#9ebaf0;color:#164fa8}
 .timeline-day{margin:12px 0 16px}.timeline-date{position:sticky;top:64px;z-index:5;background:#eef3f8;color:#223958;font-weight:900;border-radius:10px;padding:8px 10px;margin-bottom:7px}.timeline-empty{border:1px dashed #d7dee8;border-radius:10px;padding:11px;color:var(--muted);font-size:13px;background:#fafbfc}
-@media(max-width:680px){.top{padding:8px 10px}.topline{display:block}.top-brand{margin-bottom:7px}.brand{font-size:18px}.header-right{display:block}.app-nav{grid-template-columns:repeat(3,1fr);width:100%}.app-tab{text-align:center;padding:8px 5px;font-size:13px}.utility-actions{justify-content:flex-end;margin-top:5px}.utility-actions .btn{padding:6px 8px;font-size:11px}.sub{max-width:100%}}
+@media(max-width:680px){.top{padding:8px 10px}.topline{display:block}.top-brand{margin-bottom:7px}.org-switch{max-width:100%;width:100%}.brand{font-size:18px}.header-right{display:block}.app-nav{grid-template-columns:repeat(3,1fr);width:100%}.app-tab{text-align:center;padding:8px 5px;font-size:13px}.utility-actions{justify-content:flex-end;margin-top:5px}.utility-actions .btn{padding:6px 8px;font-size:11px}.sub{max-width:100%}}
 @media(max-width:430px){.vital-line{grid-template-columns:76px 1fr;gap:7px}.vital-line>label{font-size:13px}.vital-input{min-height:58px;font-size:21px!important}.bp-inputs{gap:5px}.bp-slash{font-size:18px}}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
 @media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
@@ -91,7 +91,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 
 <header class="top">
   <div class="topline">
-    <div class="top-brand"><div class="brand">申し送り</div><div id="orgLabel" class="sub">読み込み中…</div></div>
+    <div class="top-brand"><div class="brand">申し送り</div><select id="orgSwitch" class="org-switch" onchange="switchOrganization(this.value)"></select><div id="orgLabel" class="sub">読み込み中…</div></div>
     <div class="header-right">
       <nav class="app-nav" aria-label="アプリ切替">
         <a class="app-tab active" href="./">申し送り</a>
@@ -99,7 +99,8 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
         <a class="app-tab" href="../cashbook/">出納帳</a>
       </nav>
       <div class="utility-actions">
-        <button id="adminTopBtn" class="btn amber hidden" onclick="openAdminSettings()">管理</button>
+        <a class="btn" href="../manage/" style="text-decoration:none">事業所</a>
+        <button id="adminTopBtn" class="btn amber hidden" onclick="openAdminSettings()">入力設定</button>
         <button class="btn" onclick="printPdf()">印刷</button>
         <button class="btn" onclick="logout()">退出</button>
       </div>
@@ -267,7 +268,7 @@ const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物品","家族連絡","予定","コール","その他"];
 let quickInputs=[];
-let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
+let session=null,membership=null,memberships=[],organization=null,organizations=[],clients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
 let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[],selectedQuickCategory="すべて";
 
@@ -291,17 +292,31 @@ async function init(){
  await loadMembership();
 }
 async function loadMembership(){
- const {data,error}=await db.from("organization_members").select("organization_id,role,staff_name").eq("user_id",session.user.id).limit(1).maybeSingle();
+ const {data:ms,error}=await db.from("organization_members").select("organization_id,role,staff_name,created_at").eq("user_id",session.user.id).order("created_at");
  if(error){alert(error.message);return}
- if(!data){show("setup");return}
- membership=data; hide("setup");
- const {data:o}=await db.from("organizations").select("id,name").eq("id",membership.organization_id).single(); organization=o;
- document.getElementById("orgLabel").textContent=(organization?.name||"事業所")+" / "+(membership.staff_name||session.user.email||"職員");
+ memberships=ms||[];
+ if(!memberships.length){show("setup");return}
+ const ids=memberships.map(x=>x.organization_id);
+ const {data:os,error:oe}=await db.from("organizations").select("id,name,is_active,created_at").in("id",ids).order("created_at");
+ if(oe){alert(oe.message);return}
+ organizations=(os||[]).filter(x=>x.is_active);
+ if(!organizations.length){location.href="../manage/";return}
+ const saved=localStorage.getItem("activeOrganizationId");
+ organization=organizations.find(x=>x.id===saved)||organizations[0];
+ membership=memberships.find(x=>x.organization_id===organization.id);
+ localStorage.setItem("activeOrganizationId",organization.id);
+ hide("setup");hide("adminCard");hide("adminTopBtn");
+ const sw=document.getElementById("orgSwitch");
+ sw.innerHTML=organizations.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");
+ sw.value=organization.id;
+ document.getElementById("orgLabel").textContent=(membership.staff_name||session.user.email||"職員")+" / "+(membership.role==="admin"?"管理者":"一般職員");
  document.getElementById("dateInput").value=selectedDate;
+ historyClientId=null;selectedClientId=null;
  await Promise.all([loadClients(),loadStaff(),loadQuickInputs()]);
  await loadEntries();
  if(membership.role==="admin"){show("adminCard");show("adminTopBtn");}
 }
+function switchOrganization(id){localStorage.setItem("activeOrganizationId",id);location.reload()}
 async function loadClients(){
  const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",membership.organization_id).order("sort_order").order("code");
  if(error) throw error; clients=data||[];
@@ -671,7 +686,7 @@ function printPdf(){
 
 async function login(){const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;document.getElementById("authmsg").textContent="ログイン中…";const {data,error}=await db.auth.signInWithPassword({email,password});if(error){document.getElementById("authmsg").textContent=error.message;return}session=data.session;hide("auth");await loadMembership()}
 async function signup(){const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;if(!email||password.length<6){document.getElementById("authmsg").textContent="メールアドレスと6文字以上のパスワードを入力してください。";return}const {data,error}=await db.auth.signUp({email,password});if(error){document.getElementById("authmsg").textContent=error.message;return}session=data.session;if(session){hide("auth");await loadMembership()}else document.getElementById("authmsg").textContent="登録しました。ログインしてください。"}
-async function joinOrg(){const code=document.getElementById("joinCode").value.trim();const {error}=await db.rpc("join_organization",{p_join_code:code});document.getElementById("setupmsg").textContent=error?"参加できませんでした: "+error.message:"参加しました。";if(!error)await loadMembership()}
+async function joinOrg(){const code=document.getElementById("joinCode").value.trim();const {data,error}=await db.rpc("join_organization",{p_join_code:code});document.getElementById("setupmsg").textContent=error?"参加できませんでした: "+error.message:"参加しました。";if(!error){localStorage.setItem("activeOrganizationId",data);await loadMembership()}}
 async function logout(){await db.auth.signOut();location.reload()}
 init();
 </script>
