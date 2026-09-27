@@ -41,7 +41,9 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .client-picker-item.selected{border:2px solid var(--blue);background:#eef5ff}
 .catgrid{display:flex;gap:7px;flex-wrap:wrap}.cat{border:1px solid #c9d5e5;background:#f7faff;border-radius:999px;padding:9px 12px;color:#214e8a;font-weight:800}.cat:active{transform:scale(.98);background:#dce9ff}
 .quick-section{border:1px solid #dbe3ee;border-radius:13px;padding:12px;margin:12px 0;background:#fbfcfe}.quick-section-title{font-weight:900;margin-bottom:9px;color:#253a58}
-.quick-cat-tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.quick-cat-tabs::-webkit-scrollbar{display:none}.quick-cat-tab{flex:0 0 auto;border:1px solid #ccd7e6;background:#fff;border-radius:999px;padding:8px 12px;font-weight:800;color:#4b5e78}.quick-cat-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}.quick-group-title{font-size:13px;font-weight:900;color:#51627a;margin:10px 0 7px;padding-left:2px}.quick-buttons{display:flex;gap:7px;flex-wrap:wrap}.number-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.number-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.number-item label{font-size:12px;color:#536177;margin-bottom:4px}.number-item input{font-size:17px;font-weight:800;text-align:center}.quick-add{margin-top:9px;width:100%;border:0;border-radius:10px;padding:11px;background:#e8f0ff;color:#174f9b;font-weight:900}.carry-help{font-size:12px;color:#7a5b11;margin:4px 8px 10px;line-height:1.45}
+.quick-cat-tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.quick-cat-tabs::-webkit-scrollbar{display:none}.quick-cat-tab{flex:0 0 auto;border:1px solid #ccd7e6;background:#fff;border-radius:999px;padding:8px 12px;font-weight:800;color:#4b5e78}.quick-cat-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}.quick-group-title{font-size:13px;font-weight:900;color:#51627a;margin:10px 0 7px;padding-left:2px}.quick-buttons{display:flex;gap:7px;flex-wrap:wrap}.number-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.number-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.number-item label{font-size:12px;color:#536177;margin-bottom:4px}.number-item input{font-size:17px;font-weight:800;text-align:center}
+.vital-stack{display:grid;gap:10px}.vital-line{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:10px}.vital-line>label{margin:0;font-size:14px;font-weight:900;color:#40536d}.vital-input{width:100%;min-height:56px;border:2px solid #b8c7da!important;border-radius:12px!important;background:#fff!important;font-size:22px!important;font-weight:900!important;text-align:center;padding:8px 10px!important}.vital-input:focus{border-color:var(--blue)!important;outline:3px solid #2d6cdf22}.bp-inputs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}.bp-slash{font-size:22px;font-weight:900;color:#64748b}.vital-unit{font-size:12px;color:#667489;text-align:right;margin-top:3px}.vital-help{font-size:12px;color:#667489;margin:8px 0 2px}
+.quick-add{margin-top:12px;width:100%;min-height:52px;border:0;border-radius:11px;padding:12px;background:#e8f0ff;color:#174f9b;font-size:16px;font-weight:900}.carry-help{font-size:12px;color:#7a5b11;margin:4px 8px 10px;line-height:1.45}
 .checkrow{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;margin:7px 0;background:#f7f8fa}.checkrow.important{background:#fff0f3}.checkrow.carry{background:#fff8e6}
 .note{border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:12px;padding:11px;margin:9px 0;background:#fff}.note.night{border-left-color:var(--red);background:#fff9fa}.note.carry{box-shadow:inset 0 0 0 1px #f0c36b}.note-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.note-body{white-space:pre-wrap;margin:8px 0;line-height:1.55}.note-actions{display:flex;gap:6px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:700}.mini.ok{background:#e5f6ec;color:#14673e}.mini.warn{background:#fff1d7;color:#915600}
 .template{border:1px dashed #c9d1dc;background:#f8fafc;border-radius:10px;padding:8px 10px}
@@ -59,6 +61,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .client-history-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.client-history-head select{flex:1;min-width:180px;border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff}
 .range-switch{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.range-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}.range-btn.active{background:#e8f0ff;border-color:#9ebaf0;color:#164fa8}
 .timeline-day{margin:12px 0 16px}.timeline-date{position:sticky;top:64px;z-index:5;background:#eef3f8;color:#223958;font-weight:900;border-radius:10px;padding:8px 10px;margin-bottom:7px}.timeline-empty{border:1px dashed #d7dee8;border-radius:10px;padding:11px;color:var(--muted);font-size:13px;background:#fafbfc}
+@media(max-width:430px){.vital-line{grid-template-columns:76px 1fr;gap:7px}.vital-line>label{font-size:13px}.vital-input{min-height:58px;font-size:21px!important}.bp-inputs{gap:5px}.bp-slash{font-size:18px}}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
 @media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
 </style>
@@ -204,16 +207,26 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 
   <div class="quick-section">
     <div class="quick-section-title">❤️ バイタル</div>
-    <div class="number-grid">
-      <div class="number-item"><label>体温 ℃</label><input id="tempInput" type="number" inputmode="decimal" step="0.1" placeholder="36.5"></div>
-      <div class="number-item"><label>SpO₂ %</label><input id="spo2Input" type="number" inputmode="numeric" step="1" placeholder="98"></div>
+    <div class="vital-help">測った項目だけ入力すればOKです。</div>
+    <div class="vital-stack">
+      <div class="vital-line">
+        <label for="tempInput">🌡 体温</label>
+        <div><input class="vital-input" id="tempInput" type="number" inputmode="decimal" step="0.1" placeholder="36.5"><div class="vital-unit">℃</div></div>
+      </div>
+      <div class="vital-line">
+        <label>🩺 血圧</label>
+        <div><div class="bp-inputs"><input class="vital-input" id="bpSysInput" type="number" inputmode="numeric" step="1" placeholder="上 120"><span class="bp-slash">/</span><input class="vital-input" id="bpDiaInput" type="number" inputmode="numeric" step="1" placeholder="下 80"></div><div class="vital-unit">mmHg</div></div>
+      </div>
+      <div class="vital-line">
+        <label for="pulseInput">💓 脈拍</label>
+        <div><input class="vital-input" id="pulseInput" type="number" inputmode="numeric" step="1" placeholder="80"><div class="vital-unit">回/分</div></div>
+      </div>
+      <div class="vital-line">
+        <label for="spo2Input">🫁 SpO₂</label>
+        <div><input class="vital-input" id="spo2Input" type="number" inputmode="numeric" step="1" placeholder="98"><div class="vital-unit">%</div></div>
+      </div>
     </div>
-    <div class="number-grid three" style="margin-top:8px">
-      <div class="number-item"><label>血圧 上</label><input id="bpSysInput" type="number" inputmode="numeric" step="1" placeholder="120"></div>
-      <div class="number-item"><label>血圧 下</label><input id="bpDiaInput" type="number" inputmode="numeric" step="1" placeholder="80"></div>
-      <div class="number-item"><label>脈拍</label><input id="pulseInput" type="number" inputmode="numeric" step="1" placeholder="80"></div>
-    </div>
-    <button class="quick-add" onclick="addVitals()">バイタルを本文へ追加</button>
+    <button class="quick-add" onclick="addVitals()">＋ バイタルを申し送りに追加</button>
   </div>
 
   <label class="checkrow important"><input id="important" type="checkbox">⚠️ 重要な申し送り</label>
