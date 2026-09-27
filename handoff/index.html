@@ -40,6 +40,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .setup{position:fixed;inset:0;z-index:90;background:#f4f6f9;display:flex;align-items:center;justify-content:center;padding:20px}.setupbox{background:#fff;border-radius:18px;padding:20px;width:min(460px,100%);border:1px solid var(--line)}.setupbox input{width:100%;padding:12px;border:1px solid #ccd4df;border-radius:10px;margin:8px 0}
 .status{font-size:12px;color:var(--muted);margin-top:6px}.small{font-size:12px;color:var(--muted)}
 .adminline{display:flex;gap:8px;margin-top:10px}.adminline select,.adminline input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:9px}
+.admin-divider{height:1px;background:#e6ebf1;margin:18px 0}.quick-manage-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.quick-manage-item{display:flex;align-items:center;gap:5px;border:1px solid #d5deea;background:#f8fafc;border-radius:999px;padding:5px 7px 5px 10px;font-size:13px;font-weight:700}.quick-delete{border:0;background:#fee7eb;color:#a91d39;border-radius:999px;width:27px;height:27px;font-weight:900;padding:0}.quick-add-row{display:flex;gap:8px;margin-top:10px}.quick-add-row input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:10px;min-width:0}
 .generalbox{border:1px solid #f0c36b;background:#fffaf0;border-radius:14px;padding:12px;margin-bottom:12px}
 .general-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .duebox{display:grid;grid-template-columns:1fr 1fr;gap:8px}.due-over{background:#ffe3e8!important;color:#a81434!important}.due-today{background:#fff0ce!important;color:#8e5500!important}
@@ -141,6 +142,12 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
     <div class="small">申し送り画面だけに使う表示名です。空欄なら利用者コードだけ表示します。</div>
     <div class="adminline"><select id="adminClient"></select><input id="adminName" maxlength="80" placeholder="表示名"><button class="btn" onclick="saveClientName()">保存</button></div>
     <div id="adminStatus" class="status"></div>
+    <div class="admin-divider"></div>
+    <strong>管理者：かんたん入力の管理</strong>
+    <div class="small">ここで追加・削除したボタンが、全スタッフの「かんたん入力」に反映されます。</div>
+    <div class="quick-add-row"><input id="newQuickInput" maxlength="80" placeholder="例：昼食半量、入浴拒否、外泊予定"><button class="btn primary" onclick="addQuickInput()">追加</button></div>
+    <div id="quickManageStatus" class="status"></div>
+    <div id="quickManageList" class="quick-manage-list"></div>
   </section>
 </main>
 
@@ -199,17 +206,7 @@ const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
 const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物品","家族連絡","予定","コール","その他"];
-const TMPL=[
- {t:"入浴○",c:"入浴"},{t:"入浴×",c:"入浴"},{t:"シャワー浴○",c:"入浴"},
- {t:"朝食完食",c:"食事"},{t:"昼食完食",c:"食事"},{t:"夕食完食",c:"食事"},{t:"食事なし",c:"食事"},
- {t:"排便あり",c:"排泄"},{t:"排便なし",c:"排泄"},{t:"下痢あり",c:"排泄"},{t:"尿失禁あり",c:"排泄"},
- {t:"服薬確認済み",c:"服薬"},{t:"服薬拒否",c:"服薬"},{t:"眠前薬内服",c:"服薬"},
- {t:"コールあり",c:"コール"},{t:"コールなし",c:"コール"},
- {t:"体調変化なし",c:"体調"},{t:"眠気あり",c:"睡眠"},{t:"就寝",c:"睡眠"},{t:"笑顔あり",c:"体調"},{t:"不穏あり",c:"体調"},
- {t:"外出",c:"予定"},{t:"帰設",c:"予定"},{t:"外泊",c:"予定"},{t:"受診",c:"受診"},{t:"買い物",c:"予定"},
- {t:"洗濯",c:"物品"},{t:"居室掃除",c:"物品"},{t:"荷物預かり",c:"物品"},
- {t:"家族より連絡あり",c:"家族連絡"},{t:"翌朝対応必要",c:"予定"}
-];
+let quickInputs=[];
 let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
 let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[];
@@ -236,7 +233,7 @@ async function loadMembership(){
  const {data:o}=await db.from("organizations").select("id,name").eq("id",membership.organization_id).single(); organization=o;
  document.getElementById("orgLabel").textContent=(organization?.name||"事業所")+" / "+(membership.staff_name||session.user.email||"職員");
  document.getElementById("dateInput").value=selectedDate;
- await Promise.all([loadClients(),loadStaff()]);
+ await Promise.all([loadClients(),loadStaff(),loadQuickInputs()]);
  await loadEntries();
  if(membership.role==="admin") show("adminCard");
 }
@@ -253,6 +250,16 @@ async function loadClients(){
 async function loadStaff(){
  const {data}=await db.from("organization_members").select("user_id,staff_name,role").eq("organization_id",membership.organization_id);
  staffMap={}; for(const x of data||[]) staffMap[x.user_id]=x.staff_name||"職員名未登録";
+}
+async function loadQuickInputs(){
+ const {data,error}=await db.from("handoff_quick_inputs")
+   .select("id,label,category,sort_order")
+   .eq("organization_id",membership.organization_id)
+   .order("sort_order").order("created_at");
+ if(error){console.error(error);quickInputs=[];return}
+ quickInputs=data||[];
+ renderCats();
+ renderQuickManage();
 }
 async function loadEntries(){
  document.getElementById("summary").textContent="読み込み中…";
@@ -386,7 +393,9 @@ function changeDate(v){selectedDate=v;loadEntries();if(viewMode==="client")loadC
 function moveDate(n){const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()+n);selectedDate=localDate(d);loadEntries();if(viewMode==="client")loadClientTimeline()}
 
 function renderCats(){
- document.getElementById("templates").innerHTML=TMPL.map((x,i)=>'<button class="cat" type="button" onclick="addTemplate('+i+')">'+esc(x.t)+'</button>').join("");
+ const el=document.getElementById("templates"); if(!el)return;
+ el.innerHTML=quickInputs.map((x,i)=>'<button class="cat" type="button" onclick="addTemplate('+i+')">'+esc(x.label)+'</button>').join("");
+ if(!quickInputs.length) el.innerHTML='<span class="small">かんたん入力が登録されていません。</span>';
 }
 function appendBody(text){
  const el=document.getElementById("entryBody");
@@ -395,8 +404,8 @@ function appendBody(text){
  el.value=next;bodyCount();return true;
 }
 function addTemplate(i){
- const x=TMPL[i]; if(!x)return;
- if(appendBody(x.t)) selectedCats.add(x.c);
+ const x=quickInputs[i]; if(!x)return;
+ if(appendBody(x.label)) selectedCats.add(x.category||"その他");
 }
 function addWeight(){
  const v=document.getElementById("weightInput").value;
@@ -479,6 +488,32 @@ async function toggleConfirm(id,isOn){
 async function toggleCarry(id,v){await db.from("handoff_entries").update({carry_over:v,updated_at:new Date().toISOString()}).eq("id",id);await loadEntries()}
 async function toggleResolved(id,v){await db.from("handoff_entries").update({resolved:v,updated_at:new Date().toISOString()}).eq("id",id);await loadEntries()}
 async function deleteEntry(id){if(!confirm("この申し送りを削除しますか？"))return;const {error}=await db.from("handoff_entries").delete().eq("id",id);if(error)alert(error.message);await loadEntries()}
+
+
+function renderQuickManage(){
+ const el=document.getElementById("quickManageList"); if(!el)return;
+ if(!quickInputs.length){el.innerHTML='<span class="small">登録なし</span>';return}
+ el.innerHTML=quickInputs.map(x=>'<span class="quick-manage-item">'+esc(x.label)+'<button class="quick-delete" title="削除" onclick="deleteQuickInput(\''+x.id+'\')">×</button></span>').join("");
+}
+async function addQuickInput(){
+ const input=document.getElementById("newQuickInput"),label=input.value.trim(),status=document.getElementById("quickManageStatus");
+ if(!label){status.textContent="追加する言葉を入力してください。";return}
+ status.textContent="追加中…";
+ const maxOrder=quickInputs.reduce((m,x)=>Math.max(m,Number(x.sort_order)||0),0);
+ const {error}=await db.from("handoff_quick_inputs").insert({
+   organization_id:membership.organization_id,label,category:"その他",sort_order:maxOrder+10
+ });
+ if(error){status.textContent=error.code==="23505"?"同じかんたん入力がすでにあります。":"追加できませんでした: "+error.message;return}
+ input.value="";status.textContent="追加しました。";await loadQuickInputs();
+}
+async function deleteQuickInput(id){
+ const item=quickInputs.find(x=>x.id===id); const label=item?.label||"この項目";
+ if(!confirm("「"+label+"」を削除しますか？"))return;
+ const status=document.getElementById("quickManageStatus");status.textContent="削除中…";
+ const {error}=await db.from("handoff_quick_inputs").delete().eq("id",id).eq("organization_id",membership.organization_id);
+ if(error){status.textContent="削除できませんでした: "+error.message;return}
+ status.textContent="削除しました。";await loadQuickInputs();
+}
 
 async function saveClientName(){
  const id=document.getElementById("adminClient").value,name=document.getElementById("adminName").value.trim();
