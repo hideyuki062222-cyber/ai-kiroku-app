@@ -17,7 +17,9 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 .balance-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}.metric{border-radius:13px;padding:11px;background:#f7f9fc;border:1px solid var(--line)}.metric .k{font-size:11px;color:var(--muted);font-weight:800}.metric .v{font-size:20px;font-weight:950;margin-top:3px}.metric.balance{background:#eef5ff;border-color:#c6d9f7}.metric.balance .v{color:#164e96}.metric.in .v{color:var(--green)}.metric.out .v{color:var(--red)}
 .segment{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 14px}.seg{min-height:50px;border:2px solid var(--line);border-radius:12px;background:#fff;font-size:17px;font-weight:900}.seg.active.expense{background:#fff0f2;border-color:#e68f9b;color:#a32236}.seg.active.income{background:#eaf8f0;border-color:#84c9a4;color:#11653a}
 .field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:900;margin-bottom:6px}.field input,.field textarea{width:100%;border:1px solid #cfd8e4;border-radius:11px;padding:12px;font-size:16px;background:#fff}.field-label-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}.field-label-row label{margin:0}.add-master{border:1px solid #b8c9df;background:#eef5ff;color:#174f96;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}.master-note{font-size:11px;color:#6b7788;margin-top:5px}.field textarea{min-height:70px;resize:vertical}
-.amount-input{font-size:28px!important;font-weight:950!important;text-align:right;min-height:62px;border:2px solid #aabbd1!important}.date-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.amount-input{font-size:22px!important;font-weight:950!important;text-align:right;min-height:46px;border:1px solid #aabbd1!important;padding:9px 11px!important}.date-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.input-card{padding:12px}.input-card .section-title{font-size:16px;margin-bottom:7px}.input-card .field{margin:8px 0}.input-card .field label{margin-bottom:4px}.input-card input[type="date"]{min-height:44px;padding:8px 10px}.compact-segment{margin:5px 0 8px}.compact-segment .seg{min-height:40px;font-size:14px;padding:6px}
+.picker-button{width:100%;min-height:46px;border:1px solid #b8c7da;border-radius:10px;background:#fff;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;font-size:15px;font-weight:850;color:#27384f}.picker-button .placeholder{color:#7a8797;font-weight:700}.picker-button .arrow{color:#64748b}.picker-button.selected{border-color:#7ba0d5;background:#f7faff;color:#17365d}.compact-note{font-size:10px;color:#7a8797;margin-top:3px}.optional-toggle{margin-top:7px}.optional-toggle summary{font-size:12px;color:#5f6f84;font-weight:800;cursor:pointer}.optional-toggle .field{margin-top:7px}.optional-toggle textarea{min-height:55px;padding:9px 10px;font-size:14px}
 .quick-title{font-size:12px;font-weight:900;color:#5c6d83;margin:7px 0 5px}.quick-list{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.quick-list::-webkit-scrollbar{display:none}.chip{flex:0 0 auto;border:1px solid #cbd6e4;background:#f8fafc;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
 .save{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-size:17px;font-weight:900;margin-top:8px}
 .status{font-size:12px;margin-top:8px;color:#536177;min-height:18px}
@@ -27,7 +29,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 .adminbox{background:#fffaf0;border-color:#f0ddb2}.adminrow{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.adminrow .field{flex:1;min-width:160px;margin:0}.adminrow input{font-size:18px;text-align:right}
 .auth{position:fixed;inset:0;z-index:100;background:#f3f6fa;display:flex;align-items:center;justify-content:center;padding:18px}.authbox{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 40px #0001}.authbox input{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd6e2;border-radius:10px;font-size:16px}.auth-actions{display:flex;gap:8px;margin-top:10px}.auth-actions button{flex:1}
 .overlay{position:fixed;inset:0;z-index:80;background:#0007;display:flex;align-items:flex-end;justify-content:center}.sheet{width:min(600px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px 18px 0 0;padding:16px}.row-between{display:flex;justify-content:space-between;gap:8px;align-items:center}
-@media(max-width:520px){.brand{font-size:17px}.top-actions .btn{padding:8px 9px;font-size:12px}.balance-box{grid-template-columns:1fr 1fr}.metric.balance{grid-column:1/-1}.metric.balance .v{font-size:25px}.date-row{grid-template-columns:1fr}.entry-title{font-size:14px}.amount-input{font-size:26px!important}}
+.picker-search{width:100%;border:1px solid #cad5e2;border-radius:10px;padding:10px 11px;font-size:15px;margin:10px 0}.picker-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.picker-choice{border:1px solid #d3dce8;background:#fff;border-radius:10px;padding:10px 8px;font-size:14px;font-weight:850;text-align:left;min-height:42px}.picker-choice:active{background:#edf4ff}.picker-add{width:100%;margin-top:10px;border:1px dashed #7aa2d8;background:#eef5ff;color:#174f96;border-radius:10px;padding:10px;font-weight:900}.picker-empty{grid-column:1/-1;text-align:center;color:#7a8797;padding:18px 8px}
+@media(max-width:520px){.input-card{padding:10px}.input-card .save{min-height:46px;font-size:15px}.brand{font-size:17px}.top-actions .btn{padding:8px 9px;font-size:12px}.balance-box{grid-template-columns:1fr 1fr}.metric.balance{grid-column:1/-1}.metric.balance .v{font-size:25px}.date-row{grid-template-columns:1fr}.entry-title{font-size:14px}.amount-input{font-size:26px!important}}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:18px;margin-bottom:18px}.overlay{align-items:center}}
 @media print{.top,.input-card,.adminbox,.toolbar .btn,.entry-actions{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.history-card{padding:0}.entry{break-inside:avoid}}
 </style>
@@ -70,19 +73,38 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 
   <section class="card input-card">
     <div class="section-title">＋ 入出金を登録</div>
-    <div class="date-row">
-      <div class="field"><label>日付</label><input id="txDate" type="date"></div>
-      <div class="field"><label>区分</label>
-        <div class="segment">
-          <button id="expenseBtn" class="seg expense active" onclick="setKind('expense')">－ 支出</button>
-          <button id="incomeBtn" class="seg income" onclick="setKind('income')">＋ 入金</button>
-        </div>
-      </div>
+    <div class="segment compact-segment">
+      <button id="expenseBtn" class="seg expense active" onclick="setKind('expense')">－ 支出</button>
+      <button id="incomeBtn" class="seg income" onclick="setKind('income')">＋ 入金</button>
     </div>
-    <div class="field"><label>金額</label><input id="amount" class="amount-input" type="number" inputmode="numeric" min="1" step="1" placeholder="0"></div>
-    <div class="field"><div class="field-label-row"><label>品名・内容</label><button class="add-master" type="button" onclick="openChoiceAdd('item')">＋ 品名追加</button></div><input id="item" list="itemList" maxlength="120" placeholder="例：昼食、日用品、散髪"><datalist id="itemList"></datalist><div id="itemQuick" class="quick-list"></div><div class="master-note">追加した品名は全利用者で共通して使えます。</div></div>
-    <div class="field"><div class="field-label-row"><label>店名・支払先</label><button class="add-master" type="button" onclick="openChoiceAdd('store')">＋ 店名追加</button></div><input id="store" list="storeList" maxlength="120" placeholder="例：スーパー、薬局"><datalist id="storeList"></datalist><div id="storeQuick" class="quick-list"></div><div class="master-note">追加した店名は全利用者で共通して使えます。</div></div>
-    <div class="field"><label>備考（任意）</label><textarea id="memo" maxlength="300" placeholder="必要な時だけ入力"></textarea></div>
+
+    <div class="field">
+      <label>1．日付</label>
+      <input id="txDate" type="date">
+    </div>
+
+    <div class="field">
+      <label>2．店名・支払先</label>
+      <input id="store" type="hidden">
+      <button id="storePickerBtn" class="picker-button" type="button" onclick="openPicker('store')"><span id="storePickerText" class="placeholder">タップして店名を選択</span><span class="arrow">▼</span></button>
+    </div>
+
+    <div class="field">
+      <label>3．品名・内容</label>
+      <input id="item" type="hidden">
+      <button id="itemPickerBtn" class="picker-button" type="button" onclick="openPicker('item')"><span id="itemPickerText" class="placeholder">タップして品名を選択</span><span class="arrow">▼</span></button>
+    </div>
+
+    <div class="field">
+      <label>4．金額</label>
+      <input id="amount" class="amount-input" type="number" inputmode="numeric" min="1" step="1" placeholder="0">
+    </div>
+
+    <details class="optional-toggle">
+      <summary>備考を入力する（任意）</summary>
+      <div class="field"><textarea id="memo" maxlength="300" placeholder="必要な時だけ入力"></textarea></div>
+    </details>
+
     <button id="saveBtn" class="save" onclick="saveEntry()">保存する</button>
     <div id="saveStatus" class="status"></div>
   </section>
@@ -107,6 +129,15 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
     <div id="history" class="history"></div>
   </section>
 </main>
+
+<div id="pickerOverlay" class="overlay hidden">
+ <div class="sheet">
+  <div class="row-between"><div><h2 id="pickerTitle" style="margin:0;font-size:19px">店名を選択</h2><div class="small">タップすると選択されます。</div></div><button class="btn" onclick="closePicker()">×</button></div>
+  <input id="pickerSearch" class="picker-search" type="search" inputmode="search" placeholder="検索" oninput="renderPickerList()">
+  <div id="pickerList" class="picker-list"></div>
+  <button id="pickerAddBtn" class="picker-add" onclick="addFromPicker()">＋ 新しい店名を追加</button>
+ </div>
+</div>
 
 <div id="choiceOverlay" class="overlay hidden">
  <div class="sheet">
@@ -135,7 +166,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
 const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let session=null,membership=null,organization=null,clients=[],selectedClientId=null,entries=[],account=null,choices=[],kind="expense",editKind="expense",editingId=null,choiceAddKind="item";
+let session=null,membership=null,organization=null,clients=[],selectedClientId=null,entries=[],account=null,choices=[],kind="expense",editKind="expense",editingId=null,choiceAddKind="item",pickerKind="store";
 
 function show(id){document.getElementById(id).classList.remove("hidden")}
 function hide(id){document.getElementById(id).classList.add("hidden")}
@@ -194,12 +225,40 @@ async function reloadAll(){
  renderChoices();render();
 }
 function renderChoices(){
- const items=choices.filter(x=>x.kind==="item"),stores=choices.filter(x=>x.kind==="store");
- document.getElementById("itemList").innerHTML=items.map(x=>'<option value="'+esc(x.label)+'"></option>').join("");
- document.getElementById("storeList").innerHTML=stores.map(x=>'<option value="'+esc(x.label)+'"></option>').join("");
- document.getElementById("itemQuick").innerHTML=items.slice(0,8).map(x=>'<button class="chip" type="button" onclick="fillChoice(\'item\',\''+encodeURIComponent(x.label)+'\')">'+esc(x.label)+'</button>').join("");
- document.getElementById("storeQuick").innerHTML=stores.slice(0,8).map(x=>'<button class="chip" type="button" onclick="fillChoice(\'store\',\''+encodeURIComponent(x.label)+'\')">'+esc(x.label)+'</button>').join("");
+ if(!document.getElementById("pickerOverlay").classList.contains("hidden")) renderPickerList();
 }
+function openPicker(v){
+ pickerKind=v;
+ const isItem=v==="item";
+ document.getElementById("pickerTitle").textContent=isItem?"品名を選択":"店名を選択";
+ document.getElementById("pickerAddBtn").textContent=isItem?"＋ 新しい品名を追加":"＋ 新しい店名を追加";
+ document.getElementById("pickerSearch").value="";
+ show("pickerOverlay");
+ renderPickerList();
+ setTimeout(()=>document.getElementById("pickerSearch").focus(),100);
+}
+function closePicker(){hide("pickerOverlay")}
+function renderPickerList(){
+ const q=(document.getElementById("pickerSearch").value||"").trim().toLowerCase();
+ const list=choices.filter(x=>x.kind===pickerKind).filter(x=>!q||x.label.toLowerCase().includes(q));
+ const box=document.getElementById("pickerList");
+ if(!list.length){box.innerHTML='<div class="picker-empty">候補がありません。下の「＋追加」から登録できます。</div>';return}
+ box.innerHTML=list.map(x=>'<button class="picker-choice" type="button" onclick="selectChoice(\''+pickerKind+'\',\''+encodeURIComponent(x.label)+'\')">'+esc(x.label)+'</button>').join("");
+}
+function selectChoice(type,v){
+ const label=decodeURIComponent(v);
+ document.getElementById(type).value=label;
+ const text=document.getElementById(type+"PickerText"),btn=document.getElementById(type+"PickerBtn");
+ text.textContent=label;text.classList.remove("placeholder");btn.classList.add("selected");
+ closePicker();
+}
+function clearPickerValue(type){
+ document.getElementById(type).value="";
+ const text=document.getElementById(type+"PickerText"),btn=document.getElementById(type+"PickerBtn");
+ text.textContent=type==="store"?"タップして店名を選択":"タップして品名を選択";
+ text.classList.add("placeholder");btn.classList.remove("selected");
+}
+function addFromPicker(){closePicker();openChoiceAdd(pickerKind)}
 
 async function reloadChoices(){
  const {data,error}=await db.from("cashbook_choices").select("*").eq("organization_id",membership.organization_id).order("sort_order").order("created_at",{ascending:false});
@@ -227,12 +286,12 @@ async function saveChoiceMaster(){
  btn.disabled=false;
  if(error){st.textContent=error.code==="23505"?"すでに登録されています。":"追加できませんでした: "+error.message;return}
  await reloadChoices();
- const target=document.getElementById(choiceAddKind);
- if(target)target.value=label;
+ selectChoice(choiceAddKind,encodeURIComponent(label));
+ hide("pickerOverlay");
  st.textContent="全利用者で使えるように追加しました。";
  setTimeout(closeChoiceAdd,650);
 }
-function fillChoice(type,v){document.getElementById(type).value=decodeURIComponent(v)}
+function fillChoice(type,v){selectChoice(type,v)}
 function setKind(v){
  kind=v;
  document.getElementById("expenseBtn").classList.toggle("active",v==="expense");
@@ -249,13 +308,14 @@ async function saveEntry(){
  if(!selectedClientId){st.textContent="利用者を選択してください。";return}
  if(!txDate){st.textContent="日付を入力してください。";return}
  if(!Number.isInteger(amount)||amount<=0){st.textContent="金額を1円以上で入力してください。";return}
- if(!item){st.textContent="品名・内容を入力してください。";return}
+ if(!store){st.textContent="店名・支払先を選択してください。";return}
+ if(!item){st.textContent="品名・内容を選択してください。";return}
  document.getElementById("saveBtn").disabled=true;st.textContent="保存中…";
  const {error}=await db.from("cashbook_entries").insert({organization_id:membership.organization_id,client_id:selectedClientId,tx_date:txDate,kind,amount,item,store,memo,created_by:session.user.id,updated_by:session.user.id});
  document.getElementById("saveBtn").disabled=false;
  if(error){st.textContent="保存できませんでした: "+error.message;return}
  await Promise.all([rememberChoice("item",item),rememberChoice("store",store)]);
- document.getElementById("amount").value="";document.getElementById("item").value="";document.getElementById("store").value="";document.getElementById("memo").value="";
+ document.getElementById("amount").value="";clearPickerValue("item");clearPickerValue("store");document.getElementById("memo").value="";
  st.textContent="保存しました。";await reloadAll();
 }
 function ledgerRows(){
