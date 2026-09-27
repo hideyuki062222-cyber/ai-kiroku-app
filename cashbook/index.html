@@ -237,7 +237,7 @@ async function loadOrganizationContext(){
  const sw=document.getElementById("orgSwitch");
  sw.innerHTML=organizations.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join("");sw.value=organization.id;
  document.getElementById("orgLabel").textContent=(membership.staff_name||session.user.email||"職員")+" / "+(membership.role==="admin"?"管理者":"一般職員");
- const {data:cs,error:ce}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",organization.id).order("sort_order").order("code");
+ const {data:cs,error:ce}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",organization.id).eq("is_active",true).order("sort_order").order("code");
  if(ce){alert(ce.message);return}
  clients=cs||[];selectedClientId=null;entries=[];account=null;choices=[];
  document.getElementById("clientSelect").innerHTML=clients.map(c=>'<option value="'+c.id+'">'+esc(clientLabel(c))+'</option>').join("");
