@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>申し送り</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif;background:#f5f6f8;margin:0;color:#222}.wrap{max-width:680px;margin:auto;padding:18px}h1{font-size:28px}.card{background:white;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0001}button{width:100%;font-size:22px;font-weight:700;padding:20px;margin:8px 0;border:0;border-radius:14px;background:#1769e0;color:white;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.08);cursor:pointer}.secondary{background:#555}.danger{background:#b42318}.night{color:#b42318}.day{color:#111}textarea,input,select{box-sizing:border-box;width:100%;font-size:20px;padding:14px;border:1px solid #bbb;border-radius:10px;margin:7px 0}textarea{min-height:150px}.small{font-size:15px;color:#666}.item{border-top:1px solid #ddd;padding:14px 0;font-size:19px}.person{border:2px solid #ddd;border-radius:14px;padding:14px;margin:12px 0;background:#fff}.person b{font-size:24px}.person{line-height:1.55}.hidden{display:none}.listbtn{background:#16794a}</style></head><body><main class="wrap"><h1>申し送り</h1><p class="small">試作版 4.2</p><section id="home" class="card"><button onclick="startEntry()">🎤 話して入力する</button><button class="listbtn" onclick="showList()">📋 今日の申し送りを見る</button></section><section id="entry" class="card hidden">
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>申し送り</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans JP',sans-serif;background:#f5f6f8;margin:0;color:#222}.wrap{max-width:680px;margin:auto;padding:18px}h1{font-size:28px}.card{background:white;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0001}button{width:100%;font-size:22px;font-weight:700;padding:20px;margin:8px 0;border:0;border-radius:14px;background:#1769e0;color:white;touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,.08);cursor:pointer}.secondary{background:#555}.danger{background:#b42318}.night{color:#b42318}.day{color:#111}textarea,input,select{box-sizing:border-box;width:100%;font-size:20px;padding:14px;border:1px solid #bbb;border-radius:10px;margin:7px 0}textarea{min-height:150px}.small{font-size:15px;color:#666}.group{margin:18px 0 24px;border:2px solid #ddd;border-radius:16px;overflow:hidden;background:#fff}.groupTitle{font-size:24px;font-weight:800;padding:14px 16px;background:#f1f3f5}.item{border-top:1px solid #ddd;padding:14px 16px;font-size:19px}.group .item:first-of-type{border-top:0}.person{border:2px solid #ddd;border-radius:14px;padding:14px;margin:12px 0;background:#fff}.person b{font-size:24px}.person{line-height:1.55}.hidden{display:none}.listbtn{background:#16794a}</style></head><body><main class="wrap"><h1>申し送り</h1><p class="small">試作版 4.3</p><section id="home" class="card"><button onclick="startEntry()">🎤 話して入力する</button><button class="listbtn" onclick="showList()">📋 今日の申し送りを見る</button></section><section id="entry" class="card hidden">
   <label><b>① 利用者を選択</b></label><p class="small">先に利用者を選ぶので、音声では番号や名前を言わなくて大丈夫です。</p>
   <select id="resident">
     <option value="">利用者を選んでください</option>
@@ -130,14 +130,35 @@ function showList() {
   const a = JSON.parse(localStorage.getItem('handoffs') || '[]');
   const today = new Date().toLocaleDateString('ja-JP');
   const rows = a.filter(x => new Date(x.time).toLocaleDateString('ja-JP') === today);
-  $('items').innerHTML = rows.length
-    ? rows.map(x =>
+
+  if (!rows.length) {
+    $('items').innerHTML = '<p>今日の申し送りはまだありません。</p>';
+    screen('list');
+    return;
+  }
+
+  const groups = {};
+  rows.forEach(x => {
+    const key = x.id || 'その他';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(x);
+  });
+
+  const keys = Object.keys(groups).sort((a,b) => String(a).localeCompare(String(b),'ja',{numeric:true}));
+
+  $('items').innerHTML = keys.map(key => {
+    const entries = groups[key]
+      .sort((a,b) => new Date(b.time) - new Date(a.time))
+      .map(x =>
         '<div class="item ' + (x.shift === '夜勤' ? 'night' : 'day') + '">' +
-        '<b>' + (x.id ? esc(x.id) + '　' : '') + esc(x.shift) + '　' +
+        '<b>' + esc(x.shift) + '　' +
         new Date(x.time).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}) + '　' +
         esc(x.staff) + '</b><br>' + esc(x.text) + '</div>'
-      ).join('')
-    : '<p>今日の申し送りはまだありません。</p>';
+      ).join('');
+
+    return '<div class="group"><div class="groupTitle">' + esc(key) + '</div>' + entries + '</div>';
+  }).join('');
+
   screen('list');
 }
 
