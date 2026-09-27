@@ -124,7 +124,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   <div class="field"><label>対応日・時刻（任意）</label><div class="duebox"><input id="dueDate" type="date"><input id="dueTime" type="time"></div><div class="quicknote">例：明日の朝食準備、○日に受診、18:00お迎えなど</div></div>
   <div class="field"><label>申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
   <div class="field"><label>カテゴリ（複数選択可）</label><div id="categories" class="catgrid"></div></div>
-  <div class="field"><label>よく使う定型文</label><div id="templates" class="catgrid"></div></div>
+  <div class="field"><label>簡単入力</label><div id="templates" class="catgrid"></div><div class="quicknote">押した内容が申し送り本文へ追加されます。</div></div>
   <label class="checkrow important"><input id="important" type="checkbox">重要（要注意・優先対応）</label>
   <label class="checkrow carry"><input id="carry" type="checkbox">翌日へ引き継ぐ</label>
   <label class="checkrow"><input id="resolved" type="checkbox">対応済み</label>
@@ -271,7 +271,7 @@ function bodyCount(){document.getElementById("bodyCounter").textContent=document
 function setEntryShift(v){entryShift=v;document.getElementById("entryDay").classList.toggle("active",v==="day");document.getElementById("entryNight").classList.toggle("active",v==="night")}
 function openEntry(cid=null){
  selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("dueDate").value="";document.getElementById("dueTime").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("resolved").checked=false;document.getElementById("entryStatus").textContent="";
- if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId; else document.getElementById("entryClient").value="__general__";
+ if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId; else document.getElementById("entryClient").value=clients[0]?.id||"__general__";
  setEntryShift("day");renderCats();bodyCount();show("entryOverlay")
 }
 function openEntryForSelected(){closeDetail();openEntry(selectedClientId)} function closeEntry(){hide("entryOverlay")}
