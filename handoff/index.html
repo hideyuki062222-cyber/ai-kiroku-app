@@ -30,7 +30,8 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 #entryClient option{color:#172033;background:#fff;font-size:16px}
 .client-select-label{font-size:18px!important;color:var(--navy);margin-bottom:8px!important}
 .client-select-help{font-size:13px;color:#536177;margin-top:7px;font-weight:600}
-.catgrid{display:flex;gap:6px;flex-wrap:wrap}.cat{border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 10px}.cat.on{background:#e7f0ff;border-color:#86aceb;color:#194d9d;font-weight:800}
+.catgrid{display:flex;gap:7px;flex-wrap:wrap}.cat{border:1px solid #c9d5e5;background:#f7faff;border-radius:999px;padding:9px 12px;color:#214e8a;font-weight:800}.cat:active{transform:scale(.98);background:#dce9ff}
+.quick-section{border:1px solid #dbe3ee;border-radius:13px;padding:12px;margin:12px 0;background:#fbfcfe}.quick-section-title{font-weight:900;margin-bottom:9px;color:#253a58}.number-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.number-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.number-item label{font-size:12px;color:#536177;margin-bottom:4px}.number-item input{font-size:17px;font-weight:800;text-align:center}.quick-add{margin-top:9px;width:100%;border:0;border-radius:10px;padding:11px;background:#e8f0ff;color:#174f9b;font-weight:900}.carry-help{font-size:12px;color:#7a5b11;margin:4px 8px 10px;line-height:1.45}
 .checkrow{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;margin:7px 0;background:#f7f8fa}.checkrow.important{background:#fff0f3}.checkrow.carry{background:#fff8e6}
 .note{border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:12px;padding:11px;margin:9px 0;background:#fff}.note.night{border-left-color:var(--red);background:#fff9fa}.note.carry{box-shadow:inset 0 0 0 1px #f0c36b}.note-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.note-body{white-space:pre-wrap;margin:8px 0;line-height:1.55}.note-actions{display:flex;gap:6px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:700}.mini.ok{background:#e5f6ec;color:#14673e}.mini.warn{background:#fff1d7;color:#915600}
 .template{border:1px dashed #c9d1dc;background:#f8fafc;border-radius:10px;padding:8px 10px}
@@ -152,11 +153,34 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   <div class="field"><label>勤務区分</label><div class="segment"><button id="entryDay" class="seg active" onclick="setEntryShift('day')">☀ 日勤</button><button id="entryNight" class="seg night" onclick="setEntryShift('night')">☾ 夜勤</button><span></span></div></div>
   <div class="field"><label>対応日・時刻（任意）</label><div class="duebox"><input id="dueDate" type="date"><input id="dueTime" type="time"></div><div class="quicknote">例：明日の朝食準備、○日に受診、18:00お迎えなど</div></div>
   <div class="field"><label>申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
-  <div class="field"><label>カテゴリ（複数選択可）</label><div id="categories" class="catgrid"></div></div>
-  <div class="field"><label>簡単入力</label><div id="templates" class="catgrid"></div><div class="quicknote">押した内容が申し送り本文へ追加されます。</div></div>
-  <label class="checkrow important"><input id="important" type="checkbox">重要（要注意・優先対応）</label>
-  <label class="checkrow carry"><input id="carry" type="checkbox">翌日へ引き継ぐ</label>
-  <label class="checkrow"><input id="resolved" type="checkbox">対応済み</label>
+  <div class="quick-section">
+    <div class="quick-section-title">⚡ かんたん入力</div>
+    <div id="templates" class="catgrid"></div>
+    <div class="quicknote">押すだけで申し送り内容へ追加されます。</div>
+  </div>
+
+  <div class="quick-section">
+    <div class="quick-section-title">⚖️ 体重</div>
+    <div class="row"><div class="number-item" style="flex:1"><label>体重（kg）</label><input id="weightInput" type="number" inputmode="decimal" step="0.1" min="0" placeholder="例 62.8"></div><button class="btn" style="align-self:end" onclick="addWeight()">追加</button></div>
+  </div>
+
+  <div class="quick-section">
+    <div class="quick-section-title">❤️ バイタル</div>
+    <div class="number-grid">
+      <div class="number-item"><label>体温 ℃</label><input id="tempInput" type="number" inputmode="decimal" step="0.1" placeholder="36.5"></div>
+      <div class="number-item"><label>SpO₂ %</label><input id="spo2Input" type="number" inputmode="numeric" step="1" placeholder="98"></div>
+    </div>
+    <div class="number-grid three" style="margin-top:8px">
+      <div class="number-item"><label>血圧 上</label><input id="bpSysInput" type="number" inputmode="numeric" step="1" placeholder="120"></div>
+      <div class="number-item"><label>血圧 下</label><input id="bpDiaInput" type="number" inputmode="numeric" step="1" placeholder="80"></div>
+      <div class="number-item"><label>脈拍</label><input id="pulseInput" type="number" inputmode="numeric" step="1" placeholder="80"></div>
+    </div>
+    <button class="quick-add" onclick="addVitals()">バイタルを本文へ追加</button>
+  </div>
+
+  <label class="checkrow important"><input id="important" type="checkbox">⚠️ 重要な申し送り</label>
+  <label class="checkrow carry"><input id="carry" type="checkbox">📌 次の勤務にも残す</label>
+  <div class="carry-help">チェックすると、次の日・次の勤務にも表示されます。引き継ぎが終わったら一覧の「引き継ぎ終了」を押します。対応日を入れた場合は自動で残ります。</div>
   <div class="row"><button class="btn" onclick="closeEntry()">キャンセル</button><button id="saveBtn" class="btn primary" onclick="saveEntry()">保存する</button></div>
   <div id="entryStatus" class="status"></div>
  </div>
@@ -175,7 +199,17 @@ const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
 const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物品","家族連絡","予定","コール","その他"];
-const TMPL=["朝食：","昼食：","夕食：","入浴○","入浴×","排便あり","排便なし","服薬確認済み","コールあり","受診予定：","外泊","帰設予定：","体重：kg","バイタル：","家族より連絡あり","荷物預かり","翌朝対応必要"];
+const TMPL=[
+ {t:"入浴○",c:"入浴"},{t:"入浴×",c:"入浴"},{t:"シャワー浴○",c:"入浴"},
+ {t:"朝食完食",c:"食事"},{t:"昼食完食",c:"食事"},{t:"夕食完食",c:"食事"},{t:"食事なし",c:"食事"},
+ {t:"排便あり",c:"排泄"},{t:"排便なし",c:"排泄"},{t:"下痢あり",c:"排泄"},{t:"尿失禁あり",c:"排泄"},
+ {t:"服薬確認済み",c:"服薬"},{t:"服薬拒否",c:"服薬"},{t:"眠前薬内服",c:"服薬"},
+ {t:"コールあり",c:"コール"},{t:"コールなし",c:"コール"},
+ {t:"体調変化なし",c:"体調"},{t:"眠気あり",c:"睡眠"},{t:"就寝",c:"睡眠"},{t:"笑顔あり",c:"体調"},{t:"不穏あり",c:"体調"},
+ {t:"外出",c:"予定"},{t:"帰設",c:"予定"},{t:"外泊",c:"予定"},{t:"受診",c:"受診"},{t:"買い物",c:"予定"},
+ {t:"洗濯",c:"物品"},{t:"居室掃除",c:"物品"},{t:"荷物預かり",c:"物品"},
+ {t:"家族より連絡あり",c:"家族連絡"},{t:"翌朝対応必要",c:"予定"}
+];
 let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
 let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[];
@@ -258,7 +292,7 @@ function renderGeneral(){
  let out="";
  for(const e of es){
    out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(entryStaff(e))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">'+dueBadge(e);
-   if(e.is_important)out+='<span class="badge red">重要</span>'; if(e.carry_over&&!e.resolved)out+='<span class="badge amber">持越し</span>'; if(e.resolved)out+='<span class="badge green">対応済み</span>';
+   if(e.is_important)out+='<span class="badge red">重要</span>'; if(e.carry_over&&!e.resolved)out+='<span class="badge amber">継続表示</span>'; if(e.resolved)out+='<span class="badge green">対応済み</span>';
    out+='</div><div class="note-actions no-print">';
    if(e.created_by!==session.user.id) out+='<button class="mini '+(confirmations.has(e.id)?"ok":"")+'" onclick="toggleConfirm(\''+e.id+'\','+(confirmations.has(e.id)?"true":"false")+')">'+(confirmations.has(e.id)?"✓ 確認済み":"確認済みにする")+'</button>';
    out+='<button class="mini" onclick="toggleResolved(\''+e.id+'\','+(!e.resolved)+')">'+(e.resolved?"未対応に戻す":"対応済み")+'</button></div></div>';
@@ -273,7 +307,7 @@ function render(){
  document.getElementById("f"+(filterMode==="all"?"All":filterMode==="unread"?"Unread":filterMode==="important"?"Important":"Carry")).classList.add("active");
  let unread=0,important=0,carry=0,total=0;
  for(const e of entries){if(shiftFilter!=="all"&&e.shift!==shiftFilter)continue;total++;if(isUnread(e))unread++;if(e.is_important)important++;if(e.carry_over&&!e.resolved)carry++}
- document.getElementById("summary").textContent=fmtDate(selectedDate)+"　申し送り "+total+"件 / 未確認 "+unread+"件 / 重要 "+important+"件 / 持越し "+carry+"件";
+ document.getElementById("summary").textContent=fmtDate(selectedDate)+"　申し送り "+total+"件 / 未確認 "+unread+"件 / 重要 "+important+"件 / 継続 "+carry+"件";
  renderGeneral();
  let html="";
  for(const c of clients){
@@ -284,7 +318,7 @@ function render(){
    html+='<div class="client"><div class="client-main"><div><span class="client-code">'+esc(c.code)+'</span><span class="client-name">'+esc(c.display_name||"")+'</span></div><div class="client-meta">';
    if(es.length) html+='<span class="badge blue">申し送り '+es.length+'件</span>'; else html+='<span class="badge">0件</span>';
    if(u) html+='<span class="badge red">未確認 '+u+'</span>'; else if(es.length) html+='<span class="badge green">確認済み</span>';
-   if(im) html+='<span class="badge red">重要 '+im+'</span>'; if(ca) html+='<span class="badge amber">持越し '+ca+'</span>';
+   if(im) html+='<span class="badge red">重要 '+im+'</span>'; if(ca) html+='<span class="badge amber">継続 '+ca+'</span>';
    const dueNow=es.filter(x=>!x.resolved&&x.due_date&&x.due_date<=selectedDate).length;if(dueNow)html+='<span class="badge due-today">対応日 '+dueNow+'</span>';
    html+='</div><div class="client-preview">';
    if(es.length){
@@ -339,7 +373,7 @@ function renderClientTimeline(start,end){
      out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(entryStaff(e))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
      (e.categories||[]).forEach(ca=>out+='<span class="badge blue">'+esc(ca)+'</span>');
      out+=dueBadge(e);
-     if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">持越し</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
+     if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">継続表示</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
      out+='</div></div>';
    }
    out+='</div>';
@@ -352,15 +386,42 @@ function changeDate(v){selectedDate=v;loadEntries();if(viewMode==="client")loadC
 function moveDate(n){const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()+n);selectedDate=localDate(d);loadEntries();if(viewMode==="client")loadClientTimeline()}
 
 function renderCats(){
- document.getElementById("categories").innerHTML=CATS.map(c=>'<button class="cat '+(selectedCats.has(c)?"on":"")+'" onclick="toggleCat(\''+c+'\')">'+c+'</button>').join("");
- document.getElementById("templates").innerHTML=TMPL.map(t=>'<button class="template" onclick="addTemplate(\''+t+'\')">'+t+'</button>').join("");
+ document.getElementById("templates").innerHTML=TMPL.map((x,i)=>'<button class="cat" type="button" onclick="addTemplate('+i+')">'+esc(x.t)+'</button>').join("");
 }
-function toggleCat(c){selectedCats.has(c)?selectedCats.delete(c):selectedCats.add(c);renderCats()}
-function addTemplate(t){const el=document.getElementById("entryBody");el.value+=(el.value?"\n":"")+t;bodyCount()}
+function appendBody(text){
+ const el=document.getElementById("entryBody");
+ const next=(el.value?(el.value+"\n"):"")+text;
+ if(next.length>500){document.getElementById("entryStatus").textContent="申し送り内容は500文字までです。";return false}
+ el.value=next;bodyCount();return true;
+}
+function addTemplate(i){
+ const x=TMPL[i]; if(!x)return;
+ if(appendBody(x.t)) selectedCats.add(x.c);
+}
+function addWeight(){
+ const v=document.getElementById("weightInput").value;
+ if(v===""){document.getElementById("entryStatus").textContent="体重の数字を入力してください。";return}
+ if(appendBody("体重 "+v+"kg")){selectedCats.add("体調");document.getElementById("weightInput").value="";document.getElementById("entryStatus").textContent=""}
+}
+function addVitals(){
+ const t=document.getElementById("tempInput").value,spo2=document.getElementById("spo2Input").value,sys=document.getElementById("bpSysInput").value,dia=document.getElementById("bpDiaInput").value,p=document.getElementById("pulseInput").value;
+ const parts=[];
+ if(sys||dia) parts.push("血圧 "+(sys||"-")+"/"+(dia||"-"));
+ if(p) parts.push("脈拍 "+p);
+ if(spo2) parts.push("SpO₂ "+spo2+"%");
+ if(t) parts.push("体温 "+t+"℃");
+ if(!parts.length){document.getElementById("entryStatus").textContent="バイタルの数字を1つ以上入力してください。";return}
+ if(appendBody("バイタル："+parts.join("、"))){
+   selectedCats.add("体調");
+   ["tempInput","spo2Input","bpSysInput","bpDiaInput","pulseInput"].forEach(id=>document.getElementById(id).value="");
+   document.getElementById("entryStatus").textContent="";
+ }
+}
 function bodyCount(){document.getElementById("bodyCounter").textContent=document.getElementById("entryBody").value.length+"/500"}
 function setEntryShift(v){entryShift=v;document.getElementById("entryDay").classList.toggle("active",v==="day");document.getElementById("entryNight").classList.toggle("active",v==="night")}
 function openEntry(cid=null){
- selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("dueDate").value="";document.getElementById("dueTime").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("resolved").checked=false;document.getElementById("entryStatus").textContent="";
+ selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("dueDate").value="";document.getElementById("dueTime").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("entryStatus").textContent="";
+ ["weightInput","tempInput","spo2Input","bpSysInput","bpDiaInput","pulseInput"].forEach(id=>document.getElementById(id).value="");
  if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId; else document.getElementById("entryClient").value=clients[0]?.id||"__general__";
  setEntryShift("day");renderCats();bodyCount();show("entryOverlay")
 }
@@ -371,7 +432,7 @@ async function saveEntry(){
  if(!target||!body){document.getElementById("entryStatus").textContent="対象と申し送り内容を入力してください。";return}
  document.getElementById("saveBtn").disabled=true;document.getElementById("entryStatus").textContent="保存中…";
  const isGeneral=target==="__general__";
- const payload={organization_id:membership.organization_id,scope:isGeneral?"general":"client",client_id:isGeneral?null:target,service_date:selectedDate,shift:entryShift,body,categories:[...selectedCats],is_important:document.getElementById("important").checked,carry_over:document.getElementById("carry").checked||!!dueDate,resolved:document.getElementById("resolved").checked,due_date:dueDate,due_time:dueTime,created_by:session.user.id};
+ const payload={organization_id:membership.organization_id,scope:isGeneral?"general":"client",client_id:isGeneral?null:target,service_date:selectedDate,shift:entryShift,body,categories:[...selectedCats],is_important:document.getElementById("important").checked,carry_over:document.getElementById("carry").checked||!!dueDate,resolved:false,due_date:dueDate,due_time:dueTime,created_by:session.user.id};
  const {error}=await db.from("handoff_entries").insert(payload);document.getElementById("saveBtn").disabled=false;
  if(error){document.getElementById("entryStatus").textContent="保存できませんでした: "+error.message;return}
  closeEntry();await loadEntries();
@@ -397,8 +458,13 @@ async function renderDetail(history){
    if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">翌日へ</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
    out+='</div><div class="note-actions no-print">';
    if(e.created_by!==session.user.id) out+='<button class="mini '+(mine?"ok":"")+'" onclick="toggleConfirm(\''+e.id+'\','+(mine?"true":"false")+')">'+(mine?"✓ 確認済み":"確認済みにする")+'</button>';
-   out+='<button class="mini warn" onclick="toggleCarry(\''+e.id+'\','+(!e.carry_over)+')">'+(e.carry_over?"翌日引継ぎを解除":"翌日へ引き継ぐ")+'</button>';
-   out+='<button class="mini" onclick="toggleResolved(\''+e.id+'\','+(!e.resolved)+')">'+(e.resolved?"未対応に戻す":"対応済み")+'</button>';
+   if(e.resolved){
+     out+='<button class="mini" onclick="toggleResolved(\''+e.id+'\',false)">↩ 引き継ぎを再開</button>';
+   }else if(e.carry_over){
+     out+='<button class="mini ok" onclick="toggleResolved(\''+e.id+'\',true)">✓ 引き継ぎ終了</button>';
+   }else{
+     out+='<button class="mini warn" onclick="toggleCarry(\''+e.id+'\',true)">📌 次の勤務にも残す</button>';
+   }
    if(canDelete) out+='<button class="mini" onclick="deleteEntry(\''+e.id+'\')">削除</button>';
    out+='</div></div>';
  }
@@ -425,7 +491,7 @@ function printPdf(){
  const w=window.open("","_blank"); if(!w){alert("ポップアップを許可してください。");return}
  function entryHtml(e){
    const due=e.due_date?' <b>【対応 '+esc(e.due_date)+(e.due_time?' '+String(e.due_time).slice(0,5):'')+'】</b>':'';
-   return '<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(entryStaff(e))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+due+(e.carry_over&&!e.resolved?' <b>【持越し】</b>':'')+'</div>';
+   return '<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(entryStaff(e))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+due+(e.carry_over&&!e.resolved?' <b>【継続】</b>':'')+'</div>';
  }
  function pageRows(list){
    return list.map(c=>{
