@@ -180,7 +180,7 @@ function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt
 function fmtDate(v){const d=new Date(v+"T12:00:00");return d.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})}
 function fmtTime(v){return new Date(v).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
 function clientLabel(c){return c.code+(c.display_name?" "+c.display_name:"")}
-function staffName(uid){return staffMap[uid]||"職員名未登録"} function entryStaff(e){return e.source_label||entryStaff(e)}
+function staffName(uid){return staffMap[uid]||"職員名未登録"} function entryStaff(e){return e.source_label||staffName(e.created_by)}
 function show(id){document.getElementById(id).classList.remove("hidden")} function hide(id){document.getElementById(id).classList.add("hidden")}
 
 async function init(){
