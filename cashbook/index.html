@@ -24,7 +24,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 .save{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-size:17px;font-weight:900;margin-top:8px}
 .status{font-size:12px;margin-top:8px;color:#536177;min-height:18px}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.toolbar .field{margin:0;flex:1;min-width:130px}.toolbar input{min-height:43px}
-.history{margin-top:10px}.entry{border-top:1px solid #e8edf3;padding:11px 0}.entry:first-child{border-top:0}.entry-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.entry-date{font-size:12px;color:var(--muted);font-weight:800}.entry-title{font-size:15px;font-weight:900;margin-top:3px}.entry-sub{font-size:12px;color:#64748b;margin-top:4px}.entry-money{text-align:right;white-space:nowrap}.entry-money .amt{font-size:17px;font-weight:950}.entry-money .amt.out{color:var(--red)}.entry-money .amt.in{color:var(--green)}.entry-money .bal{font-size:12px;color:#536177;margin-top:3px}.entry-actions{display:flex;gap:6px;margin-top:8px}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800}
+.history{margin-top:10px}.entry{border-top:1px solid #e8edf3;padding:11px 0}.entry:first-child{border-top:0}.entry-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.entry-date{font-size:12px;color:var(--muted);font-weight:800}.entry-title{font-size:15px;font-weight:900;margin-top:3px}.entry-sub{font-size:12px;color:#64748b;margin-top:4px}.entry-who{font-size:11px;color:#7b8797;margin-top:4px;font-weight:700}.entry-money{text-align:right;white-space:nowrap}.entry-money .amt{font-size:17px;font-weight:950}.entry-money .amt.out{color:var(--red)}.entry-money .amt.in{color:var(--green)}.entry-money .bal{font-size:12px;color:#536177;margin-top:3px}.entry-actions{display:flex;gap:6px;margin-top:8px}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 9px;font-size:12px;font-weight:800}
 .empty{text-align:center;color:var(--muted);padding:25px 8px}.section-title{font-size:17px;font-weight:950;margin-bottom:10px}
 .adminbox{background:#fffaf0;border-color:#f0ddb2}.adminrow{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.adminrow .field{flex:1;min-width:160px;margin:0}.adminrow input{font-size:18px;text-align:right}
 .auth{position:fixed;inset:0;z-index:100;background:#f3f6fa;display:flex;align-items:center;justify-content:center;padding:18px}.authbox{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 40px #0001}.authbox input{width:100%;padding:12px;margin:7px 0;border:1px solid #ccd6e2;border-radius:10px;font-size:16px}.auth-actions{display:flex;gap:8px;margin-top:10px}.auth-actions button{flex:1}
@@ -151,8 +151,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
       <span>残高 <b id="printBalance">¥0</b></span>
     </div>
     <table class="print-table">
-      <colgroup><col style="width:12%"><col style="width:19%"><col style="width:22%"><col style="width:11%"><col style="width:11%"><col style="width:12%"><col style="width:13%"></colgroup>
-      <thead><tr><th>日付</th><th>店名</th><th>品名</th><th>入金</th><th>支出</th><th>残高</th><th>備考</th></tr></thead>
+      <colgroup><col style="width:10%"><col style="width:16%"><col style="width:19%"><col style="width:10%"><col style="width:10%"><col style="width:11%"><col style="width:12%"><col style="width:12%"></colgroup>
+      <thead><tr><th>日付</th><th>店名</th><th>品名</th><th>入金</th><th>支出</th><th>残高</th><th>入力者</th><th>備考</th></tr></thead>
       <tbody id="printBody"></tbody>
     </table>
   </section>
@@ -361,7 +361,8 @@ async function saveEntry(){
  if(!store){st.textContent="店名・支払先を選択してください。";return}
  if(!item){st.textContent="品名・内容を選択してください。";return}
  document.getElementById("saveBtn").disabled=true;st.textContent="保存中…";
- const {error}=await db.from("cashbook_entries").insert({organization_id:membership.organization_id,client_id:selectedClientId,tx_date:txDate,kind,amount,item,store,memo,created_by:session.user.id,updated_by:session.user.id});
+ const inputterName=membership.staff_name||session.user.email||"職員名未登録";
+ const {error}=await db.from("cashbook_entries").insert({organization_id:membership.organization_id,client_id:selectedClientId,tx_date:txDate,kind,amount,item,store,memo,created_by:session.user.id,created_by_name:inputterName,updated_by:session.user.id});
  document.getElementById("saveBtn").disabled=false;
  if(error){st.textContent="保存できませんでした: "+error.message;return}
  await Promise.all([rememberChoice("item",item),rememberChoice("store",store)]);
@@ -387,7 +388,7 @@ function render(){
 
 function printRows(){
  const month=document.getElementById("monthFilter").value||currentMonth(),q=document.getElementById("searchInput").value.trim().toLowerCase();
- return ledgerRows().filter(x=>x.tx_date.startsWith(month)).filter(x=>!q||[x.item,x.store,x.memo].some(v=>(v||"").toLowerCase().includes(q)));
+ return ledgerRows().filter(x=>x.tx_date.startsWith(month)).filter(x=>!q||[x.item,x.store,x.memo,x.created_by_name].some(v=>(v||"").toLowerCase().includes(q)));
 }
 function renderPrintReport(){
  const month=document.getElementById("monthFilter").value||currentMonth(),rows=printRows(),client=clients.find(x=>x.id===selectedClientId);
@@ -400,7 +401,7 @@ function renderPrintReport(){
  document.getElementById("printExpense").textContent=yen(expense);
  document.getElementById("printBalance").textContent=yen(balance);
  const body=document.getElementById("printBody");
- if(!rows.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:8px">記録なし</td></tr>';return}
+ if(!rows.length){body.innerHTML='<tr><td colspan="8" style="text-align:center;padding:8px">記録なし</td></tr>';return}
  body.innerHTML=rows.map(e=>'<tr>'+
    '<td class="date">'+esc(e.tx_date.slice(5).replace("-","/"))+'</td>'+
    '<td>'+esc(e.store||"")+'</td>'+
@@ -408,6 +409,7 @@ function renderPrintReport(){
    '<td class="num">'+(e.kind==="income"?yen(e.amount):"")+'</td>'+
    '<td class="num">'+(e.kind==="expense"?yen(e.amount):"")+'</td>'+
    '<td class="num">'+yen(e.balance)+'</td>'+
+   '<td>'+esc(e.created_by_name||"職員名未登録")+'</td>'+
    '<td>'+esc(e.memo||"")+'</td>'+
    '</tr>').join("");
 }
@@ -415,12 +417,12 @@ function printCashbook(){renderPrintReport();window.print()}
 
 function renderHistory(){
  const month=document.getElementById("monthFilter").value||currentMonth(),q=document.getElementById("searchInput").value.trim().toLowerCase();
- const rows=ledgerRows().filter(x=>x.tx_date.startsWith(month)).filter(x=>!q||[x.item,x.store,x.memo].some(v=>(v||"").toLowerCase().includes(q))).reverse();
+ const rows=ledgerRows().filter(x=>x.tx_date.startsWith(month)).filter(x=>!q||[x.item,x.store,x.memo,x.created_by_name].some(v=>(v||"").toLowerCase().includes(q))).reverse();
  const box=document.getElementById("history");
  if(!rows.length){box.innerHTML='<div class="empty">この月の記録はありません。</div>';return}
  box.innerHTML=rows.map(e=>{
    const canEdit=e.created_by===session.user.id||membership.role==="admin";
-   return '<div class="entry"><div class="entry-head"><div><div class="entry-date">'+esc(e.tx_date)+'</div><div class="entry-title">'+esc(e.item||"(内容なし)")+'</div><div class="entry-sub">'+(e.store?'🏪 '+esc(e.store):'')+(e.memo?'　'+esc(e.memo):'')+'</div></div><div class="entry-money"><div class="amt '+(e.kind==="income"?"in":"out")+'">'+(e.kind==="income"?"+ ":"- ")+yen(e.amount)+'</div><div class="bal">残高 '+yen(e.balance)+'</div></div></div>'+(canEdit?'<div class="entry-actions"><button class="mini" onclick="openEdit(\''+e.id+'\')">修正</button><button class="mini" onclick="deleteEntry(\''+e.id+'\')">削除</button></div>':'')+'</div>';
+   return '<div class="entry"><div class="entry-head"><div><div class="entry-date">'+esc(e.tx_date)+'</div><div class="entry-title">'+esc(e.item||"(内容なし)")+'</div><div class="entry-sub">'+(e.store?'🏪 '+esc(e.store):'')+(e.memo?'　'+esc(e.memo):'')+'</div><div class="entry-who">入力者：'+esc(e.created_by_name||"職員名未登録")+'</div></div><div class="entry-money"><div class="amt '+(e.kind==="income"?"in":"out")+'">'+(e.kind==="income"?"+ ":"- ")+yen(e.amount)+'</div><div class="bal">残高 '+yen(e.balance)+'</div></div></div>'+(canEdit?'<div class="entry-actions"><button class="mini" onclick="openEdit(\''+e.id+'\')">修正</button><button class="mini" onclick="deleteEntry(\''+e.id+'\')">削除</button></div>':'')+'</div>';
  }).join("");
 }
 async function saveOpeningBalance(){
@@ -453,7 +455,7 @@ async function deleteEntry(id){
 }
 function exportCsv(){
  const month=document.getElementById("monthFilter").value||currentMonth(),c=clients.find(x=>x.id===selectedClientId),rows=ledgerRows().filter(x=>x.tx_date.startsWith(month));
- const lines=[["利用者","日付","区分","品名・内容","店名・支払先","入金","支出","残高","備考"],...rows.map(e=>[clientLabel(c||{code:""}),e.tx_date,e.kind==="income"?"入金":"支出",e.item,e.store,e.kind==="income"?e.amount:"",e.kind==="expense"?e.amount:"",e.balance,e.memo])];
+ const lines=[["利用者","日付","区分","品名・内容","店名・支払先","入金","支出","残高","入力者","備考"],...rows.map(e=>[clientLabel(c||{code:""}),e.tx_date,e.kind==="income"?"入金":"支出",e.item,e.store,e.kind==="income"?e.amount:"",e.kind==="expense"?e.amount:"",e.balance,e.created_by_name||"職員名未登録",e.memo])];
  const csv="\uFEFF"+lines.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\r\n");
  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=(c?clientLabel(c).replace(/[\\/:*?"<>|]/g,"_"):"出納帳")+"_"+month+".csv";a.click();URL.revokeObjectURL(url);
 }
