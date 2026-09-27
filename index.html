@@ -54,6 +54,7 @@
 
   .hidden{display:none!important}
   .cloud-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  .org-switcher{margin-top:8px;max-width:360px}.org-switcher select{width:100%;border:1px solid #cbd6e3;border-radius:9px;padding:8px 10px;background:#fff;color:#273142;font-weight:800;font-size:13px}
   .cloud-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3}
   .auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(245,247,251,.97);overflow:auto;padding:24px 12px calc(24px + env(safe-area-inset-bottom))}
   .auth-box{max-width:620px;margin:24px auto;background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:22px;box-shadow:0 18px 50px rgba(17,24,39,.12)}
@@ -152,9 +153,11 @@ window.AI_KIROKU_CONFIG = {
       <div>
         <label>社内共有クラウド</label>
         <span class="cloud-badge" id="cloudState">設定確認中</span>
+        <div class="org-switcher"><select id="orgSwitch" onchange="window.switchOrganization && window.switchOrganization(this.value)"></select></div>
         <div class="pwa-note" id="cloudOrgInfo">クラウド接続を確認しています。</div>
       </div>
       <div class="actions">
+        <button class="secondary" onclick="location.href='./manage/'">事業所管理</button>
         <button class="secondary" id="reloadCloudBtn" onclick="window.cloudReloadAll && window.cloudReloadAll()">再読み込み</button>
         <button class="secondary" id="logoutBtn" onclick="window.cloudLogout && window.cloudLogout()">ログアウト</button>
       </div>
@@ -1174,7 +1177,9 @@ refreshUserSelect();
   let client = null;
   let session = null;
   let membership = null;
+  let memberships = [];
   let organization = null;
+  let organizations = [];
   let clientRows = [];
 
   function show(el){ if(el) el.classList.remove("hidden"); }
@@ -1194,26 +1199,52 @@ refreshUserSelect();
   async function getMembership(){
     const { data, error } = await client
       .from("organization_members")
-      .select("organization_id, role, staff_name")
+      .select("organization_id, role, staff_name, created_at")
       .eq("user_id", session.user.id)
-      .limit(1)
-      .maybeSingle();
+      .order("created_at", { ascending:true });
     if(error) throw error;
-    membership = data || null;
-    if(!membership){
+    memberships = data || [];
+    if(!memberships.length){
+      membership = null;
+      organization = null;
+      organizations = [];
+      return null;
+    }
+
+    const ids = memberships.map(x => x.organization_id);
+    const orgRes = await client
+      .from("organizations")
+      .select("id, name, join_code, is_active, created_at")
+      .in("id", ids)
+      .order("created_at", { ascending:true });
+    if(orgRes.error) throw orgRes.error;
+
+    organizations = (orgRes.data || []).filter(x => x.is_active);
+    if(!organizations.length){
+      membership = null;
       organization = null;
       return null;
     }
 
-    const orgRes = await client
-      .from("organizations")
-      .select("id, name, join_code")
-      .eq("id", membership.organization_id)
-      .single();
-    if(orgRes.error) throw orgRes.error;
-    organization = orgRes.data;
+    const saved = localStorage.getItem("activeOrganizationId");
+    organization = organizations.find(x => x.id === saved) || organizations[0];
+    membership = memberships.find(x => x.organization_id === organization.id) || null;
+    if(!membership) return null;
+    localStorage.setItem("activeOrganizationId", organization.id);
+
+    const sw = document.getElementById("orgSwitch");
+    if(sw){
+      sw.innerHTML = organizations.map(x => '<option value="'+x.id+'">'+escapeHtml(x.name)+'</option>').join("");
+      sw.value = organization.id;
+    }
     return membership;
   }
+
+  window.switchOrganization = (orgId) => {
+    if(!orgId) return;
+    localStorage.setItem("activeOrganizationId", orgId);
+    location.reload();
+  };
 
   async function loadCloudUsers(){
     if(!membership) return;
@@ -1353,7 +1384,7 @@ refreshUserSelect();
     show(staffAdminCard());
     if(staffJoinCodeEl()) staffJoinCodeEl().value = organization?.join_code || "";
     if(staffStatusEl()) staffStatusEl().textContent = "職員一覧を読み込んでいます…";
-    const { data, error } = await client.rpc("list_organization_staff");
+    const { data, error } = await client.rpc("list_organization_staff", { p_org:membership.organization_id });
     if(error) throw error;
     renderStaffRows(data || []);
     if(staffStatusEl()) staffStatusEl().textContent = `${(data || []).length}名が所属しています。`;
@@ -1390,7 +1421,7 @@ refreshUserSelect();
     if(!confirm(`${email} の事業所所属を解除しますか？\nアカウント自体は削除されません。`)) return;
     try{
       if(staffStatusEl()) staffStatusEl().textContent = "所属を解除しています…";
-      const { error } = await client.rpc("remove_organization_staff", { p_user_id:userId });
+      const { error } = await client.rpc("remove_organization_staff", { p_org:membership.organization_id, p_user_id:userId });
       if(error) throw error;
       await loadCloudStaff();
       if(staffStatusEl()) staffStatusEl().textContent = "職員の所属を解除しました。";
@@ -1432,6 +1463,10 @@ refreshUserSelect();
   async function enterApp(){
     await getMembership();
     if(!membership){
+      if(memberships.length && !organizations.length){
+        location.href = "./manage/";
+        return;
+      }
       show(overlay());
       hide(loginPanel());
       show(orgPanel());
@@ -1443,6 +1478,7 @@ refreshUserSelect();
     }
 
     hide(overlay());
+    hide(staffAdminCard());
     loadMyStaffName();
     await loadCloudUsers();
     await loadCloudHistory();
@@ -1455,7 +1491,7 @@ refreshUserSelect();
     if(stateEl()) stateEl().textContent = "接続中";
     if(orgInfoEl()){
       orgInfoEl().textContent =
-        `${organization.name} / ${session.user.email} / 参加コード: ${organization.join_code}`;
+        `${organization.name} / ${membership.role === "admin" ? "管理者" : "一般職員"} / ${session.user.email}`;
     }
   }
 
@@ -1522,8 +1558,7 @@ refreshUserSelect();
       setOrgStatus("事業所を作成しています…");
       const { data, error } = await client.rpc("create_organization", { p_name:name });
       if(error) throw error;
-      await getMembership();
-      await migrateLocalDataIfEmpty();
+      localStorage.setItem("activeOrganizationId", data);
       setOrgStatus("");
       await enterApp();
     }catch(e){
@@ -1539,6 +1574,7 @@ refreshUserSelect();
       setOrgStatus("事業所へ参加しています…");
       const { data, error } = await client.rpc("join_organization", { p_join_code:code });
       if(error) throw error;
+      localStorage.setItem("activeOrganizationId", data);
       await enterApp();
     }catch(e){
       console.error(e);
