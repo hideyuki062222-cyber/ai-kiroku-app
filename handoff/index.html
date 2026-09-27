@@ -180,7 +180,7 @@ function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt
 function fmtDate(v){const d=new Date(v+"T12:00:00");return d.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})}
 function fmtTime(v){return new Date(v).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
 function clientLabel(c){return c.code+(c.display_name?" "+c.display_name:"")}
-function staffName(uid){return staffMap[uid]||"職員名未登録"}
+function staffName(uid){return staffMap[uid]||"職員名未登録"} function entryStaff(e){return e.source_label||entryStaff(e)}
 function show(id){document.getElementById(id).classList.remove("hidden")} function hide(id){document.getElementById(id).classList.add("hidden")}
 
 async function init(){
@@ -252,7 +252,7 @@ function renderGeneral(){
  if(filterMode==="carry") es=es.filter(e=>e.carry_over&&!e.resolved);
  let out="";
  for(const e of es){
-   out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">'+dueBadge(e);
+   out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(entryStaff(e))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">'+dueBadge(e);
    if(e.is_important)out+='<span class="badge red">重要</span>'; if(e.carry_over&&!e.resolved)out+='<span class="badge amber">持越し</span>'; if(e.resolved)out+='<span class="badge green">対応済み</span>';
    out+='</div><div class="note-actions no-print">';
    if(e.created_by!==session.user.id) out+='<button class="mini '+(confirmations.has(e.id)?"ok":"")+'" onclick="toggleConfirm(\''+e.id+'\','+(confirmations.has(e.id)?"true":"false")+')">'+(confirmations.has(e.id)?"✓ 確認済み":"確認済みにする")+'</button>';
@@ -284,7 +284,7 @@ function render(){
    html+='</div><div class="client-preview">';
    if(es.length){
      for(const e of es){
-       html+='<div class="preview-line '+(e.shift==="night"?"night":"")+'"><div class="preview-head">'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'　'+esc(staffName(e.created_by))+(e.is_important?'　【重要】':'')+(e.due_date?'　【対応 '+esc(e.due_date)+(e.due_time?' '+String(e.due_time).slice(0,5):'')+'】':'')+'</div>'+esc(e.body)+'</div>';
+       html+='<div class="preview-line '+(e.shift==="night"?"night":"")+'"><div class="preview-head">'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'　'+esc(entryStaff(e))+(e.is_important?'　【重要】':'')+(e.due_date?'　【対応 '+esc(e.due_date)+(e.due_time?' '+String(e.due_time).slice(0,5):'')+'】':'')+'</div>'+esc(e.body)+'</div>';
      }
    }else{
      html+='<div class="preview-empty">申し送りなし</div>';
@@ -331,7 +331,7 @@ function renderClientTimeline(start,end){
    out+='<div class="timeline-day"><div class="timeline-date">'+esc(fmtDate(day))+'</div>';
    if(!es.length) out+='<div class="timeline-empty">申し送りなし</div>';
    for(const e of es){
-     out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
+     out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(entryStaff(e))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
      (e.categories||[]).forEach(ca=>out+='<span class="badge blue">'+esc(ca)+'</span>');
      out+=dueBadge(e);
      if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">持越し</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
@@ -386,7 +386,7 @@ async function renderDetail(history){
  let out="";
  for(const e of es){
    const mine=confirmations.has(e.id),canDelete=e.created_by===session.user.id||membership.role==="admin";
-   out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+'　'+esc(e.service_date)+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
+   out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+'　'+esc(e.service_date)+' '+fmtTime(e.created_at)+'</span><span>'+esc(entryStaff(e))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
    (e.categories||[]).forEach(ca=>out+='<span class="badge blue">'+esc(ca)+'</span>');
    out+=dueBadge(e);
    if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">翌日へ</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
@@ -420,7 +420,7 @@ function printPdf(){
  const w=window.open("","_blank"); if(!w){alert("ポップアップを許可してください。");return}
  function entryHtml(e){
    const due=e.due_date?' <b>【対応 '+esc(e.due_date)+(e.due_time?' '+String(e.due_time).slice(0,5):'')+'】</b>':'';
-   return '<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(staffName(e.created_by))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+due+(e.carry_over&&!e.resolved?' <b>【持越し】</b>':'')+'</div>';
+   return '<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(entryStaff(e))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+due+(e.carry_over&&!e.resolved?' <b>【持越し】</b>':'')+'</div>';
  }
  function pageRows(list){
    return list.map(c=>{
