@@ -32,7 +32,21 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 .picker-search{width:100%;border:1px solid #cad5e2;border-radius:10px;padding:10px 11px;font-size:15px;margin:10px 0}.picker-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.picker-choice{border:1px solid #d3dce8;background:#fff;border-radius:10px;padding:10px 8px;font-size:14px;font-weight:850;text-align:left;min-height:42px}.picker-choice:active{background:#edf4ff}.picker-add{width:100%;margin-top:10px;border:1px dashed #7aa2d8;background:#eef5ff;color:#174f96;border-radius:10px;padding:10px;font-weight:900}.picker-empty{grid-column:1/-1;text-align:center;color:#7a8797;padding:18px 8px}
 @media(max-width:520px){.input-card{padding:10px}.input-card .save{min-height:46px;font-size:15px}.brand{font-size:17px}.top-actions .btn{padding:8px 9px;font-size:12px}.balance-box{grid-template-columns:1fr 1fr}.metric.balance{grid-column:1/-1}.metric.balance .v{font-size:25px}.date-row{grid-template-columns:1fr}.entry-title{font-size:14px}.amount-input{font-size:26px!important}}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:18px;margin-bottom:18px}.overlay{align-items:center}}
-@media print{.top,.input-card,.adminbox,.toolbar .btn,.entry-actions{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.history-card{padding:0}.entry{break-inside:avoid}}
+.print-report{display:none}
+.print-head{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-bottom:5px}.print-title{font-size:15px;font-weight:900}.print-meta{font-size:9px;color:#444}.print-summary{display:flex;gap:12px;font-size:9px;margin:3px 0 6px}.print-summary b{font-size:10px}.print-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8.5px;line-height:1.15}.print-table th,.print-table td{border:1px solid #777;padding:2px 3px;vertical-align:top;word-break:break-word}.print-table th{background:#f1f1f1;font-weight:900;text-align:center}.print-table .num{text-align:right;white-space:nowrap}.print-table .date{white-space:nowrap;text-align:center}
+@media print{
+ @page{size:A4 portrait;margin:6mm}
+ body{background:#fff;color:#000;font-size:9px}
+ .top,.input-card,.adminbox,.history-card,.card:not(.print-report),.overlay{display:none!important}
+ .wrap{max-width:none!important;margin:0!important;padding:0!important}
+ .print-report{display:block!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important}
+ .print-head{margin:0 0 4px}.print-title{font-size:14px}.print-meta{font-size:8px}
+ .print-summary{font-size:8px;margin:2px 0 4px;gap:10px}.print-summary b{font-size:9px}
+ .print-table{font-size:7.8px;line-height:1.08}
+ .print-table th,.print-table td{padding:1.5px 2px}
+ .print-table thead{display:table-header-group}
+ .print-table tr{break-inside:avoid;page-break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -54,7 +68,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
   <div class="top-actions">
     <a class="btn" href="../handoff/" style="text-decoration:none">申し送り</a>
     <a class="btn" href="../" style="text-decoration:none">AI記録</a>
-    <button class="btn" onclick="window.print()">印刷</button>
+    <button class="btn" onclick="printCashbook()">印刷</button>
     <button class="btn" onclick="logout()">退出</button>
   </div>
  </div>
@@ -117,6 +131,23 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
       <button class="btn primary" onclick="saveOpeningBalance()">保存</button>
     </div>
     <div id="adminStatus" class="status"></div>
+  </section>
+
+  <section id="printReport" class="card print-report">
+    <div class="print-head">
+      <div><div class="print-title">金銭出納帳</div><div id="printClient" class="print-meta"></div></div>
+      <div id="printMonth" class="print-meta"></div>
+    </div>
+    <div class="print-summary">
+      <span>入金 <b id="printIncome">¥0</b></span>
+      <span>支出 <b id="printExpense">¥0</b></span>
+      <span>残高 <b id="printBalance">¥0</b></span>
+    </div>
+    <table class="print-table">
+      <colgroup><col style="width:12%"><col style="width:19%"><col style="width:22%"><col style="width:11%"><col style="width:11%"><col style="width:12%"><col style="width:13%"></colgroup>
+      <thead><tr><th>日付</th><th>店名</th><th>品名</th><th>入金</th><th>支出</th><th>残高</th><th>備考</th></tr></thead>
+      <tbody id="printBody"></tbody>
+    </table>
   </section>
 
   <section class="card history-card">
@@ -332,7 +363,37 @@ function render(){
  document.getElementById("monthIncome").textContent=yen(income);
  document.getElementById("monthExpense").textContent=yen(expense);
  renderHistory();
+ renderPrintReport();
 }
+
+function printRows(){
+ const month=document.getElementById("monthFilter").value||currentMonth(),q=document.getElementById("searchInput").value.trim().toLowerCase();
+ return ledgerRows().filter(x=>x.tx_date.startsWith(month)).filter(x=>!q||[x.item,x.store,x.memo].some(v=>(v||"").toLowerCase().includes(q)));
+}
+function renderPrintReport(){
+ const month=document.getElementById("monthFilter").value||currentMonth(),rows=printRows(),client=clients.find(x=>x.id===selectedClientId);
+ const income=rows.filter(x=>x.kind==="income").reduce((a,x)=>a+Number(x.amount),0);
+ const expense=rows.filter(x=>x.kind==="expense").reduce((a,x)=>a+Number(x.amount),0);
+ const allRows=ledgerRows(),balance=allRows.length?allRows[allRows.length-1].balance:Number(account?.opening_balance)||0;
+ document.getElementById("printClient").textContent=client?clientLabel(client):"";
+ document.getElementById("printMonth").textContent=month.replace("-","年")+"月";
+ document.getElementById("printIncome").textContent=yen(income);
+ document.getElementById("printExpense").textContent=yen(expense);
+ document.getElementById("printBalance").textContent=yen(balance);
+ const body=document.getElementById("printBody");
+ if(!rows.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;padding:8px">記録なし</td></tr>';return}
+ body.innerHTML=rows.map(e=>'<tr>'+
+   '<td class="date">'+esc(e.tx_date.slice(5).replace("-","/"))+'</td>'+
+   '<td>'+esc(e.store||"")+'</td>'+
+   '<td>'+esc(e.item||"")+'</td>'+
+   '<td class="num">'+(e.kind==="income"?yen(e.amount):"")+'</td>'+
+   '<td class="num">'+(e.kind==="expense"?yen(e.amount):"")+'</td>'+
+   '<td class="num">'+yen(e.balance)+'</td>'+
+   '<td>'+esc(e.memo||"")+'</td>'+
+   '</tr>').join("");
+}
+function printCashbook(){renderPrintReport();window.print()}
+
 function renderHistory(){
  const month=document.getElementById("monthFilter").value||currentMonth(),q=document.getElementById("searchInput").value.trim().toLowerCase();
  const rows=ledgerRows().filter(x=>x.tx_date.startsWith(month)).filter(x=>!q||[x.item,x.store,x.memo].some(v=>(v||"").toLowerCase().includes(q))).reverse();
