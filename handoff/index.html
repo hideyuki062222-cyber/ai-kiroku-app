@@ -38,6 +38,10 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .general-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .duebox{display:grid;grid-template-columns:1fr 1fr;gap:8px}.due-over{background:#ffe3e8!important;color:#a81434!important}.due-today{background:#fff0ce!important;color:#8e5500!important}
 .quicknote{font-size:12px;color:#6d7887;margin-top:5px}
+.view-switch{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}.view-btn{padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:900}.view-btn.active{background:#16345b;color:#fff;border-color:#16345b}
+.client-history-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.client-history-head select{flex:1;min-width:180px;border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff}
+.range-switch{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.range-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800}.range-btn.active{background:#e8f0ff;border-color:#9ebaf0;color:#164fa8}
+.timeline-day{margin:12px 0 16px}.timeline-date{position:sticky;top:64px;z-index:5;background:#eef3f8;color:#223958;font-weight:900;border-radius:10px;padding:8px 10px;margin-bottom:7px}.timeline-empty{border:1px dashed #d7dee8;border-radius:10px;padding:11px;color:var(--muted);font-size:13px;background:#fafbfc}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
 @media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
 </style>
@@ -76,6 +80,10 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 
 <main class="wrap">
   <section class="card">
+    <div class="view-switch">
+      <button id="viewDayBtn" class="view-btn active" onclick="setViewMode('day')">📅 日付ごと</button>
+      <button id="viewClientBtn" class="view-btn" onclick="setViewMode('client')">👤 利用者ごと</button>
+    </div>
     <div class="datebar">
       <button class="btn" onclick="moveDate(-1)">‹</button>
       <input id="dateInput" type="date" onchange="changeDate(this.value)">
@@ -96,6 +104,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
     <div id="summary" class="status"></div>
   </section>
 
+  <div id="dayModeArea">
   <section class="generalbox">
     <div class="general-title"><div><strong>📌 全体申し送り・備考</strong><div class="small">利用者に紐づかない共通連絡</div></div><button class="btn amber no-print" onclick="openEntry('__general__')">＋ 追加</button></div>
     <div id="generalList"></div>
@@ -104,6 +113,21 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   <section class="card">
     <div class="row between"><strong>利用者一覧</strong><span class="small">内容を一覧で確認できます</span></div>
     <div id="clientList"></div>
+  </section>
+
+  </div>
+
+  <section id="clientModeArea" class="card hidden">
+    <div class="client-history-head">
+      <div style="flex:1"><strong>利用者別の経過</strong><div class="small">選択した日を基準に、数日間の申し送りを日付別に表示します。</div></div>
+      <select id="historyClient" onchange="changeHistoryClient(this.value)"></select>
+    </div>
+    <div class="range-switch">
+      <button id="range3" class="range-btn" onclick="setHistoryRange(3)">3日</button>
+      <button id="range7" class="range-btn active" onclick="setHistoryRange(7)">7日</button>
+      <button id="range14" class="range-btn" onclick="setHistoryRange(14)">14日</button>
+    </div>
+    <div id="clientTimeline" style="margin-top:12px"></div>
   </section>
 
   <section id="adminCard" class="card hidden">
@@ -149,6 +173,7 @@ const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物�
 const TMPL=["朝食：","昼食：","夕食：","入浴○","入浴×","排便あり","排便なし","服薬確認済み","コールあり","受診予定：","外泊","帰設予定：","体重：kg","バイタル：","家族より連絡あり","荷物預かり","翌朝対応必要"];
 let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
+let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[];
 
 function localDate(d=new Date()){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
 function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -182,6 +207,9 @@ async function loadClients(){
  const opts=clients.map(c=>'<option value="'+c.id+'">'+esc(clientLabel(c))+'</option>').join("");
  document.getElementById("entryClient").innerHTML='<option value="__general__">【全体申し送り・備考】</option>'+opts;
  document.getElementById("adminClient").innerHTML=opts;
+ document.getElementById("historyClient").innerHTML=opts;
+ if(!historyClientId&&clients.length)historyClientId=clients[0].id;
+ if(historyClientId)document.getElementById("historyClient").value=historyClientId;
 }
 async function loadStaff(){
  const {data}=await db.from("organization_members").select("user_id,staff_name,role").eq("organization_id",membership.organization_id);
@@ -265,9 +293,58 @@ function render(){
  }
  document.getElementById("clientList").innerHTML=html||'<div class="empty">該当する申し送りはありません</div>';
 }
-function setShift(v){shiftFilter=v;render()} function setFilter(v){filterMode=v;render()}
-function changeDate(v){selectedDate=v;loadEntries()} function goToday(){selectedDate=localDate();loadEntries()}
-function moveDate(n){const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()+n);selectedDate=localDate(d);loadEntries()}
+function setViewMode(mode){
+ viewMode=mode;
+ document.getElementById("viewDayBtn").classList.toggle("active",mode==="day");
+ document.getElementById("viewClientBtn").classList.toggle("active",mode==="client");
+ document.getElementById("dayModeArea").classList.toggle("hidden",mode!=="day");
+ document.getElementById("clientModeArea").classList.toggle("hidden",mode!=="client");
+ if(mode==="client") loadClientTimeline();
+}
+function setHistoryRange(days){
+ historyDays=days;
+ [3,7,14].forEach(n=>document.getElementById("range"+n).classList.toggle("active",n===days));
+ loadClientTimeline();
+}
+function changeHistoryClient(id){historyClientId=id;loadClientTimeline()}
+async function loadClientTimeline(){
+ if(viewMode!=="client"||!membership||!historyClientId)return;
+ const box=document.getElementById("clientTimeline");box.innerHTML='<div class="empty">読み込み中…</div>';
+ const end=selectedDate;const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()-(historyDays-1));const start=localDate(d);
+ const {data,error}=await db.from("handoff_entries").select("*")
+   .eq("organization_id",membership.organization_id)
+   .eq("scope","client")
+   .eq("client_id",historyClientId)
+   .gte("service_date",start).lte("service_date",end)
+   .order("service_date",{ascending:false}).order("created_at",{ascending:true});
+ if(error){box.innerHTML='<div class="empty">'+esc(error.message)+'</div>';return}
+ historyEntries=data||[];
+ renderClientTimeline(start,end);
+}
+function renderClientTimeline(start,end){
+ const c=clients.find(x=>x.id===historyClientId);
+ let out='<div class="small" style="margin-bottom:8px"><b>'+esc(c?clientLabel(c):"")+'</b>　'+esc(start)+' ～ '+esc(end)+'</div>';
+ const cur=new Date(end+"T12:00:00");
+ for(let i=0;i<historyDays;i++){
+   const day=localDate(cur);
+   const es=historyEntries.filter(e=>e.service_date===day).filter(e=>shiftFilter==="all"||e.shift===shiftFilter);
+   out+='<div class="timeline-day"><div class="timeline-date">'+esc(fmtDate(day))+'</div>';
+   if(!es.length) out+='<div class="timeline-empty">申し送りなし</div>';
+   for(const e of es){
+     out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
+     (e.categories||[]).forEach(ca=>out+='<span class="badge blue">'+esc(ca)+'</span>');
+     out+=dueBadge(e);
+     if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">持越し</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
+     out+='</div></div>';
+   }
+   out+='</div>';
+   cur.setDate(cur.getDate()-1);
+ }
+ document.getElementById("clientTimeline").innerHTML=out;
+}
+function setShift(v){shiftFilter=v;render();if(viewMode==="client")renderClientTimeline((()=>{const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()-(historyDays-1));return localDate(d)})(),selectedDate)} function setFilter(v){filterMode=v;render()}
+function changeDate(v){selectedDate=v;loadEntries();if(viewMode==="client")loadClientTimeline()} function goToday(){selectedDate=localDate();loadEntries();if(viewMode==="client")loadClientTimeline()}
+function moveDate(n){const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()+n);selectedDate=localDate(d);loadEntries();if(viewMode==="client")loadClientTimeline()}
 
 function renderCats(){
  document.getElementById("categories").innerHTML=CATS.map(c=>'<button class="cat '+(selectedCats.has(c)?"on":"")+'" onclick="toggleCat(\''+c+'\')">'+c+'</button>').join("");
