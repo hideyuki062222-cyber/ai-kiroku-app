@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#16345b">
-<title>デジタル申し送り | COZY蒲生</title>
+<title>デジタル申し送り v2 | COZY蒲生</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--navy:#16345b;--blue:#2d6cdf;--red:#df4a67;--green:#16804a;--amber:#b76a00;--bg:#f4f6f9;--line:#dfe4ea;--text:#172033;--muted:#677489}
@@ -34,6 +34,10 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .setup{position:fixed;inset:0;z-index:90;background:#f4f6f9;display:flex;align-items:center;justify-content:center;padding:20px}.setupbox{background:#fff;border-radius:18px;padding:20px;width:min(460px,100%);border:1px solid var(--line)}.setupbox input{width:100%;padding:12px;border:1px solid #ccd4df;border-radius:10px;margin:8px 0}
 .status{font-size:12px;color:var(--muted);margin-top:6px}.small{font-size:12px;color:var(--muted)}
 .adminline{display:flex;gap:8px;margin-top:10px}.adminline select,.adminline input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:9px}
+.generalbox{border:1px solid #f0c36b;background:#fffaf0;border-radius:14px;padding:12px;margin-bottom:12px}
+.general-title{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.duebox{display:grid;grid-template-columns:1fr 1fr;gap:8px}.due-over{background:#ffe3e8!important;color:#a81434!important}.due-today{background:#fff0ce!important;color:#8e5500!important}
+.quicknote{font-size:12px;color:#6d7887;margin-top:5px}
 @media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
 @media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
 </style>
@@ -61,7 +65,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 
 <header class="top">
   <div class="topline">
-    <div><div class="brand">申し送り</div><div id="orgLabel" class="sub">読み込み中…</div></div>
+    <div><div class="brand">申し送り <span class="small">v2</span></div><div id="orgLabel" class="sub">読み込み中…</div></div>
     <div class="top-actions">
       <a class="btn" href="../" style="text-decoration:none">AI記録</a>
       <button class="btn" onclick="printPdf()">PDF/印刷</button>
@@ -92,6 +96,11 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
     <div id="summary" class="status"></div>
   </section>
 
+  <section class="generalbox">
+    <div class="general-title"><div><strong>📌 全体申し送り・備考</strong><div class="small">利用者に紐づかない共通連絡</div></div><button class="btn amber no-print" onclick="openEntry('__general__')">＋ 追加</button></div>
+    <div id="generalList"></div>
+  </section>
+
   <section class="card">
     <div class="row between"><strong>利用者一覧</strong><span class="small">タップで詳細</span></div>
     <div id="clientList"></div>
@@ -110,8 +119,9 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 <div id="entryOverlay" class="overlay hidden">
  <div class="sheet">
   <div class="row between"><h2>申し送り入力</h2><button class="close" onclick="closeEntry()">×</button></div>
-  <div class="field"><label>利用者</label><select id="entryClient"></select></div>
+  <div class="field"><label>対象</label><select id="entryClient"></select><div class="quicknote">「全体申し送り・備考」を選ぶと、事業所全体への連絡になります。</div></div>
   <div class="field"><label>勤務区分</label><div class="segment"><button id="entryDay" class="seg active" onclick="setEntryShift('day')">☀ 日勤</button><button id="entryNight" class="seg night" onclick="setEntryShift('night')">☾ 夜勤</button><span></span></div></div>
+  <div class="field"><label>対応日・時刻（任意）</label><div class="duebox"><input id="dueDate" type="date"><input id="dueTime" type="time"></div><div class="quicknote">例：明日の朝食準備、○日に受診、18:00お迎えなど</div></div>
   <div class="field"><label>申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
   <div class="field"><label>カテゴリ（複数選択可）</label><div id="categories" class="catgrid"></div></div>
   <div class="field"><label>よく使う定型文</label><div id="templates" class="catgrid"></div></div>
@@ -136,7 +146,7 @@ const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
 const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物品","家族連絡","予定","コール","その他"];
-const TMPL=["入浴キャンセル","服薬確認済み","朝食欠食","夕食欠食","受診予定あり","家族より連絡あり","荷物預かり","翌朝対応必要"];
+const TMPL=["朝食：","昼食：","夕食：","入浴○","入浴×","排便あり","排便なし","服薬確認済み","コールあり","受診予定：","外泊","帰設予定：","体重：kg","バイタル：","家族より連絡あり","荷物預かり","翌朝対応必要"];
 let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
 
@@ -170,7 +180,8 @@ async function loadClients(){
  const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",membership.organization_id).order("sort_order").order("code");
  if(error) throw error; clients=data||[];
  const opts=clients.map(c=>'<option value="'+c.id+'">'+esc(clientLabel(c))+'</option>').join("");
- document.getElementById("entryClient").innerHTML=opts; document.getElementById("adminClient").innerHTML=opts;
+ document.getElementById("entryClient").innerHTML='<option value="__general__">【全体申し送り・備考】</option>'+opts;
+ document.getElementById("adminClient").innerHTML=opts;
 }
 async function loadStaff(){
  const {data}=await db.from("organization_members").select("user_id,staff_name,role").eq("organization_id",membership.organization_id);
@@ -195,10 +206,32 @@ async function loadEntries(){
  if(selectedClientId) renderDetail(false);
 }
 function filteredEntriesForClient(cid){
- return entries.filter(e=>e.client_id===cid)
+ return entries.filter(e=>e.scope!=="general"&&e.client_id===cid)
   .filter(e=>shiftFilter==="all"||e.shift===shiftFilter);
 }
 function isUnread(e){return e.created_by!==session.user.id&&!confirmations.has(e.id)}
+function dueBadge(e){
+ if(!e.due_date) return "";
+ const label=(e.due_date===selectedDate?"今日":e.due_date)+" "+(e.due_time?String(e.due_time).slice(0,5):"");
+ const over=!e.resolved&&e.due_date<selectedDate;
+ const cls=over?"due-over":e.due_date===selectedDate?"due-today":"amber";
+ return '<span class="badge '+cls+'">対応 '+esc(label)+(over?" 期限超過":"")+'</span>';
+}
+function renderGeneral(){
+ let es=entries.filter(e=>e.scope==="general").filter(e=>shiftFilter==="all"||e.shift===shiftFilter);
+ if(filterMode==="unread") es=es.filter(isUnread);
+ if(filterMode==="important") es=es.filter(e=>e.is_important);
+ if(filterMode==="carry") es=es.filter(e=>e.carry_over&&!e.resolved);
+ let out="";
+ for(const e of es){
+   out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">'+dueBadge(e);
+   if(e.is_important)out+='<span class="badge red">重要</span>'; if(e.carry_over&&!e.resolved)out+='<span class="badge amber">持越し</span>'; if(e.resolved)out+='<span class="badge green">対応済み</span>';
+   out+='</div><div class="note-actions no-print">';
+   if(e.created_by!==session.user.id) out+='<button class="mini '+(confirmations.has(e.id)?"ok":"")+'" onclick="toggleConfirm(\''+e.id+'\','+(confirmations.has(e.id)?"true":"false")+')">'+(confirmations.has(e.id)?"✓ 確認済み":"確認済みにする")+'</button>';
+   out+='<button class="mini" onclick="toggleResolved(\''+e.id+'\','+(!e.resolved)+')">'+(e.resolved?"未対応に戻す":"対応済み")+'</button></div></div>';
+ }
+ document.getElementById("generalList").innerHTML=out||'<div class="empty" style="padding:12px">全体申し送りはありません</div>';
+}
 function render(){
  document.getElementById("dateInput").value=selectedDate;
  ["All","Day","Night"].forEach(x=>document.getElementById("shift"+x).classList.remove("active"));
@@ -207,7 +240,8 @@ function render(){
  document.getElementById("f"+(filterMode==="all"?"All":filterMode==="unread"?"Unread":filterMode==="important"?"Important":"Carry")).classList.add("active");
  let unread=0,important=0,carry=0,total=0;
  for(const e of entries){if(shiftFilter!=="all"&&e.shift!==shiftFilter)continue;total++;if(isUnread(e))unread++;if(e.is_important)important++;if(e.carry_over&&!e.resolved)carry++}
- document.getElementById("summary").textContent=fmtDate(selectedDate)+"　申し送り "+total+"件 / 未確認 "+unread+"件 / 重要 "+important+"件 / 翌日対応 "+carry+"件";
+ document.getElementById("summary").textContent=fmtDate(selectedDate)+"　申し送り "+total+"件 / 未確認 "+unread+"件 / 重要 "+important+"件 / 持越し "+carry+"件";
+ renderGeneral();
  let html="";
  for(const c of clients){
    let es=filteredEntriesForClient(c.id);
@@ -217,7 +251,8 @@ function render(){
    html+='<div class="client"><div class="client-main"><div><span class="client-code">'+esc(c.code)+'</span><span class="client-name">'+esc(c.display_name||"")+'</span></div><div class="client-meta">';
    if(es.length) html+='<span class="badge blue">申し送り '+es.length+'件</span>'; else html+='<span class="badge">0件</span>';
    if(u) html+='<span class="badge red">未確認 '+u+'</span>'; else if(es.length) html+='<span class="badge green">確認済み</span>';
-   if(im) html+='<span class="badge red">重要 '+im+'</span>'; if(ca) html+='<span class="badge amber">翌日対応 '+ca+'</span>';
+   if(im) html+='<span class="badge red">重要 '+im+'</span>'; if(ca) html+='<span class="badge amber">持越し '+ca+'</span>';
+   const dueNow=es.filter(x=>!x.resolved&&x.due_date&&x.due_date<=selectedDate).length;if(dueNow)html+='<span class="badge due-today">対応日 '+dueNow+'</span>';
    html+='</div></div><button class="client-open" onclick="openDetail(\''+c.id+'\')">見る ›</button></div>';
  }
  document.getElementById("clientList").innerHTML=html||'<div class="empty">該当する申し送りはありません</div>';
@@ -235,16 +270,18 @@ function addTemplate(t){const el=document.getElementById("entryBody");el.value+=
 function bodyCount(){document.getElementById("bodyCounter").textContent=document.getElementById("entryBody").value.length+"/500"}
 function setEntryShift(v){entryShift=v;document.getElementById("entryDay").classList.toggle("active",v==="day");document.getElementById("entryNight").classList.toggle("active",v==="night")}
 function openEntry(cid=null){
- selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("resolved").checked=false;document.getElementById("entryStatus").textContent="";
- if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId;
+ selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("dueDate").value="";document.getElementById("dueTime").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("resolved").checked=false;document.getElementById("entryStatus").textContent="";
+ if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId; else document.getElementById("entryClient").value="__general__";
  setEntryShift("day");renderCats();bodyCount();show("entryOverlay")
 }
 function openEntryForSelected(){closeDetail();openEntry(selectedClientId)} function closeEntry(){hide("entryOverlay")}
 async function saveEntry(){
- const cid=document.getElementById("entryClient").value,body=document.getElementById("entryBody").value.trim();
- if(!cid||!body){document.getElementById("entryStatus").textContent="利用者と申し送り内容を入力してください。";return}
+ const target=document.getElementById("entryClient").value,body=document.getElementById("entryBody").value.trim();
+ const dueDate=document.getElementById("dueDate").value||null,dueTime=document.getElementById("dueTime").value||null;
+ if(!target||!body){document.getElementById("entryStatus").textContent="対象と申し送り内容を入力してください。";return}
  document.getElementById("saveBtn").disabled=true;document.getElementById("entryStatus").textContent="保存中…";
- const payload={organization_id:membership.organization_id,client_id:cid,service_date:selectedDate,shift:entryShift,body,categories:[...selectedCats],is_important:document.getElementById("important").checked,carry_over:document.getElementById("carry").checked,resolved:document.getElementById("resolved").checked,created_by:session.user.id};
+ const isGeneral=target==="__general__";
+ const payload={organization_id:membership.organization_id,scope:isGeneral?"general":"client",client_id:isGeneral?null:target,service_date:selectedDate,shift:entryShift,body,categories:[...selectedCats],is_important:document.getElementById("important").checked,carry_over:document.getElementById("carry").checked||!!dueDate,resolved:document.getElementById("resolved").checked,due_date:dueDate,due_time:dueTime,created_by:session.user.id};
  const {error}=await db.from("handoff_entries").insert(payload);document.getElementById("saveBtn").disabled=false;
  if(error){document.getElementById("entryStatus").textContent="保存できませんでした: "+error.message;return}
  closeEntry();await loadEntries();
@@ -266,6 +303,7 @@ async function renderDetail(history){
    const mine=confirmations.has(e.id),canDelete=e.created_by===session.user.id||membership.role==="admin";
    out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+'　'+esc(e.service_date)+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
    (e.categories||[]).forEach(ca=>out+='<span class="badge blue">'+esc(ca)+'</span>');
+   out+=dueBadge(e);
    if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">翌日へ</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
    out+='</div><div class="note-actions no-print">';
    if(e.created_by!==session.user.id) out+='<button class="mini '+(mine?"ok":"")+'" onclick="toggleConfirm(\''+e.id+'\','+(mine?"true":"false")+')">'+(mine?"✓ 確認済み":"確認済みにする")+'</button>';
@@ -295,13 +333,22 @@ document.getElementById("adminClient").addEventListener("change",e=>{const c=cli
 
 function printPdf(){
  const w=window.open("","_blank"); if(!w){alert("ポップアップを許可してください。");return}
- let rows="";
- for(const c of clients){
-   const es=entries.filter(e=>e.client_id===c.id&&e.service_date===selectedDate);
-   let txt=es.map(e=>'<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(staffName(e.created_by))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+(e.carry_over&&!e.resolved?' <b>【翌日対応】</b>':'')+'</div>').join("");
-   rows+='<tr><th>'+esc(clientLabel(c))+'</th><td>'+(txt||"")+'</td></tr>';
+ function entryHtml(e){
+   const due=e.due_date?' <b>【対応 '+esc(e.due_date)+(e.due_time?' '+String(e.due_time).slice(0,5):'')+'】</b>':'';
+   return '<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(staffName(e.created_by))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+due+(e.carry_over&&!e.resolved?' <b>【持越し】</b>':'')+'</div>';
  }
- w.document.write('<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>申し送り '+selectedDate+'</title><style>@page{size:A4 portrait;margin:8mm}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;font-size:10.5pt}h1{font-size:16pt;margin:0 0 8px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #666;padding:6px;vertical-align:top}th{width:25%;text-align:left}.night{color:#c32645;margin:2px 0}.day{color:#111;margin:2px 0}.meta{font-size:9pt;color:#555;margin-bottom:8px}</style></head><body><h1>申し送り '+esc(fmtDate(selectedDate))+'</h1><div class="meta">'+esc(organization?.name||"")+'　※端末でPDF/印刷用に生成（サーバー保存なし）</div><table>'+rows+'</table></body></html>');
+ function pageRows(list){
+   return list.map(c=>{
+     const es=entries.filter(e=>e.scope!=="general"&&e.client_id===c.id);
+     return '<tr><th>'+esc(clientLabel(c))+'</th><td>'+es.map(entryHtml).join("")+'</td></tr>';
+   }).join("");
+ }
+ const p1=clients.filter(c=>["101","201","202","203","204","205","206","301","302"].includes(c.code));
+ const p2=clients.filter(c=>!["101","201","202","203","204","205","206","301","302"].includes(c.code));
+ const general=entries.filter(e=>e.scope==="general").map(entryHtml).join("")||"";
+ const css='@page{size:A4 portrait;margin:7mm}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;font-size:9.5pt;margin:0}h1{font-size:15pt;text-align:center;margin:0 0 5px}.page{min-height:270mm;page-break-after:always}.page:last-child{page-break-after:auto}.meta{font-size:8.5pt;color:#555;margin-bottom:5px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #555;padding:5px;vertical-align:top;min-height:20mm}th{width:23%;text-align:center}.night{color:#c32645;margin:2px 0}.day{color:#111;margin:2px 0}.remarks{border:1px solid #555;padding:6px;min-height:20mm;margin-top:-1px}.remarks b{display:block;margin-bottom:4px}';
+ const page=(rows,n,remarks)=>'<section class="page"><h1>申し送り　'+esc(fmtDate(selectedDate))+'</h1><div class="meta">'+esc(organization?.name||"")+'　'+n+'ページ目</div><table>'+rows+'</table><div class="remarks"><b>（備考・全体申し送り）</b>'+remarks+'</div></section>';
+ w.document.write('<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>申し送り '+selectedDate+'</title><style>'+css+'</style></head><body>'+page(pageRows(p1),'1 / 2','')+page(pageRows(p2),'2 / 2',general)+'</body></html>');
  w.document.close();setTimeout(()=>{w.focus();w.print()},250);
 }
 
