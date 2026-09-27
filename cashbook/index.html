@@ -16,7 +16,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 .client-label{font-weight:900;font-size:14px;margin-bottom:7px}.client-select{width:100%;min-height:58px;border:2px solid var(--blue);border-radius:12px;background:#eef5ff;color:var(--navy);font-size:18px;font-weight:900;padding:11px 13px}
 .balance-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}.metric{border-radius:13px;padding:11px;background:#f7f9fc;border:1px solid var(--line)}.metric .k{font-size:11px;color:var(--muted);font-weight:800}.metric .v{font-size:20px;font-weight:950;margin-top:3px}.metric.balance{background:#eef5ff;border-color:#c6d9f7}.metric.balance .v{color:#164e96}.metric.in .v{color:var(--green)}.metric.out .v{color:var(--red)}
 .segment{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 14px}.seg{min-height:50px;border:2px solid var(--line);border-radius:12px;background:#fff;font-size:17px;font-weight:900}.seg.active.expense{background:#fff0f2;border-color:#e68f9b;color:#a32236}.seg.active.income{background:#eaf8f0;border-color:#84c9a4;color:#11653a}
-.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:900;margin-bottom:6px}.field input,.field textarea{width:100%;border:1px solid #cfd8e4;border-radius:11px;padding:12px;font-size:16px;background:#fff}.field textarea{min-height:70px;resize:vertical}
+.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:900;margin-bottom:6px}.field input,.field textarea{width:100%;border:1px solid #cfd8e4;border-radius:11px;padding:12px;font-size:16px;background:#fff}.field-label-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}.field-label-row label{margin:0}.add-master{border:1px solid #b8c9df;background:#eef5ff;color:#174f96;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}.master-note{font-size:11px;color:#6b7788;margin-top:5px}.field textarea{min-height:70px;resize:vertical}
 .amount-input{font-size:28px!important;font-weight:950!important;text-align:right;min-height:62px;border:2px solid #aabbd1!important}.date-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .quick-title{font-size:12px;font-weight:900;color:#5c6d83;margin:7px 0 5px}.quick-list{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}.quick-list::-webkit-scrollbar{display:none}.chip{flex:0 0 auto;border:1px solid #cbd6e4;background:#f8fafc;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
 .save{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-size:17px;font-weight:900;margin-top:8px}
@@ -80,8 +80,8 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
       </div>
     </div>
     <div class="field"><label>金額</label><input id="amount" class="amount-input" type="number" inputmode="numeric" min="1" step="1" placeholder="0"></div>
-    <div class="field"><label>品名・内容</label><input id="item" list="itemList" maxlength="120" placeholder="例：昼食、日用品、散髪"><datalist id="itemList"></datalist><div id="itemQuick" class="quick-list"></div></div>
-    <div class="field"><label>店名・支払先</label><input id="store" list="storeList" maxlength="120" placeholder="例：スーパー、薬局"><datalist id="storeList"></datalist><div id="storeQuick" class="quick-list"></div></div>
+    <div class="field"><div class="field-label-row"><label>品名・内容</label><button class="add-master" type="button" onclick="openChoiceAdd('item')">＋ 品名追加</button></div><input id="item" list="itemList" maxlength="120" placeholder="例：昼食、日用品、散髪"><datalist id="itemList"></datalist><div id="itemQuick" class="quick-list"></div><div class="master-note">追加した品名は全利用者で共通して使えます。</div></div>
+    <div class="field"><div class="field-label-row"><label>店名・支払先</label><button class="add-master" type="button" onclick="openChoiceAdd('store')">＋ 店名追加</button></div><input id="store" list="storeList" maxlength="120" placeholder="例：スーパー、薬局"><datalist id="storeList"></datalist><div id="storeQuick" class="quick-list"></div><div class="master-note">追加した店名は全利用者で共通して使えます。</div></div>
     <div class="field"><label>備考（任意）</label><textarea id="memo" maxlength="300" placeholder="必要な時だけ入力"></textarea></div>
     <button id="saveBtn" class="save" onclick="saveEntry()">保存する</button>
     <div id="saveStatus" class="status"></div>
@@ -108,6 +108,15 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
   </section>
 </main>
 
+<div id="choiceOverlay" class="overlay hidden">
+ <div class="sheet">
+  <div class="row-between"><div><h2 id="choiceTitle" style="margin:0">品名を追加</h2><div class="small">登録すると、すべての利用者で候補として使えます。</div></div><button class="btn" onclick="closeChoiceAdd()">×</button></div>
+  <div class="field"><label id="choiceLabel">品名</label><input id="newChoiceInput" maxlength="120" placeholder="例：昼食"></div>
+  <button id="choiceSaveBtn" class="save" onclick="saveChoiceMaster()">全利用者に追加する</button>
+  <div id="choiceStatus" class="status"></div>
+ </div>
+</div>
+
 <div id="editOverlay" class="overlay hidden">
  <div class="sheet">
   <div class="row-between"><h2 style="margin:0">記録を修正</h2><button class="btn" onclick="closeEdit()">×</button></div>
@@ -126,7 +135,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino 
 const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
 const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let session=null,membership=null,organization=null,clients=[],selectedClientId=null,entries=[],account=null,choices=[],kind="expense",editKind="expense",editingId=null;
+let session=null,membership=null,organization=null,clients=[],selectedClientId=null,entries=[],account=null,choices=[],kind="expense",editKind="expense",editingId=null,choiceAddKind="item";
 
 function show(id){document.getElementById(id).classList.remove("hidden")}
 function hide(id){document.getElementById(id).classList.add("hidden")}
@@ -190,6 +199,38 @@ function renderChoices(){
  document.getElementById("storeList").innerHTML=stores.map(x=>'<option value="'+esc(x.label)+'"></option>').join("");
  document.getElementById("itemQuick").innerHTML=items.slice(0,8).map(x=>'<button class="chip" type="button" onclick="fillChoice(\'item\',\''+encodeURIComponent(x.label)+'\')">'+esc(x.label)+'</button>').join("");
  document.getElementById("storeQuick").innerHTML=stores.slice(0,8).map(x=>'<button class="chip" type="button" onclick="fillChoice(\'store\',\''+encodeURIComponent(x.label)+'\')">'+esc(x.label)+'</button>').join("");
+}
+
+async function reloadChoices(){
+ const {data,error}=await db.from("cashbook_choices").select("*").eq("organization_id",membership.organization_id).order("sort_order").order("created_at",{ascending:false});
+ if(error){document.getElementById("choiceStatus").textContent="読み込めませんでした: "+error.message;return}
+ choices=data||[];renderChoices();
+}
+function openChoiceAdd(v){
+ choiceAddKind=v;
+ const isItem=v==="item";
+ document.getElementById("choiceTitle").textContent=isItem?"品名を追加":"店名を追加";
+ document.getElementById("choiceLabel").textContent=isItem?"品名・内容":"店名・支払先";
+ document.getElementById("newChoiceInput").placeholder=isItem?"例：昼食、日用品、散髪":"例：スーパー、薬局、コンビニ";
+ document.getElementById("newChoiceInput").value="";
+ document.getElementById("choiceStatus").textContent="";
+ show("choiceOverlay");
+ setTimeout(()=>document.getElementById("newChoiceInput").focus(),100);
+}
+function closeChoiceAdd(){hide("choiceOverlay")}
+async function saveChoiceMaster(){
+ const input=document.getElementById("newChoiceInput"),label=input.value.trim(),st=document.getElementById("choiceStatus"),btn=document.getElementById("choiceSaveBtn");
+ if(!label){st.textContent=(choiceAddKind==="item"?"品名":"店名")+"を入力してください。";return}
+ if(choices.some(x=>x.kind===choiceAddKind&&x.label===label)){st.textContent="すでに登録されています。";return}
+ btn.disabled=true;st.textContent="追加中…";
+ const {error}=await db.from("cashbook_choices").insert({organization_id:membership.organization_id,kind:choiceAddKind,label,sort_order:0,created_by:session.user.id});
+ btn.disabled=false;
+ if(error){st.textContent=error.code==="23505"?"すでに登録されています。":"追加できませんでした: "+error.message;return}
+ await reloadChoices();
+ const target=document.getElementById(choiceAddKind);
+ if(target)target.value=label;
+ st.textContent="全利用者で使えるように追加しました。";
+ setTimeout(closeChoiceAdd,650);
 }
 function fillChoice(type,v){document.getElementById(type).value=decodeURIComponent(v)}
 function setKind(v){
