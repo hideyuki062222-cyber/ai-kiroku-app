@@ -226,19 +226,35 @@ async function removeStaff(userId,labelEnc){
 }
 
 async function loadClients(){
- const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",activeOrg.id).order("sort_order").order("code");
+ const {data,error}=await db.from("clients").select("id,code,display_name,sort_order,is_active").eq("organization_id",activeOrg.id).order("is_active",{ascending:false}).order("sort_order").order("code");
  if(error){document.getElementById("clientStatus").textContent="利用者を読み込めませんでした。";return}
  clients=data||[];
- document.getElementById("clientList").innerHTML=clients.map(x=>'<div class="manage-row"><div class="manage-main"><div class="manage-name">'+esc(x.code)+(x.display_name?" "+esc(x.display_name):"")+'</div></div><div class="manage-actions"><span class="badge staff">所属中</span></div></div>').join("")||'<div class="empty">利用者はまだ登録されていません。</div>';
- document.getElementById("clientStatus").textContent=clients.length+"名を登録しています。";
+ document.getElementById("clientList").innerHTML=clients.map(x=>'<div class="manage-row"><div class="manage-main"><div class="manage-name">'+esc(x.code)+(x.display_name?" "+esc(x.display_name):"")+'</div><div class="manage-sub">'+(x.is_active?"利用中":"削除済み（過去記録は保持）")+'</div></div><div class="manage-actions"><span class="badge '+(x.is_active?"staff":"off")+'">'+(x.is_active?"利用中":"削除済み")+'</span><button class="mini" onclick="setManagedClientActive(\''+x.id+'\','+(!x.is_active)+')">'+(x.is_active?"削除":"復元")+'</button></div></div>').join("")||'<div class="empty">利用者はまだ登録されていません。</div>';
+ document.getElementById("clientStatus").textContent=clients.filter(x=>x.is_active).length+"名が利用中です。";
+}
+async function setManagedClientActive(id,active){
+ if(activeMembership?.role!=="admin")return;
+ const x=clients.find(c=>c.id===id);if(!x)return;
+ const msg=active?"「"+x.code+"」を復元しますか？":"「"+x.code+"」を削除しますか？\n過去の記録は削除されません。";
+ if(!confirm(msg))return;
+ const {error}=await db.from("clients").update({is_active:active,updated_at:new Date().toISOString()}).eq("id",id).eq("organization_id",activeOrg.id);
+ document.getElementById("clientStatus").textContent=error?"変更できませんでした: "+error.message:(active?"利用者を復元しました。":"利用者を削除しました。");
+ if(!error)await loadClients();
 }
 async function addClient(){
  if(activeMembership?.role!=="admin")return;
  const code=document.getElementById("newClientCode").value.trim(),name=document.getElementById("newClientName").value.trim(),st=document.getElementById("clientStatus");
  if(!code){st.textContent="利用者コードを入力してください。";return}
- const maxSort=clients.reduce((m,x)=>Math.max(m,Number(x.sort_order)||0),0);
- const {error}=await db.from("clients").insert({organization_id:activeOrg.id,code,display_name:name,sort_order:maxSort+10});
- if(error){st.textContent=error.code==="23505"?"同じ利用者コードがすでにあります。":"追加できませんでした: "+error.message;return}
+ const existing=clients.find(x=>x.code===code);
+ if(existing){
+   if(existing.is_active){st.textContent="同じ利用者コードがすでにあります。";return}
+   const {error}=await db.from("clients").update({is_active:true,display_name:name||existing.display_name||"",updated_at:new Date().toISOString()}).eq("id",existing.id).eq("organization_id",activeOrg.id);
+   if(error){st.textContent="復元できませんでした: "+error.message;return}
+ }else{
+   const maxSort=clients.reduce((m,x)=>Math.max(m,Number(x.sort_order)||0),0);
+   const {error}=await db.from("clients").insert({organization_id:activeOrg.id,code,display_name:name,sort_order:maxSort+10,is_active:true});
+   if(error){st.textContent="追加できませんでした: "+error.message;return}
+ }
  document.getElementById("newClientCode").value="";document.getElementById("newClientName").value="";st.textContent="利用者を追加しました。";await loadClients();
 }
 init();
