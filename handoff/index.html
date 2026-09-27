@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#16345b">
+<title>デジタル申し送り | COZY蒲生</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--navy:#16345b;--blue:#2d6cdf;--red:#df4a67;--green:#16804a;--amber:#b76a00;--bg:#f4f6f9;--line:#dfe4ea;--text:#172033;--muted:#677489}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display:none!important}
+.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:10px 12px}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:980px;margin:auto}
+.brand{font-weight:800;font-size:18px}.sub{font-size:12px;color:var(--muted)}.top-actions{display:flex;gap:6px}
+.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:700;background:#e9eef5;color:var(--navy)}
+.btn.primary{background:var(--navy);color:#fff}.btn.danger{background:#fee7eb;color:#a91d39}.btn.amber{background:#fff0d4;color:#945400}
+.wrap{max-width:980px;margin:auto;padding:12px 12px 80px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px #00000008}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.between{justify-content:space-between}
+.datebar{display:flex;align-items:center;justify-content:center;gap:8px}.datebar input{border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.seg{padding:10px;border:1px solid var(--line);border-radius:11px;background:#fff;font-weight:800}.seg.active{background:var(--navy);color:#fff;border-color:var(--navy)}.seg.night.active{background:var(--red);border-color:var(--red)}
+.filters{display:flex;gap:7px;overflow:auto;padding:10px 0 2px}.chip{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 11px;font-size:13px}.chip.active{background:#e8f0ff;border-color:#9ebaf0;color:#164fa8;font-weight:800}
+.client{display:grid;grid-template-columns:1fr auto;gap:8px;padding:13px 4px;border-bottom:1px solid #edf0f3}.client:last-child{border-bottom:0}.client-main{min-width:0}.client-code{font-weight:900;font-size:17px}.client-name{font-weight:700;margin-left:8px}.client-meta{margin-top:5px;display:flex;gap:5px;flex-wrap:wrap}.badge{font-size:12px;border-radius:999px;padding:4px 7px;background:#eef2f6;color:#536177}.badge.red{background:#ffe1e7;color:#b92140}.badge.amber{background:#fff0ce;color:#9b5a00}.badge.green{background:#dcf5e7;color:#146b40}.badge.blue{background:#e4edff;color:#2253a1}.client-open{align-self:center;border:0;background:#eef3f8;border-radius:10px;padding:10px 12px;color:var(--navy);font-weight:800}
+.fab{position:fixed;right:18px;bottom:22px;z-index:15;border:0;border-radius:999px;background:var(--navy);color:#fff;padding:14px 18px;font-weight:900;box-shadow:0 8px 24px #16345b44}
+.overlay{position:fixed;inset:0;background:#0008;z-index:50;display:flex;align-items:flex-end;justify-content:center}.sheet{background:#fff;width:100%;max-width:720px;max-height:93vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px}.sheet h2{margin:0 0 12px}.close{border:0;background:#eef2f6;border-radius:999px;width:38px;height:38px;font-size:20px}
+.field{margin:13px 0}.field label{display:block;font-weight:800;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid #ccd4df;border-radius:11px;padding:11px;background:#fff}.field textarea{min-height:120px;resize:vertical}.counter{text-align:right;font-size:12px;color:var(--muted)}
+.catgrid{display:flex;gap:6px;flex-wrap:wrap}.cat{border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 10px}.cat.on{background:#e7f0ff;border-color:#86aceb;color:#194d9d;font-weight:800}
+.checkrow{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;margin:7px 0;background:#f7f8fa}.checkrow.important{background:#fff0f3}.checkrow.carry{background:#fff8e6}
+.note{border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:12px;padding:11px;margin:9px 0;background:#fff}.note.night{border-left-color:var(--red);background:#fff9fa}.note.carry{box-shadow:inset 0 0 0 1px #f0c36b}.note-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.note-body{white-space:pre-wrap;margin:8px 0;line-height:1.55}.note-actions{display:flex;gap:6px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:700}.mini.ok{background:#e5f6ec;color:#14673e}.mini.warn{background:#fff1d7;color:#915600}
+.template{border:1px dashed #c9d1dc;background:#f8fafc;border-radius:10px;padding:8px 10px}
+.empty{padding:30px 10px;text-align:center;color:var(--muted)}
+.auth{position:fixed;inset:0;z-index:100;background:#f4f6f9;display:flex;align-items:center;justify-content:center;padding:20px}.authbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;width:min(440px,100%);box-shadow:0 12px 40px #0001}.authbox input{width:100%;padding:12px;border:1px solid #ccd4df;border-radius:10px;margin:6px 0}.authmsg{font-size:13px;color:var(--muted);min-height:20px;margin-top:8px}
+.setup{position:fixed;inset:0;z-index:90;background:#f4f6f9;display:flex;align-items:center;justify-content:center;padding:20px}.setupbox{background:#fff;border-radius:18px;padding:20px;width:min(460px,100%);border:1px solid var(--line)}.setupbox input{width:100%;padding:12px;border:1px solid #ccd4df;border-radius:10px;margin:8px 0}
+.status{font-size:12px;color:var(--muted);margin-top:6px}.small{font-size:12px;color:var(--muted)}
+.adminline{display:flex;gap:8px;margin-top:10px}.adminline select,.adminline input{flex:1;border:1px solid #ccd4df;border-radius:10px;padding:9px}
+@media(min-width:700px){.wrap{padding-top:18px}.sheet{border-radius:20px;margin-bottom:20px}.overlay{align-items:center}.fab{right:calc((100vw - 980px)/2 + 22px)}}
+@media print{.top,.fab,.no-print{display:none!important}.wrap{padding:0}.card{box-shadow:none;border:0}.client-open{display:none}}
+</style>
+</head>
+<body>
+<div id="auth" class="auth hidden">
+  <div class="authbox">
+    <h2>デジタル申し送り</h2><div class="sub">AI記録作成と同じアカウントを使えます</div>
+    <input id="email" type="email" placeholder="メールアドレス">
+    <input id="password" type="password" placeholder="パスワード（6文字以上）">
+    <div class="row"><button class="btn primary" onclick="login()">ログイン</button><button class="btn" onclick="signup()">新規登録</button></div>
+    <div id="authmsg" class="authmsg"></div>
+  </div>
+</div>
+
+<div id="setup" class="setup hidden">
+  <div class="setupbox">
+    <h2>事業所へ参加</h2>
+    <p class="small">AI記録作成ですでに事業所へ参加済みなら、そのまま利用できます。未参加の場合だけ参加コードを入力してください。</p>
+    <input id="joinCode" placeholder="参加コード">
+    <div class="row"><button class="btn primary" onclick="joinOrg()">参加する</button><button class="btn" onclick="logout()">ログアウト</button></div>
+    <div id="setupmsg" class="authmsg"></div>
+  </div>
+</div>
+
+<header class="top">
+  <div class="topline">
+    <div><div class="brand">申し送り</div><div id="orgLabel" class="sub">読み込み中…</div></div>
+    <div class="top-actions">
+      <a class="btn" href="../" style="text-decoration:none">AI記録</a>
+      <button class="btn" onclick="printPdf()">PDF/印刷</button>
+      <button class="btn" onclick="logout()">退出</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="datebar">
+      <button class="btn" onclick="moveDate(-1)">‹</button>
+      <input id="dateInput" type="date" onchange="changeDate(this.value)">
+      <button class="btn" onclick="moveDate(1)">›</button>
+      <button class="btn" onclick="goToday()">今日</button>
+    </div>
+    <div class="segment">
+      <button id="shiftAll" class="seg active" onclick="setShift('all')">すべて</button>
+      <button id="shiftDay" class="seg" onclick="setShift('day')">☀ 日勤</button>
+      <button id="shiftNight" class="seg night" onclick="setShift('night')">☾ 夜勤</button>
+    </div>
+    <div class="filters">
+      <button id="fAll" class="chip active" onclick="setFilter('all')">すべて</button>
+      <button id="fUnread" class="chip" onclick="setFilter('unread')">未確認</button>
+      <button id="fImportant" class="chip" onclick="setFilter('important')">重要</button>
+      <button id="fCarry" class="chip" onclick="setFilter('carry')">翌日対応</button>
+    </div>
+    <div id="summary" class="status"></div>
+  </section>
+
+  <section class="card">
+    <div class="row between"><strong>利用者一覧</strong><span class="small">タップで詳細</span></div>
+    <div id="clientList"></div>
+  </section>
+
+  <section id="adminCard" class="card hidden">
+    <strong>管理者：利用者表示名</strong>
+    <div class="small">申し送り画面だけに使う表示名です。空欄なら利用者コードだけ表示します。</div>
+    <div class="adminline"><select id="adminClient"></select><input id="adminName" maxlength="80" placeholder="表示名"><button class="btn" onclick="saveClientName()">保存</button></div>
+    <div id="adminStatus" class="status"></div>
+  </section>
+</main>
+
+<button class="fab" onclick="openEntry()">＋ 申し送り</button>
+
+<div id="entryOverlay" class="overlay hidden">
+ <div class="sheet">
+  <div class="row between"><h2>申し送り入力</h2><button class="close" onclick="closeEntry()">×</button></div>
+  <div class="field"><label>利用者</label><select id="entryClient"></select></div>
+  <div class="field"><label>勤務区分</label><div class="segment"><button id="entryDay" class="seg active" onclick="setEntryShift('day')">☀ 日勤</button><button id="entryNight" class="seg night" onclick="setEntryShift('night')">☾ 夜勤</button><span></span></div></div>
+  <div class="field"><label>申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
+  <div class="field"><label>カテゴリ（複数選択可）</label><div id="categories" class="catgrid"></div></div>
+  <div class="field"><label>よく使う定型文</label><div id="templates" class="catgrid"></div></div>
+  <label class="checkrow important"><input id="important" type="checkbox">重要（要注意・優先対応）</label>
+  <label class="checkrow carry"><input id="carry" type="checkbox">翌日へ引き継ぐ</label>
+  <label class="checkrow"><input id="resolved" type="checkbox">対応済み</label>
+  <div class="row"><button class="btn" onclick="closeEntry()">キャンセル</button><button id="saveBtn" class="btn primary" onclick="saveEntry()">保存する</button></div>
+  <div id="entryStatus" class="status"></div>
+ </div>
+</div>
+
+<div id="detailOverlay" class="overlay hidden">
+ <div class="sheet">
+  <div class="row between"><div><h2 id="detailTitle">利用者詳細</h2><div id="detailSub" class="small"></div></div><button class="close" onclick="closeDetail()">×</button></div>
+  <div class="row no-print"><button class="btn primary" onclick="openEntryForSelected()">＋ この利用者へ追加</button><button class="btn" onclick="loadHistory()">過去30日</button></div>
+  <div id="detailList"></div>
+ </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://pagamoaxhqszojxrpxyu.supabase.co";
+const SUPABASE_KEY="sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物品","家族連絡","予定","コール","その他"];
+const TMPL=["入浴キャンセル","服薬確認済み","朝食欠食","夕食欠食","受診予定あり","家族より連絡あり","荷物預かり","翌朝対応必要"];
+let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
+let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
+
+function localDate(d=new Date()){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
+function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function fmtDate(v){const d=new Date(v+"T12:00:00");return d.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})}
+function fmtTime(v){return new Date(v).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
+function clientLabel(c){return c.code+(c.display_name?" "+c.display_name:"")}
+function staffName(uid){return staffMap[uid]||"職員名未登録"}
+function show(id){document.getElementById(id).classList.remove("hidden")} function hide(id){document.getElementById(id).classList.add("hidden")}
+
+async function init(){
+ const {data:{session:s}}=await db.auth.getSession(); session=s;
+ if(!session){show("auth");return}
+ hide("auth");
+ await loadMembership();
+}
+async function loadMembership(){
+ const {data,error}=await db.from("organization_members").select("organization_id,role,staff_name").eq("user_id",session.user.id).limit(1).maybeSingle();
+ if(error){alert(error.message);return}
+ if(!data){show("setup");return}
+ membership=data; hide("setup");
+ const {data:o}=await db.from("organizations").select("id,name").eq("id",membership.organization_id).single(); organization=o;
+ document.getElementById("orgLabel").textContent=(organization?.name||"事業所")+" / "+(membership.staff_name||session.user.email||"職員");
+ document.getElementById("dateInput").value=selectedDate;
+ await Promise.all([loadClients(),loadStaff()]);
+ await loadEntries();
+ if(membership.role==="admin") show("adminCard");
+}
+async function loadClients(){
+ const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",membership.organization_id).order("sort_order").order("code");
+ if(error) throw error; clients=data||[];
+ const opts=clients.map(c=>'<option value="'+c.id+'">'+esc(clientLabel(c))+'</option>').join("");
+ document.getElementById("entryClient").innerHTML=opts; document.getElementById("adminClient").innerHTML=opts;
+}
+async function loadStaff(){
+ const {data}=await db.from("organization_members").select("user_id,staff_name,role").eq("organization_id",membership.organization_id);
+ staffMap={}; for(const x of data||[]) staffMap[x.user_id]=x.staff_name||"職員名未登録";
+}
+async function loadEntries(){
+ document.getElementById("summary").textContent="読み込み中…";
+ const base=db.from("handoff_entries").select("*").eq("organization_id",membership.organization_id);
+ const [{data:today,error:e1},{data:carry,error:e2}]=await Promise.all([
+   base.eq("service_date",selectedDate).order("created_at"),
+   db.from("handoff_entries").select("*").eq("organization_id",membership.organization_id).eq("carry_over",true).eq("resolved",false).lt("service_date",selectedDate).order("created_at")
+ ]);
+ if(e1||e2){document.getElementById("summary").textContent=(e1||e2).message;return}
+ const m=new Map(); [...(carry||[]),...(today||[])].forEach(x=>m.set(x.id,x)); entries=[...m.values()];
+ confirmations=new Set();
+ const ids=entries.map(x=>x.id);
+ if(ids.length){
+   const {data:cs}=await db.from("handoff_confirmations").select("entry_id,user_id").in("entry_id",ids).eq("user_id",session.user.id);
+   (cs||[]).forEach(x=>confirmations.add(x.entry_id));
+ }
+ render();
+ if(selectedClientId) renderDetail(false);
+}
+function filteredEntriesForClient(cid){
+ return entries.filter(e=>e.client_id===cid)
+  .filter(e=>shiftFilter==="all"||e.shift===shiftFilter);
+}
+function isUnread(e){return e.created_by!==session.user.id&&!confirmations.has(e.id)}
+function render(){
+ document.getElementById("dateInput").value=selectedDate;
+ ["All","Day","Night"].forEach(x=>document.getElementById("shift"+x).classList.remove("active"));
+ document.getElementById("shift"+(shiftFilter==="all"?"All":shiftFilter==="day"?"Day":"Night")).classList.add("active");
+ ["All","Unread","Important","Carry"].forEach(x=>document.getElementById("f"+x).classList.remove("active"));
+ document.getElementById("f"+(filterMode==="all"?"All":filterMode==="unread"?"Unread":filterMode==="important"?"Important":"Carry")).classList.add("active");
+ let unread=0,important=0,carry=0,total=0;
+ for(const e of entries){if(shiftFilter!=="all"&&e.shift!==shiftFilter)continue;total++;if(isUnread(e))unread++;if(e.is_important)important++;if(e.carry_over&&!e.resolved)carry++}
+ document.getElementById("summary").textContent=fmtDate(selectedDate)+"　申し送り "+total+"件 / 未確認 "+unread+"件 / 重要 "+important+"件 / 翌日対応 "+carry+"件";
+ let html="";
+ for(const c of clients){
+   let es=filteredEntriesForClient(c.id);
+   let u=es.filter(isUnread).length,im=es.filter(x=>x.is_important).length,ca=es.filter(x=>x.carry_over&&!x.resolved).length;
+   let visible=filterMode==="all"|| (filterMode==="unread"&&u)||(filterMode==="important"&&im)||(filterMode==="carry"&&ca);
+   if(!visible) continue;
+   html+='<div class="client"><div class="client-main"><div><span class="client-code">'+esc(c.code)+'</span><span class="client-name">'+esc(c.display_name||"")+'</span></div><div class="client-meta">';
+   if(es.length) html+='<span class="badge blue">申し送り '+es.length+'件</span>'; else html+='<span class="badge">0件</span>';
+   if(u) html+='<span class="badge red">未確認 '+u+'</span>'; else if(es.length) html+='<span class="badge green">確認済み</span>';
+   if(im) html+='<span class="badge red">重要 '+im+'</span>'; if(ca) html+='<span class="badge amber">翌日対応 '+ca+'</span>';
+   html+='</div></div><button class="client-open" onclick="openDetail(\''+c.id+'\')">見る ›</button></div>';
+ }
+ document.getElementById("clientList").innerHTML=html||'<div class="empty">該当する申し送りはありません</div>';
+}
+function setShift(v){shiftFilter=v;render()} function setFilter(v){filterMode=v;render()}
+function changeDate(v){selectedDate=v;loadEntries()} function goToday(){selectedDate=localDate();loadEntries()}
+function moveDate(n){const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()+n);selectedDate=localDate(d);loadEntries()}
+
+function renderCats(){
+ document.getElementById("categories").innerHTML=CATS.map(c=>'<button class="cat '+(selectedCats.has(c)?"on":"")+'" onclick="toggleCat(\''+c+'\')">'+c+'</button>').join("");
+ document.getElementById("templates").innerHTML=TMPL.map(t=>'<button class="template" onclick="addTemplate(\''+t+'\')">'+t+'</button>').join("");
+}
+function toggleCat(c){selectedCats.has(c)?selectedCats.delete(c):selectedCats.add(c);renderCats()}
+function addTemplate(t){const el=document.getElementById("entryBody");el.value+=(el.value?"\n":"")+t;bodyCount()}
+function bodyCount(){document.getElementById("bodyCounter").textContent=document.getElementById("entryBody").value.length+"/500"}
+function setEntryShift(v){entryShift=v;document.getElementById("entryDay").classList.toggle("active",v==="day");document.getElementById("entryNight").classList.toggle("active",v==="night")}
+function openEntry(cid=null){
+ selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("resolved").checked=false;document.getElementById("entryStatus").textContent="";
+ if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId;
+ setEntryShift("day");renderCats();bodyCount();show("entryOverlay")
+}
+function openEntryForSelected(){closeDetail();openEntry(selectedClientId)} function closeEntry(){hide("entryOverlay")}
+async function saveEntry(){
+ const cid=document.getElementById("entryClient").value,body=document.getElementById("entryBody").value.trim();
+ if(!cid||!body){document.getElementById("entryStatus").textContent="利用者と申し送り内容を入力してください。";return}
+ document.getElementById("saveBtn").disabled=true;document.getElementById("entryStatus").textContent="保存中…";
+ const payload={organization_id:membership.organization_id,client_id:cid,service_date:selectedDate,shift:entryShift,body,categories:[...selectedCats],is_important:document.getElementById("important").checked,carry_over:document.getElementById("carry").checked,resolved:document.getElementById("resolved").checked,created_by:session.user.id};
+ const {error}=await db.from("handoff_entries").insert(payload);document.getElementById("saveBtn").disabled=false;
+ if(error){document.getElementById("entryStatus").textContent="保存できませんでした: "+error.message;return}
+ closeEntry();await loadEntries();
+}
+function openDetail(cid){selectedClientId=cid;renderDetail(false);show("detailOverlay")}
+function closeDetail(){hide("detailOverlay")}
+async function renderDetail(history){
+ const c=clients.find(x=>x.id===selectedClientId);if(!c)return;
+ document.getElementById("detailTitle").textContent=clientLabel(c);
+ document.getElementById("detailSub").textContent=history?"過去30日の申し送り":fmtDate(selectedDate)+" の申し送り";
+ let es;
+ if(history){
+   const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()-30);const from=localDate(d);
+   const {data,error}=await db.from("handoff_entries").select("*").eq("organization_id",membership.organization_id).eq("client_id",selectedClientId).gte("service_date",from).lte("service_date",selectedDate).order("created_at",{ascending:false}).limit(200);
+   if(error){document.getElementById("detailList").innerHTML='<div class="empty">'+esc(error.message)+'</div>';return} es=data||[];
+ }else{es=entries.filter(x=>x.client_id===selectedClientId).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at))}
+ let out="";
+ for(const e of es){
+   const mine=confirmations.has(e.id),canDelete=e.created_by===session.user.id||membership.role==="admin";
+   out+='<div class="note '+(e.shift==="night"?"night ":"")+(e.carry_over&&!e.resolved?"carry":"")+'"><div class="note-head"><span>'+(e.shift==="day"?"☀ 日勤":"☾ 夜勤")+'　'+esc(e.service_date)+' '+fmtTime(e.created_at)+'</span><span>'+esc(staffName(e.created_by))+'</span></div><div class="note-body">'+esc(e.body)+'</div><div class="client-meta">';
+   (e.categories||[]).forEach(ca=>out+='<span class="badge blue">'+esc(ca)+'</span>');
+   if(e.is_important)out+='<span class="badge red">重要</span>';if(e.carry_over&&!e.resolved)out+='<span class="badge amber">翌日へ</span>';if(e.resolved)out+='<span class="badge green">対応済み</span>';
+   out+='</div><div class="note-actions no-print">';
+   if(e.created_by!==session.user.id) out+='<button class="mini '+(mine?"ok":"")+'" onclick="toggleConfirm(\''+e.id+'\','+(mine?"true":"false")+')">'+(mine?"✓ 確認済み":"確認済みにする")+'</button>';
+   out+='<button class="mini warn" onclick="toggleCarry(\''+e.id+'\','+(!e.carry_over)+')">'+(e.carry_over?"翌日引継ぎを解除":"翌日へ引き継ぐ")+'</button>';
+   out+='<button class="mini" onclick="toggleResolved(\''+e.id+'\','+(!e.resolved)+')">'+(e.resolved?"未対応に戻す":"対応済み")+'</button>';
+   if(canDelete) out+='<button class="mini" onclick="deleteEntry(\''+e.id+'\')">削除</button>';
+   out+='</div></div>';
+ }
+ document.getElementById("detailList").innerHTML=out||'<div class="empty">申し送りはありません</div>';
+}
+async function loadHistory(){await renderDetail(true)}
+async function toggleConfirm(id,isOn){
+ if(isOn) await db.from("handoff_confirmations").delete().eq("entry_id",id).eq("user_id",session.user.id);
+ else await db.from("handoff_confirmations").insert({entry_id:id,user_id:session.user.id});
+ await loadEntries();
+}
+async function toggleCarry(id,v){await db.from("handoff_entries").update({carry_over:v,updated_at:new Date().toISOString()}).eq("id",id);await loadEntries()}
+async function toggleResolved(id,v){await db.from("handoff_entries").update({resolved:v,updated_at:new Date().toISOString()}).eq("id",id);await loadEntries()}
+async function deleteEntry(id){if(!confirm("この申し送りを削除しますか？"))return;const {error}=await db.from("handoff_entries").delete().eq("id",id);if(error)alert(error.message);await loadEntries()}
+
+async function saveClientName(){
+ const id=document.getElementById("adminClient").value,name=document.getElementById("adminName").value.trim();
+ const {error}=await db.from("clients").update({display_name:name,updated_at:new Date().toISOString()}).eq("id",id).eq("organization_id",membership.organization_id);
+ document.getElementById("adminStatus").textContent=error?"保存できませんでした: "+error.message:"保存しました。";if(!error){await loadClients();render()}
+}
+document.getElementById("adminClient").addEventListener("change",e=>{const c=clients.find(x=>x.id===e.target.value);document.getElementById("adminName").value=c?.display_name||""});
+
+function printPdf(){
+ const w=window.open("","_blank"); if(!w){alert("ポップアップを許可してください。");return}
+ let rows="";
+ for(const c of clients){
+   const es=entries.filter(e=>e.client_id===c.id&&e.service_date===selectedDate);
+   let txt=es.map(e=>'<div class="'+(e.shift==="night"?"night":"day")+'"><b>'+(e.shift==="night"?"夜勤":"日勤")+'</b> '+fmtTime(e.created_at)+' '+esc(staffName(e.created_by))+'　'+esc(e.body).replace(/\n/g,"<br>")+(e.is_important?' <b>【重要】</b>':'')+(e.carry_over&&!e.resolved?' <b>【翌日対応】</b>':'')+'</div>').join("");
+   rows+='<tr><th>'+esc(clientLabel(c))+'</th><td>'+(txt||"")+'</td></tr>';
+ }
+ w.document.write('<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>申し送り '+selectedDate+'</title><style>@page{size:A4 portrait;margin:8mm}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;font-size:10.5pt}h1{font-size:16pt;margin:0 0 8px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #666;padding:6px;vertical-align:top}th{width:25%;text-align:left}.night{color:#c32645;margin:2px 0}.day{color:#111;margin:2px 0}.meta{font-size:9pt;color:#555;margin-bottom:8px}</style></head><body><h1>申し送り '+esc(fmtDate(selectedDate))+'</h1><div class="meta">'+esc(organization?.name||"")+'　※端末でPDF/印刷用に生成（サーバー保存なし）</div><table>'+rows+'</table></body></html>');
+ w.document.close();setTimeout(()=>{w.focus();w.print()},250);
+}
+
+async function login(){const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;document.getElementById("authmsg").textContent="ログイン中…";const {data,error}=await db.auth.signInWithPassword({email,password});if(error){document.getElementById("authmsg").textContent=error.message;return}session=data.session;hide("auth");await loadMembership()}
+async function signup(){const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;if(!email||password.length<6){document.getElementById("authmsg").textContent="メールアドレスと6文字以上のパスワードを入力してください。";return}const {data,error}=await db.auth.signUp({email,password});if(error){document.getElementById("authmsg").textContent=error.message;return}session=data.session;if(session){hide("auth");await loadMembership()}else document.getElementById("authmsg").textContent="登録しました。ログインしてください。"}
+async function joinOrg(){const code=document.getElementById("joinCode").value.trim();const {error}=await db.rpc("join_organization",{p_join_code:code});document.getElementById("setupmsg").textContent=error?"参加できませんでした: "+error.message:"参加しました。";if(!error)await loadMembership()}
+async function logout(){await db.auth.signOut();location.reload()}
+init();
+</script>
+</body></html>
