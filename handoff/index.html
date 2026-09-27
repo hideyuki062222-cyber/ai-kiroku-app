@@ -40,7 +40,8 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .client-picker-item.general{background:#fff8e8;border-color:#efd08b;color:#7b5000}
 .client-picker-item.selected{border:2px solid var(--blue);background:#eef5ff}
 .catgrid{display:flex;gap:7px;flex-wrap:wrap}.cat{border:1px solid #c9d5e5;background:#f7faff;border-radius:999px;padding:9px 12px;color:#214e8a;font-weight:800}.cat:active{transform:scale(.98);background:#dce9ff}
-.quick-section{border:1px solid #dbe3ee;border-radius:13px;padding:12px;margin:12px 0;background:#fbfcfe}.quick-section-title{font-weight:900;margin-bottom:9px;color:#253a58}.number-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.number-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.number-item label{font-size:12px;color:#536177;margin-bottom:4px}.number-item input{font-size:17px;font-weight:800;text-align:center}.quick-add{margin-top:9px;width:100%;border:0;border-radius:10px;padding:11px;background:#e8f0ff;color:#174f9b;font-weight:900}.carry-help{font-size:12px;color:#7a5b11;margin:4px 8px 10px;line-height:1.45}
+.quick-section{border:1px solid #dbe3ee;border-radius:13px;padding:12px;margin:12px 0;background:#fbfcfe}.quick-section-title{font-weight:900;margin-bottom:9px;color:#253a58}
+.quick-cat-tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.quick-cat-tabs::-webkit-scrollbar{display:none}.quick-cat-tab{flex:0 0 auto;border:1px solid #ccd7e6;background:#fff;border-radius:999px;padding:8px 12px;font-weight:800;color:#4b5e78}.quick-cat-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}.quick-group-title{font-size:13px;font-weight:900;color:#51627a;margin:10px 0 7px;padding-left:2px}.quick-buttons{display:flex;gap:7px;flex-wrap:wrap}.number-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.number-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.number-item label{font-size:12px;color:#536177;margin-bottom:4px}.number-item input{font-size:17px;font-weight:800;text-align:center}.quick-add{margin-top:9px;width:100%;border:0;border-radius:10px;padding:11px;background:#e8f0ff;color:#174f9b;font-weight:900}.carry-help{font-size:12px;color:#7a5b11;margin:4px 8px 10px;line-height:1.45}
 .checkrow{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;margin:7px 0;background:#f7f8fa}.checkrow.important{background:#fff0f3}.checkrow.carry{background:#fff8e6}
 .note{border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:12px;padding:11px;margin:9px 0;background:#fff}.note.night{border-left-color:var(--red);background:#fff9fa}.note.carry{box-shadow:inset 0 0 0 1px #f0c36b}.note-head{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.note-body{white-space:pre-wrap;margin:8px 0;line-height:1.55}.note-actions{display:flex;gap:6px;flex-wrap:wrap}.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:700}.mini.ok{background:#e5f6ec;color:#14673e}.mini.warn{background:#fff1d7;color:#915600}
 .template{border:1px dashed #c9d1dc;background:#f8fafc;border-radius:10px;padding:8px 10px}
@@ -157,7 +158,24 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
     <div class="admin-divider"></div>
     <strong>かんたん入力の管理</strong>
     <div class="small">ここで追加・削除したボタンが、全スタッフの「かんたん入力」に反映されます。</div>
-    <div class="quick-add-row"><input id="newQuickInput" maxlength="80" placeholder="例：昼食半量、入浴拒否、外泊予定"><button class="btn primary" onclick="addQuickInput()">追加</button></div>
+    <div class="quick-add-row" style="flex-wrap:wrap">
+  <select id="newQuickCategory" style="border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff;min-width:130px">
+    <option value="食事">🍚 食事</option>
+    <option value="入浴">🛁 入浴</option>
+    <option value="排泄">🚻 排泄</option>
+    <option value="服薬">💊 服薬</option>
+    <option value="体調">❤️ 体調</option>
+    <option value="睡眠">🌙 睡眠</option>
+    <option value="受診">🏥 受診</option>
+    <option value="予定">📅 予定・外出</option>
+    <option value="コール">🔔 コール</option>
+    <option value="物品">📦 物品・生活</option>
+    <option value="家族連絡">☎ 家族連絡</option>
+    <option value="その他">その他</option>
+  </select>
+  <input id="newQuickInput" maxlength="80" placeholder="例：昼食半量、入浴拒否、外泊予定">
+  <button class="btn primary" onclick="addQuickInput()">追加</button>
+</div>
     <div id="quickManageStatus" class="status"></div>
     <div id="quickManageList" class="quick-manage-list"></div>
   </section>
@@ -174,8 +192,9 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   <div class="field"><label>申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
   <div class="quick-section">
     <div class="quick-section-title">⚡ かんたん入力</div>
-    <div id="templates" class="catgrid"></div>
-    <div class="quicknote">押すだけで申し送り内容へ追加されます。</div>
+    <div id="quickCategoryTabs" class="quick-cat-tabs"></div>
+    <div id="templates"></div>
+    <div class="quicknote">カテゴリーを選んで、使いたい項目を押してください。</div>
   </div>
 
   <div class="quick-section">
@@ -229,8 +248,13 @@ const CATS=["体調","食事","服薬","入浴","排泄","睡眠","受診","物�
 let quickInputs=[];
 let session=null,membership=null,organization=null,clients=[],staffMap={},entries=[],confirmations=new Set();
 let selectedDate=localDate(),shiftFilter="all",filterMode="all",entryShift="day",selectedCats=new Set(),selectedClientId=null;
-let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[];
+let viewMode="day",historyClientId=null,historyDays=7,historyEntries=[],selectedQuickCategory="すべて";
 
+const QUICK_CATEGORY_ORDER=["食事","入浴","排泄","服薬","体調","睡眠","受診","予定","コール","物品","家族連絡","その他"];
+const QUICK_CATEGORY_LABELS={
+ "食事":"🍚 食事","入浴":"🛁 入浴","排泄":"🚻 排泄","服薬":"💊 服薬","体調":"❤️ 体調","睡眠":"🌙 睡眠",
+ "受診":"🏥 受診","予定":"📅 予定・外出","コール":"🔔 コール","物品":"📦 物品・生活","家族連絡":"☎ 家族連絡","その他":"その他"
+};
 function localDate(d=new Date()){const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)}
 function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function fmtDate(v){const d=new Date(v+"T12:00:00");return d.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})}
@@ -443,10 +467,26 @@ function selectEntryClient(value){
  closeClientPicker();
 }
 function renderCats(){
- const el=document.getElementById("templates"); if(!el)return;
- el.innerHTML=quickInputs.map((x,i)=>'<button class="cat" type="button" onclick="addTemplate('+i+')">'+esc(x.label)+'</button>').join("");
- if(!quickInputs.length) el.innerHTML='<span class="small">かんたん入力が登録されていません。</span>';
+ const el=document.getElementById("templates"),tabs=document.getElementById("quickCategoryTabs");
+ if(!el||!tabs)return;
+ const cats=QUICK_CATEGORY_ORDER.filter(cat=>quickInputs.some(x=>(x.category||"その他")===cat));
+ tabs.innerHTML=['すべて',...cats].map(cat=>'<button type="button" class="quick-cat-tab '+(selectedQuickCategory===cat?'active':'')+'" onclick="setQuickCategory(\''+cat+'\')">'+(cat==="すべて"?"すべて":QUICK_CATEGORY_LABELS[cat]||esc(cat))+'</button>').join("");
+ if(!quickInputs.length){el.innerHTML='<span class="small">かんたん入力が登録されていません。</span>';return}
+ if(selectedQuickCategory!=="すべて"&&!cats.includes(selectedQuickCategory))selectedQuickCategory="すべて";
+ const showCats=selectedQuickCategory==="すべて"?cats:[selectedQuickCategory];
+ let html="";
+ for(const cat of showCats){
+   const items=quickInputs.filter(x=>(x.category||"その他")===cat);
+   if(!items.length)continue;
+   if(selectedQuickCategory==="すべて") html+='<div class="quick-group-title">'+esc(QUICK_CATEGORY_LABELS[cat]||cat)+'</div>';
+   html+='<div class="quick-buttons">'+items.map(x=>{
+     const i=quickInputs.indexOf(x);
+     return '<button class="cat" type="button" onclick="addTemplate('+i+')">'+esc(x.label)+'</button>';
+   }).join("")+'</div>';
+ }
+ el.innerHTML=html||'<span class="small">このカテゴリーには項目がありません。</span>';
 }
+function setQuickCategory(cat){selectedQuickCategory=cat;renderCats()}
 function appendBody(text){
  const el=document.getElementById("entryBody");
  const next=(el.value?(el.value+"\n"):"")+text;
@@ -544,15 +584,22 @@ async function deleteEntry(id){if(!confirm("この申し送りを削除します
 function renderQuickManage(){
  const el=document.getElementById("quickManageList"); if(!el)return;
  if(!quickInputs.length){el.innerHTML='<span class="small">登録なし</span>';return}
- el.innerHTML=quickInputs.map(x=>'<span class="quick-manage-item">'+esc(x.label)+'<button class="quick-delete" title="削除" onclick="deleteQuickInput(\''+x.id+'\')">×</button></span>').join("");
+ let html="";
+ for(const cat of QUICK_CATEGORY_ORDER){
+   const items=quickInputs.filter(x=>(x.category||"その他")===cat);
+   if(!items.length)continue;
+   html+='<div style="width:100%;font-size:12px;font-weight:900;color:#667489;margin-top:7px">'+esc(QUICK_CATEGORY_LABELS[cat]||cat)+'</div>';
+   html+=items.map(x=>'<span class="quick-manage-item">'+esc(x.label)+'<button class="quick-delete" title="削除" onclick="deleteQuickInput(\''+x.id+'\')">×</button></span>').join("");
+ }
+ el.innerHTML=html;
 }
 async function addQuickInput(){
- const input=document.getElementById("newQuickInput"),label=input.value.trim(),status=document.getElementById("quickManageStatus");
+ const input=document.getElementById("newQuickInput"),label=input.value.trim(),category=document.getElementById("newQuickCategory").value||"その他",status=document.getElementById("quickManageStatus");
  if(!label){status.textContent="追加する言葉を入力してください。";return}
  status.textContent="追加中…";
  const maxOrder=quickInputs.reduce((m,x)=>Math.max(m,Number(x.sort_order)||0),0);
  const {error}=await db.from("handoff_quick_inputs").insert({
-   organization_id:membership.organization_id,label,category:"その他",sort_order:maxOrder+10
+   organization_id:membership.organization_id,label,category,sort_order:maxOrder+10
  });
  if(error){status.textContent=error.code==="23505"?"同じかんたん入力がすでにあります。":"追加できませんでした: "+error.message;return}
  input.value="";status.textContent="追加しました。";await loadQuickInputs();
