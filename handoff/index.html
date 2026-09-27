@@ -79,6 +79,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
     <div><div class="brand">申し送り <span class="small">v2</span></div><div id="orgLabel" class="sub">読み込み中…</div></div>
     <div class="top-actions">
       <a class="btn" href="../" style="text-decoration:none">AI記録</a>
+      <button id="adminTopBtn" class="btn amber hidden" onclick="openAdminSettings()">⚙ 管理</button>
       <button class="btn" onclick="printPdf()">PDF/印刷</button>
       <button class="btn" onclick="logout()">退出</button>
     </div>
@@ -138,12 +139,14 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   </section>
 
   <section id="adminCard" class="card hidden">
-    <strong>管理者：利用者表示名</strong>
+    <div class="row between"><div><strong style="font-size:18px">⚙ 管理者設定</strong><div class="small">管理者だけに表示されます</div></div><button class="btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">上へ戻る</button></div>
+    <div class="admin-divider"></div>
+    <strong>利用者表示名</strong>
     <div class="small">申し送り画面だけに使う表示名です。空欄なら利用者コードだけ表示します。</div>
     <div class="adminline"><select id="adminClient"></select><input id="adminName" maxlength="80" placeholder="表示名"><button class="btn" onclick="saveClientName()">保存</button></div>
     <div id="adminStatus" class="status"></div>
     <div class="admin-divider"></div>
-    <strong>管理者：かんたん入力の管理</strong>
+    <strong>かんたん入力の管理</strong>
     <div class="small">ここで追加・削除したボタンが、全スタッフの「かんたん入力」に反映されます。</div>
     <div class="quick-add-row"><input id="newQuickInput" maxlength="80" placeholder="例：昼食半量、入浴拒否、外泊予定"><button class="btn primary" onclick="addQuickInput()">追加</button></div>
     <div id="quickManageStatus" class="status"></div>
@@ -235,7 +238,7 @@ async function loadMembership(){
  document.getElementById("dateInput").value=selectedDate;
  await Promise.all([loadClients(),loadStaff(),loadQuickInputs()]);
  await loadEntries();
- if(membership.role==="admin") show("adminCard");
+ if(membership.role==="admin"){show("adminCard");show("adminTopBtn");}
 }
 async function loadClients(){
  const {data,error}=await db.from("clients").select("id,code,display_name,sort_order").eq("organization_id",membership.organization_id).order("sort_order").order("code");
@@ -515,6 +518,13 @@ async function deleteQuickInput(id){
  status.textContent="削除しました。";await loadQuickInputs();
 }
 
+
+function openAdminSettings(){
+ const card=document.getElementById("adminCard");
+ if(!card||card.classList.contains("hidden"))return;
+ card.scrollIntoView({behavior:"smooth",block:"start"});
+ setTimeout(()=>document.getElementById("newQuickInput")?.focus(),450);
+}
 async function saveClientName(){
  const id=document.getElementById("adminClient").value,name=document.getElementById("adminName").value.trim();
  const {error}=await db.from("clients").update({display_name:name,updated_at:new Date().toISOString()}).eq("id",id).eq("organization_id",membership.organization_id);
