@@ -25,11 +25,20 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 .fab{position:fixed;right:18px;bottom:22px;z-index:15;border:0;border-radius:999px;background:var(--navy);color:#fff;padding:14px 18px;font-weight:900;box-shadow:0 8px 24px #16345b44}
 .overlay{position:fixed;inset:0;background:#0008;z-index:50;display:flex;align-items:flex-end;justify-content:center}.sheet{background:#fff;width:100%;max-width:720px;max-height:93vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px}.sheet h2{margin:0 0 12px}.close{border:0;background:#eef2f6;border-radius:999px;width:38px;height:38px;font-size:20px}
 .field{margin:13px 0}.field label{display:block;font-weight:800;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid #ccd4df;border-radius:11px;padding:11px;background:#fff;color:var(--text)}.field textarea{min-height:120px;resize:vertical}.counter{text-align:right;font-size:12px;color:var(--muted)}
-#entryClient{min-height:58px;border:2px solid var(--blue);background:#eef5ff;color:var(--navy);font-size:18px;font-weight:900;padding:13px 14px;box-shadow:0 2px 8px #2d6cdf1f}
-#entryClient:focus{outline:3px solid #2d6cdf22;outline-offset:2px}
-#entryClient option{color:#172033;background:#fff;font-size:16px}
+#entryClient{display:none}
 .client-select-label{font-size:18px!important;color:var(--navy);margin-bottom:8px!important}
 .client-select-help{font-size:13px;color:#536177;margin-top:7px;font-weight:600}
+.client-picker-button{width:100%;min-height:72px;border:3px solid var(--blue);background:#eef5ff;color:var(--navy);border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:21px;font-weight:900;text-align:left;box-shadow:0 3px 12px #2d6cdf22;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.client-picker-button:active{background:#dceaff;transform:scale(.995)}
+.client-picker-arrow{font-size:28px;line-height:1;color:var(--blue)}
+.picker-overlay{z-index:80}
+.picker-sheet{max-height:88vh}
+.client-search{width:100%;border:1px solid #ccd4df;border-radius:12px;padding:12px 14px;font-size:17px;margin-bottom:10px}
+.client-picker-list{display:grid;gap:8px;padding-bottom:20px}
+.client-picker-item{width:100%;border:1px solid #d6dfeb;background:#fff;border-radius:13px;padding:15px 14px;text-align:left;font-size:18px;font-weight:850;color:#1d2f4b;min-height:58px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.client-picker-item:active{background:#eaf2ff}
+.client-picker-item.general{background:#fff8e8;border-color:#efd08b;color:#7b5000}
+.client-picker-item.selected{border:2px solid var(--blue);background:#eef5ff}
 .catgrid{display:flex;gap:7px;flex-wrap:wrap}.cat{border:1px solid #c9d5e5;background:#f7faff;border-radius:999px;padding:9px 12px;color:#214e8a;font-weight:800}.cat:active{transform:scale(.98);background:#dce9ff}
 .quick-section{border:1px solid #dbe3ee;border-radius:13px;padding:12px;margin:12px 0;background:#fbfcfe}.quick-section-title{font-weight:900;margin-bottom:9px;color:#253a58}.number-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.number-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.number-item label{font-size:12px;color:#536177;margin-bottom:4px}.number-item input{font-size:17px;font-weight:800;text-align:center}.quick-add{margin-top:9px;width:100%;border:0;border-radius:10px;padding:11px;background:#e8f0ff;color:#174f9b;font-weight:900}.carry-help{font-size:12px;color:#7a5b11;margin:4px 8px 10px;line-height:1.45}
 .checkrow{display:flex;align-items:center;gap:9px;padding:10px;border-radius:10px;margin:7px 0;background:#f7f8fa}.checkrow.important{background:#fff0f3}.checkrow.carry{background:#fff8e6}
@@ -159,7 +168,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
 <div id="entryOverlay" class="overlay hidden">
  <div class="sheet">
   <div class="row between"><h2>申し送り入力</h2><button class="close" onclick="closeEntry()">×</button></div>
-  <div class="field"><label class="client-select-label">👤 利用者を選択</label><select id="entryClient" aria-label="利用者を選択"></select><div class="client-select-help">▼ ここをタップして利用者を選択してください</div><div class="quicknote">「全体申し送り・備考」を選ぶと、事業所全体への連絡になります。</div></div>
+  <div class="field"><label class="client-select-label">👤 利用者を選択</label><select id="entryClient" aria-label="利用者を選択"></select><button id="entryClientButton" type="button" class="client-picker-button" onclick="openClientPicker()"><span id="entryClientButtonText">利用者を選ぶ</span><span class="client-picker-arrow">›</span></button><div class="client-select-help">この大きなボタンをタップして選択してください</div><div class="quicknote">「全体申し送り・備考」を選ぶと、事業所全体への連絡になります。</div></div>
   <div class="field"><label>勤務区分</label><div class="segment"><button id="entryDay" class="seg active" onclick="setEntryShift('day')">☀ 日勤</button><button id="entryNight" class="seg night" onclick="setEntryShift('night')">☾ 夜勤</button><span></span></div></div>
   <div class="field"><label>対応日・時刻（任意）</label><div class="duebox"><input id="dueDate" type="date"><input id="dueTime" type="time"></div><div class="quicknote">例：明日の朝食準備、○日に受診、18:00お迎えなど</div></div>
   <div class="field"><label>申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
@@ -193,6 +202,14 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}.hidden{display
   <div class="carry-help">チェックすると、次の日・次の勤務にも表示されます。引き継ぎが終わったら一覧の「引き継ぎ終了」を押します。対応日を入れた場合は自動で残ります。</div>
   <div class="row"><button class="btn" onclick="closeEntry()">キャンセル</button><button id="saveBtn" class="btn primary" onclick="saveEntry()">保存する</button></div>
   <div id="entryStatus" class="status"></div>
+ </div>
+</div>
+
+<div id="clientPickerOverlay" class="overlay picker-overlay hidden">
+ <div class="sheet picker-sheet">
+  <div class="row between"><h2>利用者を選択</h2><button class="close" onclick="closeClientPicker()">×</button></div>
+  <input id="clientSearch" class="client-search" type="search" inputmode="search" placeholder="番号・名前で検索" oninput="renderClientPicker()">
+  <div id="clientPickerList" class="client-picker-list"></div>
  </div>
 </div>
 
@@ -249,6 +266,7 @@ async function loadClients(){
  document.getElementById("historyClient").innerHTML=opts;
  if(!historyClientId&&clients.length)historyClientId=clients[0].id;
  if(historyClientId)document.getElementById("historyClient").value=historyClientId;
+ updateEntryClientButton();
 }
 async function loadStaff(){
  const {data}=await db.from("organization_members").select("user_id,staff_name,role").eq("organization_id",membership.organization_id);
@@ -395,6 +413,35 @@ function setShift(v){shiftFilter=v;render();if(viewMode==="client")renderClientT
 function changeDate(v){selectedDate=v;loadEntries();if(viewMode==="client")loadClientTimeline()} function goToday(){selectedDate=localDate();loadEntries();if(viewMode==="client")loadClientTimeline()}
 function moveDate(n){const d=new Date(selectedDate+"T12:00:00");d.setDate(d.getDate()+n);selectedDate=localDate(d);loadEntries();if(viewMode==="client")loadClientTimeline()}
 
+function entryClientText(value){
+ if(value==="__general__") return "📌 全体申し送り・備考";
+ const c=clients.find(x=>x.id===value);
+ return c ? clientLabel(c) : "利用者を選ぶ";
+}
+function updateEntryClientButton(){
+ const sel=document.getElementById("entryClient"),txt=document.getElementById("entryClientButtonText");
+ if(sel&&txt) txt.textContent=entryClientText(sel.value);
+}
+function openClientPicker(){
+ const search=document.getElementById("clientSearch");
+ if(search) search.value="";
+ renderClientPicker();
+ show("clientPickerOverlay");
+ setTimeout(()=>{if(search)search.focus()},150);
+}
+function closeClientPicker(){hide("clientPickerOverlay")}
+function renderClientPicker(){
+ const q=(document.getElementById("clientSearch")?.value||"").trim().toLowerCase();
+ const current=document.getElementById("entryClient")?.value||"";
+ let items=[{id:"__general__",label:"📌 全体申し送り・備考",general:true},...clients.map(c=>({id:c.id,label:clientLabel(c),general:false}))];
+ if(q) items=items.filter(x=>x.label.toLowerCase().includes(q));
+ document.getElementById("clientPickerList").innerHTML=items.map(x=>'<button type="button" class="client-picker-item '+(x.general?"general ":"")+(x.id===current?"selected":"")+'" onclick="selectEntryClient(\''+x.id+'\')">'+esc(x.label)+'</button>').join("") || '<div class="empty">該当する利用者がいません</div>';
+}
+function selectEntryClient(value){
+ document.getElementById("entryClient").value=value;
+ updateEntryClientButton();
+ closeClientPicker();
+}
 function renderCats(){
  const el=document.getElementById("templates"); if(!el)return;
  el.innerHTML=quickInputs.map((x,i)=>'<button class="cat" type="button" onclick="addTemplate('+i+')">'+esc(x.label)+'</button>').join("");
@@ -435,6 +482,7 @@ function openEntry(cid=null){
  selectedCats=new Set();entryShift="day";document.getElementById("entryBody").value="";document.getElementById("dueDate").value="";document.getElementById("dueTime").value="";document.getElementById("important").checked=false;document.getElementById("carry").checked=false;document.getElementById("entryStatus").textContent="";
  ["weightInput","tempInput","spo2Input","bpSysInput","bpDiaInput","pulseInput"].forEach(id=>document.getElementById(id).value="");
  if(cid) document.getElementById("entryClient").value=cid; else if(selectedClientId) document.getElementById("entryClient").value=selectedClientId; else document.getElementById("entryClient").value=clients[0]?.id||"__general__";
+ updateEntryClientButton();
  setEntryShift("day");renderCats();bodyCount();show("entryOverlay")
 }
 function openEntryForSelected(){closeDetail();openEntry(selectedClientId)} function closeEntry(){hide("entryOverlay")}
