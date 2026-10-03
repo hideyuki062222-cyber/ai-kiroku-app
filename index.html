@@ -584,8 +584,12 @@ function buildInterventionSentence(level,seed){
   if(!arr.length)return "";
   return normalizeSentence(arr[Math.abs(Number(seed)||0)%arr.length]);
 }
-function buildSupportMethodSentence(profile){
-  const t=(profile?.supportMethod||"").trim().replace(/[。]+$/,"");
+function buildSupportMethodSentence(profile,compact=false){
+  let t=(profile?.supportMethod||"").trim().replace(/[。]+$/,"");
+  if(compact && t){
+    const first=t.split(/[。！？!?]/).map(x=>x.trim()).find(Boolean);
+    if(first)t=first;
+  }
   return t?normalizeSentence("利用者ごとの支援方法として「"+t+"」を踏まえて対応した"):"";
 }
 
@@ -1070,8 +1074,8 @@ function buildCareRecord(len, actionSentences, profile, seed, interventionLevel)
 
   actionSentences.forEach(s=>pushUnique(out,s));
 
-  const supportMethod=buildSupportMethodSentence(profile);
-  if(supportMethod && (len!=="short" || out.join("").length<150)) pushUnique(out,supportMethod);
+  const supportMethod=buildSupportMethodSentence(profile,len==="short");
+  if(supportMethod) pushUnique(out,supportMethod);
 
   // 支援方法に関係するプロフィールだけを②へ反映
   if(len!=="short" && profile.communication && out.join("").length<170){
