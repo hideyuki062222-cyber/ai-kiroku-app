@@ -243,6 +243,19 @@ window.AI_KIROKU_CONFIG = {
     </div>
 
     <div class="field-group">
+      <label for="interventionLevel">今回の支援介入度 <span style="color:#b42318">※毎回選択</span></label>
+      <select id="interventionLevel">
+        <option value="">選択してください</option>
+        <option value="active">積極的支援（直接介助を多め）</option>
+        <option value="partial">必要な部分を介助</option>
+        <option value="prompt">声かけ・促し中心</option>
+        <option value="watch">見守り中心</option>
+        <option value="minimal">最小限の支援・確認中心</option>
+      </select>
+      <div class="notice">その日の実際の支援に合わせて選択してください。選んだ介入度に応じて②の支援内容の表現を変えます。</div>
+    </div>
+
+    <div class="field-group">
       <label>サービス内容（複数選択可）※実施したサービス名は作成結果に重複記載しません</label>
       <div class="checks">
         <label><input type="checkbox" name="serviceContent" value="起床介助"> 起床介助</label>
@@ -396,6 +409,9 @@ window.AI_KIROKU_CONFIG = {
     </div>
     <label for="profileCaution">支援時に注意すること</label>
     <textarea id="profileCaution" placeholder="例：急な声かけを避け、次に行うことを事前に伝える"></textarea>
+    <label for="profileSupportMethod" style="margin-top:12px">この利用者への基本的な支援の仕方</label>
+    <textarea id="profileSupportMethod" maxlength="1000" placeholder="例：本人ができる動作はまず見守り、難しい場面だけ介助する。急がせず、短い言葉で一つずつ声をかける。"></textarea>
+    <div class="notice">ここに登録した内容を、毎回の「支援介入度」と組み合わせて②の記録文に反映します。</div>
     <div class="actions">
       <button class="primary" onclick="saveProfile()">プロフィールを保存</button>
       <button class="secondary" onclick="clearProfile()">入力をクリア</button>
@@ -492,12 +508,13 @@ function loadProfile(){
   document.getElementById("profileTrait").value=p.trait||"";
   document.getElementById("profileCaution").value=p.caution||"";
   document.getElementById("profileCommunication").value=p.communication||"";
-  document.getElementById("profileStatus").textContent=u?((p.usual||p.trait||p.caution||p.communication)?"登録済みのプロフィールを読み込みました。":"まだプロフィールは登録されていません。"):"";
+  document.getElementById("profileSupportMethod").value=p.supportMethod||"";
+  document.getElementById("profileStatus").textContent=u?((p.usual||p.trait||p.caution||p.communication||p.supportMethod)?"登録済みのプロフィールを読み込みました。":"まだプロフィールは登録されていません。"):"";
 }
 async function saveProfile(){
   const u=document.getElementById("profileUser").value;
   if(!u){alert("プロフィールを編集する利用者を選択してください。");return;}
-  const p={usual:document.getElementById("profileUsual").value.trim(),trait:document.getElementById("profileTrait").value.trim(),caution:document.getElementById("profileCaution").value.trim(),communication:document.getElementById("profileCommunication").value.trim()};
+  const p={usual:document.getElementById("profileUsual").value.trim(),trait:document.getElementById("profileTrait").value.trim(),caution:document.getElementById("profileCaution").value.trim(),communication:document.getElementById("profileCommunication").value.trim(),supportMethod:document.getElementById("profileSupportMethod").value.trim()};
   if(window.cloudSaveProfile){
     await window.cloudSaveProfile(u,p);
     return;
@@ -506,7 +523,7 @@ async function saveProfile(){
   saveProfiles();document.getElementById("profileStatus").textContent="「"+u+"」のプロフィールを保存しました。";
 }
 function clearProfile(){
-  ["profileUsual","profileTrait","profileCaution","profileCommunication"].forEach(id=>document.getElementById(id).value="");
+  ["profileUsual","profileTrait","profileCaution","profileCommunication","profileSupportMethod"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("profileStatus").textContent="入力をクリアしました。保存前なので登録内容は変更されていません。";
 }
 
@@ -523,6 +540,53 @@ function normalizeSentence(s){
 }
 function splitSentences(s){
   return (s||"").split("。").map(x=>x.trim()).filter(Boolean).map(normalizeSentence);
+}
+
+const INTERVENTION_LABELS={
+  active:"積極的支援",
+  partial:"必要な部分を介助",
+  prompt:"声かけ・促し中心",
+  watch:"見守り中心",
+  minimal:"最小限の支援・確認中心"
+};
+
+const interventionSentences={
+  active:[
+    "本人の様子を確認しながら、必要な場面では介護者が動作を一緒に行い、直接介助を中心に支援した",
+    "安全を確認しつつ、本人が難しい動作には介護者が積極的に介入して支援した",
+    "本人の反応に合わせながら、必要な部分は介護者が直接介助して支援を進めた"
+  ],
+  partial:[
+    "本人ができる動作は本人に任せ、難しい部分のみ介護者が直接介助した",
+    "本人の力を活かしながら、支援が必要な部分に限って介助を行った",
+    "本人の動きを見ながら、難しい場面だけ介護者が補助して支援した"
+  ],
+  prompt:[
+    "本人の動きを待ちながら、必要な場面で声かけや手順の提示を行い、自身で進められるよう支援した",
+    "直接介助は必要な場面に留め、声かけや促しを中心に本人の動作を支援した",
+    "本人が次の動作を進めやすいよう、短い声かけと促しを中心に対応した"
+  ],
+  watch:[
+    "本人主体で進めてもらい、介護者は見守りを中心に安全面を確認しながら必要時のみ声をかけた",
+    "本人の自発的な動きを尊重して見守り、困った場面や安全上必要な時だけ支援した",
+    "介護者の介入を控えめにし、本人の動作を見守りながら必要な場面のみ声をかけた"
+  ],
+  minimal:[
+    "本人の自立した動作を尊重し、介護者は安全確認を中心に最小限の介入とした",
+    "本人自身で進められるよう見守り、介護者は確認と必要最小限の声かけに留めた",
+    "本人の判断と動作を優先し、介護者は安全確認と必要時の補助のみ行った"
+  ]
+};
+
+function interventionLabel(level){return INTERVENTION_LABELS[level]||""}
+function buildInterventionSentence(level,seed){
+  const arr=interventionSentences[level]||[];
+  if(!arr.length)return "";
+  return normalizeSentence(arr[Math.abs(Number(seed)||0)%arr.length]);
+}
+function buildSupportMethodSentence(profile){
+  const t=(profile?.supportMethod||"").trim().replace(/[。]+$/,"");
+  return t?normalizeSentence("利用者ごとの支援方法として「"+t+"」を踏まえて対応した"):"";
 }
 
 const serviceTemplates={
@@ -998,17 +1062,24 @@ function buildVisitRecord(len, scene, condition, health, profile, seed){
   return picked.join("") || result;
 }
 
-function buildCareRecord(len, actionSentences, profile, seed){
+function buildCareRecord(len, actionSentences, profile, seed, interventionLevel){
   const out=["指示内容確認しました。前回のサービス記録確認しました。"];
+
+  const intervention=buildInterventionSentence(interventionLevel,seed);
+  if(intervention) pushUnique(out,intervention);
+
   actionSentences.forEach(s=>pushUnique(out,s));
 
+  const supportMethod=buildSupportMethodSentence(profile);
+  if(supportMethod && (len!=="short" || out.join("").length<150)) pushUnique(out,supportMethod);
+
   // 支援方法に関係するプロフィールだけを②へ反映
-  if(len!=="short" && profile.communication && out.join("").length<120){
+  if(len!=="short" && profile.communication && out.join("").length<170){
     let c=profile.communication.replace(/[。]+$/,"");
     c=c.replace(/声かけする$/,"声をかけた").replace(/する$/,"した");
     pushUnique(out, "本人には"+c.replace(/^本人には/,""));
   }
-  if(len==="long" && profile.caution && out.join("").length<155){
+  if(len==="long" && profile.caution && out.join("").length<210){
     pushUnique(out, "支援時は"+profile.caution.replace(/^支援時は/,"").replace(/[。]+$/,"")+"よう配慮した");
   }
 
@@ -1033,8 +1104,10 @@ async function generate(){
     const condition=document.getElementById("condition").value;
     const health=document.getElementById("health").value;
     const len=document.getElementById("length").value;
+    const interventionLevel=document.getElementById("interventionLevel").value;
 
     if(!user){ alert("利用者を選択してください。"); return; }
+    if(!interventionLevel){ alert("今回の支援介入度を選択してください。"); return; }
     if(!scene && !condition && !health && !services.length && !raw){
       alert("訪問時の様子・体調、またはサービス内容を入力してください。");
       return;
@@ -1045,7 +1118,8 @@ async function generate(){
 
     const signature=[
       user,service,services.join(","),scene,condition,health,len,raw,
-      profile.usual||"",profile.trait||"",profile.caution||"",profile.communication||""
+      interventionLevel,
+      profile.usual||"",profile.trait||"",profile.caution||"",profile.communication||"",profile.supportMethod||""
     ].join("||");
     let seed;
     if(window.cloudNextVariantSeed){
@@ -1060,7 +1134,7 @@ async function generate(){
     }
 
     let visitText=buildVisitRecord(len,scene,condition,health,profile,seed);
-    let careText=buildCareRecord(len,actions,profile,seed);
+    let careText=buildCareRecord(len,actions,profile,seed,interventionLevel);
 
     if(visitText && !visitText.endsWith("。") && !visitText.endsWith("ください。")) visitText+="。";
     if(careText && !careText.endsWith("。") && !careText.endsWith("ください。")) careText+="。";
@@ -1074,7 +1148,7 @@ async function generate(){
       careText.includes("入力してください") ? "0文字" : careText.length+"文字";
 
     const historyText="【訪問時】"+visitText+" 【支援中】"+careText;
-    addHistory(user+" / "+service,historyText);
+    addHistory(user+" / "+service+" / "+interventionLabel(interventionLevel),historyText);
 
     if(window.cloudSaveRecord){
       window.cloudSaveRecord({
@@ -1086,6 +1160,8 @@ async function generate(){
         lengthMode:len,
         services:services,
         careInput:raw,
+        interventionLevel:interventionLevel,
+        supportMethodSnapshot:profile.supportMethod||"",
         visitNote:visitText,
         careNote:careText
       }).catch(e=>console.warn("クラウド履歴保存失敗:",e));
@@ -1139,6 +1215,7 @@ function addHistory(service,text){
 function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
 function clearAll(){
   document.getElementById("visitScene").value="";
+  document.getElementById("interventionLevel").value="";
   input.value="";
   document.getElementById("inputCount").textContent="0文字";
   document.getElementById("visitResult").textContent="ここに訪問時の記録文が表示されます。";
@@ -1250,7 +1327,7 @@ refreshUserSelect();
     if(!membership) return;
     const { data, error } = await client
       .from("clients")
-      .select("id, code, usual, trait, caution, communication")
+      .select("id, code, usual, trait, caution, communication, support_method")
       .eq("organization_id", membership.organization_id)
       .eq("is_active", true)
       .order("sort_order", { ascending:true })
@@ -1265,7 +1342,8 @@ refreshUserSelect();
         usual:r.usual || "",
         trait:r.trait || "",
         caution:r.caution || "",
-        communication:r.communication || ""
+        communication:r.communication || "",
+        supportMethod:r.support_method || ""
       };
     }
 
@@ -1279,7 +1357,7 @@ refreshUserSelect();
     if(!membership) return;
     const { data, error } = await client
       .from("care_records")
-      .select("created_at, service_type, visit_note, care_note, clients(code)")
+      .select("created_at, service_type, intervention_level, visit_note, care_note, clients(code)")
       .eq("organization_id", membership.organization_id)
       .order("created_at", { ascending:false })
       .limit(30);
@@ -1297,8 +1375,9 @@ refreshUserSelect();
       d.className = "history-item";
       const code = r.clients?.code || "利用者";
       const dt = new Date(r.created_at).toLocaleString("ja-JP");
+      const levelLabel=interventionLabel(r.intervention_level||"");
       d.innerHTML =
-        '<span class="tag">'+escapeHtml(code+" / "+(r.service_type||""))+'</span>'+
+        '<span class="tag">'+escapeHtml(code+" / "+(r.service_type||"")+(levelLabel?" / "+levelLabel:""))+'</span>'+
         '<div class="sub">'+escapeHtml(dt)+'</div>'+
         escapeHtml("【訪問時】"+(r.visit_note||"")+" 【支援中】"+(r.care_note||""));
       h.appendChild(d);
@@ -1665,7 +1744,8 @@ refreshUserSelect();
           usual:p.usual || "",
           trait:p.trait || "",
           caution:p.caution || "",
-          communication:p.communication || ""
+          communication:p.communication || "",
+          support_method:p.supportMethod || ""
         })
         .eq("id", row.id)
         .eq("organization_id", membership.organization_id);
@@ -1696,6 +1776,8 @@ refreshUserSelect();
       length_mode:record.lengthMode || "normal",
       services:record.services || [],
       care_input:record.careInput || "",
+      intervention_level:record.interventionLevel || "",
+      support_method_snapshot:record.supportMethodSnapshot || "",
       visit_note:record.visitNote || "",
       care_note:record.careNote || ""
     };
