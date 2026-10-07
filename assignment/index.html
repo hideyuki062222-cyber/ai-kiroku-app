@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>時間別 担当割当 | 障害福祉 AI記録</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:#f5f7fb;color:#222}
+.wrap{max-width:1050px;margin:0 auto;padding:28px 18px 60px}
+header{background:#fff;border-radius:18px;padding:20px 22px;margin-bottom:18px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+h1{font-size:24px;margin:0 0 5px}.sub{color:#667085;font-size:13px}
+.app-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:#eef2f7;border-radius:12px;padding:4px;margin-top:14px}
+.app-tab{border:0;border-radius:9px;padding:9px 7px;font-size:13px;font-weight:800;color:#526175;background:transparent;text-align:center;text-decoration:none;white-space:nowrap}
+.app-tab.active{background:#fff;color:#111827;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.card{background:#fff;border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:700;font-size:14px;margin:0 0 8px}
+select,input,textarea{width:100%;border:1px solid #d8dee9;border-radius:10px;padding:11px 12px;font-size:14px;background:#fff;font-family:inherit}
+textarea{min-height:90px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:800;cursor:pointer;font-size:13px}
+.primary{background:#111827;color:#fff}.secondary{background:#eef2f7;color:#273142}.danger{background:#fee4e2;color:#b42318}
+.notice{font-size:12px;color:#667085;line-height:1.6;margin-top:9px}
+.cloud-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3}
+.section-title{margin:15px 0 8px;padding:10px 12px;background:#eef2f7;border-radius:10px;font-weight:900}
+.time-row{display:grid;grid-template-columns:72px 1fr;gap:9px;padding:7px 0;border-bottom:1px solid #edf0f4}
+.time-box{display:flex;align-items:center;justify-content:center;min-height:76px;border-radius:10px;background:#111827;color:#fff;font-size:16px;font-weight:900}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.slot{border:1px solid #d6dde7;border-radius:11px;padding:10px;background:#fff;min-height:76px;cursor:pointer}
+.slot.selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
+.slot.assigned{border-color:#8fd0aa;background:#f2fbf5}.slot.recorded{border-color:#7aa7e8;background:#f0f6ff}
+.slot-name{font-weight:900;font-size:13px}.slot-meta{font-size:11px;color:#667085;margin-top:4px;line-height:1.45}
+.slot-status{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:900;background:#eef2f7}
+.slot-status.done{background:#dbeafe;color:#1d4ed8}.slot-status.todo{background:#fff1f2;color:#b42318}
+.slot-buttons{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.slot-buttons button{padding:7px 8px;font-size:11px}
+.ai-btn{background:#111827;color:#fff}.edit-btn{background:#eef2f7;color:#273142}
+.memo-input{margin-top:7px;font-size:12px;padding:7px 8px}
+.summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.summary span{padding:6px 9px;border-radius:999px;background:#f2f4f7;font-size:11px;font-weight:800}
+.settings-client{border:1px solid #e4e8ef;border-radius:12px;padding:12px;margin-top:9px}
+.auth-overlay{position:fixed;inset:0;z-index:9999;background:rgba(245,247,251,.98);padding:24px 12px;overflow:auto}.auth-box{max-width:600px;margin:30px auto;background:#fff;border-radius:18px;padding:22px;box-shadow:0 18px 50px rgba(17,24,39,.12)}
+.hidden{display:none!important}
+.modal-bg{position:fixed;inset:0;z-index:5000;background:rgba(17,24,39,.55);display:none;align-items:center;justify-content:center;padding:15px}.modal-bg.open{display:flex}.modal{background:#fff;border-radius:16px;padding:18px;width:min(520px,100%);max-height:90vh;overflow:auto}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.wrap{padding:12px}.app-nav{grid-template-columns:repeat(2,1fr)}.slots{grid-template-columns:1fr}.time-row{grid-template-columns:58px 1fr}.card{padding:16px}}
+</style>
+</head>
+<body>
+<div id="authOverlay" class="auth-overlay hidden">
+  <div class="auth-box">
+    <h2>時間別 担当割当</h2>
+    <p class="notice">AI記録作成と同じ職員アカウントでログインしてください。</p>
+    <label>メールアドレス</label><input id="authEmail" type="email" autocomplete="username">
+    <label style="margin-top:10px">パスワード</label><input id="authPassword" type="password" autocomplete="current-password">
+    <div class="actions"><button class="primary" id="loginBtn">ログイン</button><a class="secondary" style="text-decoration:none;display:inline-flex;align-items:center" href="../">AI記録へ戻る</a></div>
+    <div id="authStatus" class="notice"></div>
+  </div>
+</div>
+
+<div class="wrap">
+<header>
+  <h1>時間別 担当割当</h1>
+  <div class="sub">担当を決める → 支援する → AI記録を作成 → 記録済みを確認</div>
+  <nav class="app-nav">
+    <a class="app-tab active" href="./">担当割当</a>
+    <a class="app-tab" href="../handoff/">申し送り</a>
+    <a class="app-tab" href="../">AI記録</a>
+    <a class="app-tab" href="../cashbook/">出納帳</a>
+  </nav>
+</header>
+
+<section class="card">
+  <div class="grid">
+    <div><label>日付</label><input id="assignDate" type="date"></div>
+    <div><label>担当者</label><select id="staffSelect"><option value="">担当者を選択</option></select></div>
+  </div>
+  <div class="summary">
+    <span id="orgLabel">事業所確認中</span>
+    <span id="cloudState">同期中</span>
+    <span id="recordSummary">記録状況確認中</span>
+  </div>
+  <div class="actions">
+    <button class="primary" id="saveSelectedBtn">選択した担当を登録</button>
+    <button class="secondary" id="clearSelectedBtn">選択解除</button>
+    <button class="secondary" id="reloadBtn">最新情報に更新</button>
+  </div>
+  <div class="notice">未登録の利用者枠をタップして選択します。登録済みの枠は「編集」、支援後は「AI記録作成」を押してください。</div>
+</section>
+
+<section class="card">
+  <div id="schedule"></div>
+</section>
+
+<section class="card">
+  <label>利用者・サービス時間設定</label>
+  <div class="notice">担当割当に表示する時間を変更できます。利用者の追加・名前変更はAI記録本体の「利用者登録・変更」と共通です。</div>
+  <div id="clientSettings"></div>
+</section>
+</div>
+
+<div id="editModal" class="modal-bg">
+  <div class="modal">
+    <h2 style="margin-top:0">担当登録を編集</h2>
+    <div id="editTarget" class="notice"></div>
+    <label>担当者</label><select id="editStaff"></select>
+    <label style="margin-top:10px">メモ</label><textarea id="editMemo"></textarea>
+    <div class="actions">
+      <button class="primary" id="saveEditBtn">修正保存</button>
+      <button class="danger" id="deleteEditBtn">登録削除</button>
+      <button class="secondary" id="closeEditBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CFG={url:"https://pagamoaxhqszojxrpxyu.supabase.co",key:"sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT"};
+const sb=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+let session=null,membership=null,organization=null,clients=[],members=[],slots=[],assignments=[],records=[],selected=new Set(),editing=null;
+const today=()=>new Date().toISOString().slice(0,10);
+$("#assignDate").value=today();
+
+function fmtTime(t){return String(t||"").slice(0,5).replace(/^0/,"")}
+function minute(t){const [h,m]=String(t).slice(0,5).split(":").map(Number);return h*60+m}
+function orderMinute(t){const m=minute(t);if(m>=1020)return m;if(m<240)return m+1440;return m+2880}
+function clientLabel(c){return `${c.code}${c.display_name?` ${c.display_name}`:""}`}
+function staffName(m){return (m?.staff_name||"").trim()||"職員名未登録"}
+function findAssignment(slot){return assignments.find(a=>a.client_id===slot.client_id&&String(a.service_time).slice(0,5)===String(slot.service_time).slice(0,5))}
+function hasRecord(a){return !!(a&&records.some(r=>r.assignment_id===a.id))}
+function dayOfWeek(){return new Date($("#assignDate").value+"T12:00:00").getDay()}
+function visibleSlots(){const dow=dayOfWeek();return slots.filter(s=>s.is_active&&(s.days_of_week||[]).includes(dow)).sort((a,b)=>orderMinute(a.service_time)-orderMinute(b.service_time))}
+
+async function getMembership(){
+  const {data,error}=await sb.from("organization_members").select("organization_id,user_id,role,staff_name,created_at").eq("user_id",session.user.id).order("created_at");
+  if(error)throw error;
+  if(!data?.length)return null;
+  const saved=localStorage.getItem("activeOrganizationId");
+  const ids=data.map(x=>x.organization_id);
+  const orgRes=await sb.from("organizations").select("id,name,join_code,is_active").in("id",ids);
+  if(orgRes.error)throw orgRes.error;
+  const active=(orgRes.data||[]).filter(x=>x.is_active);
+  organization=active.find(x=>x.id===saved)||active[0];
+  if(!organization)return null;
+  membership=data.find(x=>x.organization_id===organization.id)||null;
+  return membership;
+}
+
+async function loadAll(){
+  $("#cloudState").textContent="同期中";
+  const date=$("#assignDate").value;
+  const [c,m,s,a,r]=await Promise.all([
+    sb.from("clients").select("id,code,display_name,is_active,sort_order").eq("organization_id",organization.id).eq("is_active",true).order("sort_order").order("code"),
+    sb.from("organization_members").select("organization_id,user_id,role,staff_name").eq("organization_id",organization.id),
+    sb.from("client_service_slots").select("*").eq("organization_id",organization.id).eq("is_active",true),
+    sb.from("staff_assignments").select("*").eq("organization_id",organization.id).eq("service_date",date),
+    sb.from("care_records").select("id,assignment_id,client_id,service_date,service_time").eq("organization_id",organization.id).eq("service_date",date)
+  ]);
+  const err=[c,m,s,a,r].find(x=>x.error)?.error;if(err)throw err;
+  clients=c.data||[];members=m.data||[];slots=s.data||[];assignments=a.data||[];records=r.data||[];
+  fillStaff();renderSchedule();renderClientSettings();
+  $("#orgLabel").textContent=organization.name;
+  $("#cloudState").textContent="共有中";
+}
+function fillStaff(){
+  const opts='<option value="">担当者を選択</option>'+members.map(m=>`<option value="${m.user_id}">${esc(staffName(m))}</option>`).join("");
+  $("#staffSelect").innerHTML=opts;$("#editStaff").innerHTML=opts;
+}
+function renderSchedule(){
+  const groups={};
+  visibleSlots().forEach(s=>{const key=fmtTime(s.service_time);(groups[key]??=[]).push(s)});
+  let html="",phase="";
+  for(const [time,items] of Object.entries(groups)){
+    const night=orderMinute(items[0].service_time)<2880;
+    const p=night?"夕方・夜間　17:00 ～ 翌3:59":"朝・日中　4:00 ～ 16:59";
+    if(p!==phase){html+=`<div class="section-title">${p}</div>`;phase=p}
+    html+=`<div class="time-row"><div class="time-box">${esc(time)}</div><div class="slots">${items.map(slotHtml).join("")}</div></div>`;
+  }
+  $("#schedule").innerHTML=html||'<div class="notice">この日のサービス時間が登録されていません。</div>';
+  const assigned=assignments.length,done=assignments.filter(hasRecord).length;
+  $("#recordSummary").textContent=`担当 ${assigned}件 / 記録済 ${done}件 / 未記録 ${Math.max(0,assigned-done)}件`;
+  $$(".slot[data-slot]").forEach(el=>el.addEventListener("click",e=>{
+    if(e.target.closest("input,button"))return;
+    const slot=slots.find(s=>s.id===el.dataset.slot),a=findAssignment(slot);
+    if(a){openEdit(a,slot);return}
+    selected.has(slot.id)?selected.delete(slot.id):selected.add(slot.id);renderSchedule();
+  }));
+  $$('[data-edit]').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=assignments.find(x=>x.id===b.dataset.edit),slot=slots.find(x=>x.id===b.dataset.slot);openEdit(a,slot)});
+  $$('[data-ai]').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=assignments.find(x=>x.id===b.dataset.ai),slot=slots.find(x=>x.id===b.dataset.slot);goAI(a,slot)});
+}
+function slotHtml(slot){
+  const c=clients.find(x=>x.id===slot.client_id);if(!c)return "";
+  const a=findAssignment(slot),done=hasRecord(a),sel=selected.has(slot.id);
+  const cls=`slot ${a?"assigned":""} ${done?"recorded":""} ${sel?"selected":""}`;
+  let body=`<div class="slot-name">${esc(clientLabel(c))}</div>`;
+  if(a){
+    body+=`<div class="slot-meta">担当：${esc(a.assigned_staff_name||"")} ${a.memo?`<br>${esc(a.memo)}`:""}</div>`;
+    body+=`<span class="slot-status ${done?"done":"todo"}">${done?"✓ 記録済み":"未記録"}</span>`;
+    body+=`<div class="slot-buttons"><button class="edit-btn" data-edit="${a.id}" data-slot="${slot.id}">編集</button><button class="ai-btn" data-ai="${a.id}" data-slot="${slot.id}">${done?"記録を見る・追加":"AI記録作成"}</button></div>`;
+  }else{
+    body+='<div class="slot-meta">担当未登録</div>';
+    body+=`<input class="memo-input" data-memo="${slot.id}" placeholder="この時間のメモ" onclick="event.stopPropagation()">`;
+  }
+  return `<div class="${cls}" data-slot="${slot.id}">${body}</div>`;
+}
+$("#clearSelectedBtn").onclick=()=>{selected.clear();renderSchedule()};
+$("#reloadBtn").onclick=()=>loadAll().catch(showError);
+$("#assignDate").onchange=()=>{selected.clear();loadAll().catch(showError)};
+$("#saveSelectedBtn").onclick=async()=>{
+  const uid=$("#staffSelect").value;if(!uid)return alert("担当者を選択してください。");if(!selected.size)return alert("利用者を選択してください。");
+  const member=members.find(m=>m.user_id===uid),date=$("#assignDate").value;
+  const rows=[...selected].map(id=>{const s=slots.find(x=>x.id===id);return {organization_id:organization.id,client_id:s.client_id,service_date:date,service_time:s.service_time,assigned_user_id:uid,assigned_staff_name:staffName(member),memo:document.querySelector(`[data-memo="${id}"]`)?.value?.trim()||"",created_by:session.user.id,updated_by:session.user.id}});
+  const {error}=await sb.from("staff_assignments").upsert(rows,{onConflict:"organization_id,client_id,service_date,service_time"});
+  if(error)return alert("登録できませんでした："+error.message);
+  selected.clear();await loadAll();
+};
+function openEdit(a,slot){
+  editing={a,slot};const c=clients.find(x=>x.id===slot.client_id);
+  $("#editTarget").textContent=`${a.service_date}　${fmtTime(a.service_time)}　${clientLabel(c)}`;
+  $("#editStaff").value=a.assigned_user_id||"";$("#editMemo").value=a.memo||"";$("#editModal").classList.add("open");
+}
+function closeEdit(){editing=null;$("#editModal").classList.remove("open")}
+$("#closeEditBtn").onclick=closeEdit;$("#editModal").onclick=e=>{if(e.target===$("#editModal"))closeEdit()};
+$("#saveEditBtn").onclick=async()=>{
+  if(!editing)return;const uid=$("#editStaff").value;if(!uid)return alert("担当者を選択してください。");
+  const m=members.find(x=>x.user_id===uid);
+  const {error}=await sb.from("staff_assignments").update({assigned_user_id:uid,assigned_staff_name:staffName(m),memo:$("#editMemo").value.trim(),updated_by:session.user.id,updated_at:new Date().toISOString()}).eq("id",editing.a.id);
+  if(error)return alert(error.message);closeEdit();await loadAll();
+};
+$("#deleteEditBtn").onclick=async()=>{
+  if(!editing||!confirm("この担当登録を削除しますか？"))return;
+  const {error}=await sb.from("staff_assignments").delete().eq("id",editing.a.id);
+  if(error)return alert(error.message);closeEdit();await loadAll();
+};
+function goAI(a,slot){
+  const c=clients.find(x=>x.id===slot.client_id);
+  const qs=new URLSearchParams({from:"assignment",assignment:a.id,client:c.code,date:a.service_date,time:String(a.service_time).slice(0,5),staff:a.assigned_staff_name||"",memo:a.memo||"",label:slot.label||""});
+  location.href="../?"+qs.toString();
+}
+function currentTimes(cid){return slots.filter(s=>s.client_id===cid&&s.is_active).sort((a,b)=>minute(a.service_time)-minute(b.service_time)).map(s=>fmtTime(s.service_time))}
+function renderClientSettings(){
+  $("#clientSettings").innerHTML=clients.map(c=>`<div class="settings-client"><b>${esc(clientLabel(c))}</b><div class="grid" style="margin-top:8px"><div><label>サービス時間</label><input data-times="${c.id}" value="${esc(currentTimes(c.id).join(" / "))}" placeholder="7:00 / 13:00 / 17:30"></div><div class="actions" style="align-items:end"><button class="secondary" data-save-times="${c.id}">時間を保存</button></div></div></div>`).join("");
+  $$('[data-save-times]').forEach(b=>b.onclick=()=>saveTimes(b.dataset.saveTimes));
+}
+function normalizeTimes(raw){
+  const out=[];for(const p of String(raw||"").split(/[\/／,、\s]+/).filter(Boolean)){const m=p.match(/^(\d{1,2}):(\d{1,2})$/);if(!m||+m[1]>23||+m[2]>59)return null;const t=`${String(+m[1]).padStart(2,"0")}:${String(+m[2]).padStart(2,"0")}:00`;if(!out.includes(t))out.push(t)}return out.sort((a,b)=>minute(a)-minute(b));
+}
+async function saveTimes(cid){
+  const ts=normalizeTimes(document.querySelector(`[data-times="${cid}"]`).value);if(!ts)return alert("時間は 7:00 / 13:00 / 17:30 の形式で入力してください。");
+  const existing=slots.filter(s=>s.client_id===cid),want=ts.map(fmtTime);
+  const del=existing.filter(s=>!want.includes(fmtTime(s.service_time))).map(s=>s.id);
+  if(del.length){const r=await sb.from("client_service_slots").delete().in("id",del);if(r.error)return alert(r.error.message)}
+  const rows=ts.map(t=>{const ex=existing.find(s=>fmtTime(s.service_time)===fmtTime(t));return {organization_id:organization.id,client_id:cid,service_time:t,days_of_week:ex?.days_of_week||[0,1,2,3,4,5,6],label:ex?.label||"",note:ex?.note||"",sort_order:orderMinute(t),is_active:true}});
+  if(rows.length){const r=await sb.from("client_service_slots").upsert(rows,{onConflict:"organization_id,client_id,service_time"});if(r.error)return alert(r.error.message)}
+  await loadAll();alert("サービス時間を保存しました。");
+}
+function showError(e){console.error(e);$("#cloudState").textContent="同期エラー";alert("共有データを読み込めませんでした。再読み込みしてください。")}
+$("#loginBtn").onclick=async()=>{
+  const email=$("#authEmail").value.trim(),password=$("#authPassword").value;
+  if(!email||!password)return $("#authStatus").textContent="メールアドレスとパスワードを入力してください。";
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)return $("#authStatus").textContent="ログインできませんでした。";
+  session=data.session;boot();
+};
+async function boot(){
+  const {data}=await sb.auth.getSession();session=data.session||null;
+  if(!session){$("#authOverlay").classList.remove("hidden");return}
+  try{
+    membership=await getMembership();
+    if(!membership){$("#authOverlay").classList.remove("hidden");$("#authStatus").textContent="事業所への参加が必要です。AI記録本体で事業所設定をしてください。";return}
+    $("#authOverlay").classList.add("hidden");await loadAll();
+  }catch(e){showError(e)}
+}
+setInterval(()=>{if(session&&organization)loadAll().catch(()=>{})},30000);
+boot();
+</script>
+</body>
+</html>
