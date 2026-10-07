@@ -18,11 +18,7 @@
  let h='',lastError=null;
  for(const url of sources){try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);h=await r.text();if(h.includes('デジタル申し送り'))break;}catch(e){lastError=e}}
  if(!h){document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');return}
- h=h.replace('grid-template-columns:repeat(3,auto)','grid-template-columns:repeat(4,auto)');
- h=h.replace('.app-nav{grid-template-columns:repeat(3,1fr);width:100%}', '.app-nav{grid-template-columns:repeat(2,1fr);width:100%}');
- if(!h.includes('../assignment/')){
-   h=h.replace(/(<nav class="app-nav" aria-label="アプリ切替">\s*)/, '$1<a class="app-tab" href="../assignment/">担当割当</a>\n      ');
- }
+ h=h.replace('</body>','<script src="../common-nav.js?v=20261007-1"><\/script></body>');
  document.open();document.write(h);document.close();
 })();
 </script>
