@@ -1,0 +1,75 @@
+name: Add assignment nav
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - nav-update-trigger.txt
+
+permissions:
+  contents: write
+
+jobs:
+  update-nav:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update handoff and cashbook navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          targets = [
+              (Path('handoff/index.html'), 'handoff'),
+              (Path('cashbook/index.html'), 'cashbook'),
+          ]
+
+          for path, kind in targets:
+              s = path.read_text(encoding='utf-8')
+              s = s.replace('grid-template-columns:repeat(3,auto)', 'grid-template-columns:repeat(4,auto)')
+              s = s.replace('.app-nav{grid-template-columns:repeat(3,1fr);width:100%}', '.app-nav{grid-template-columns:repeat(2,1fr);width:100%}')
+
+              if kind == 'handoff':
+                  old = '''<nav class="app-nav" aria-label="アプリ切替">
+      <a class="app-tab active" href="./">申し送り</a>
+      <a class="app-tab" href="../">AI記録</a>
+      <a class="app-tab" href="../cashbook/">出納帳</a>
+    </nav>'''
+                  new = '''<nav class="app-nav" aria-label="アプリ切替">
+      <a class="app-tab" href="../assignment/">担当割当</a>
+      <a class="app-tab active" href="./">申し送り</a>
+      <a class="app-tab" href="../">AI記録</a>
+      <a class="app-tab" href="../cashbook/">出納帳</a>
+    </nav>'''
+              else:
+                  old = '''<nav class="app-nav" aria-label="アプリ切替">
+      <a class="app-tab" href="../handoff/">申し送り</a>
+      <a class="app-tab" href="../">AI記録</a>
+      <a class="app-tab active" href="./">出納帳</a>
+    </nav>'''
+                  new = '''<nav class="app-nav" aria-label="アプリ切替">
+      <a class="app-tab" href="../assignment/">担当割当</a>
+      <a class="app-tab" href="../handoff/">申し送り</a>
+      <a class="app-tab" href="../">AI記録</a>
+      <a class="app-tab active" href="./">出納帳</a>
+    </nav>'''
+
+              if old not in s:
+                  if '../assignment/' not in s:
+                      raise SystemExit(f'Navigation block not found in {path}')
+              else:
+                  s = s.replace(old, new)
+
+              path.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add handoff/index.html cashbook/index.html
+          git commit -m "Add assignment navigation to handoff and cashbook"
+          git push
