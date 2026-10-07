@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>今日の業務 | COZY支援システム</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}.wrap{max-width:1000px;margin:auto;padding:16px 12px 80px}header,.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 2px 10px #00000008}.top{padding:16px;margin-bottom:12px}.toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}h1{font-size:22px;margin:0 0 4px}.sub{font-size:12px;color:#667085}.app-nav{margin-top:12px;background:#eef2f7;border-radius:12px;padding:4px}.org{border:1px solid #cbd5e1;border-radius:9px;padding:8px;background:#fff;font-weight:800;max-width:260px}.card{padding:14px;margin-bottom:12px}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.metric{background:#f8fafc;border:1px solid #e2e8f0;border-radius:13px;padding:11px}.metric .k{font-size:11px;color:#667085;font-weight:800}.metric .v{font-size:24px;font-weight:950;margin-top:3px}.metric.alert .v{color:#b42318}.metric.ok .v{color:#166534}.section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.section-title{font-size:17px;font-weight:950}.btn{border:0;border-radius:9px;padding:8px 10px;background:#eef2f7;color:#25364d;font-weight:850;text-decoration:none;font-size:12px;display:inline-block}.btn.primary{background:#111827;color:#fff}.list{display:grid;gap:8px}.row{border:1px solid #e3e8ef;border-radius:12px;padding:11px;background:#fff;display:grid;grid-template-columns:76px 1fr auto;gap:10px;align-items:center}.time{font-weight:950;font-size:17px;text-align:center;background:#111827;color:#fff;border-radius:10px;padding:10px 5px}.name{font-weight:900}.meta{font-size:12px;color:#667085;line-height:1.5;margin-top:3px}.status{font-size:11px;font-weight:900;border-radius:999px;padding:5px 8px;background:#fff1f2;color:#b42318;white-space:nowrap}.status.done{background:#dcfce7;color:#166534}.empty{padding:24px;text-align:center;color:#667085;font-size:13px}.handoff{border-left:4px solid #64748b}.handoff.important{border-left-color:#dc2626;background:#fff7f7}.handoff .body{white-space:pre-wrap;font-size:13px;line-height:1.5}.toolbar{display:flex;gap:7px;flex-wrap:wrap}.loading{padding:40px;text-align:center;color:#667085}.error{background:#fff1f2;color:#9f1239;border:1px solid #fecdd3;border-radius:12px;padding:12px;line-height:1.6}.hidden{display:none!important}@media(max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}.metric:last-child{grid-column:1/-1}.row{grid-template-columns:58px 1fr}.row>.actions{grid-column:1/-1}.time{font-size:14px}.wrap{padding:10px 10px 70px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div class="toprow"><div><h1>今日の業務</h1><div class="sub" id="todayLabel">読み込み中…</div></div><select id="orgSwitch" class="org"></select></div>
+  <nav class="app-nav"></nav>
+</header>
+<section class="card" id="loadingCard"><div class="loading">今日の情報を読み込んでいます…</div></section>
+<section class="card hidden" id="errorCard"><div class="error" id="errorText"></div><div style="margin-top:10px"><a class="btn primary" href="../">AI記録でログインする</a></div></section>
+<div id="main" class="hidden">
+<section class="card"><div class="metrics">
+  <div class="metric"><div class="k">今日の担当</div><div class="v" id="mAssign">0</div></div>
+  <div class="metric alert"><div class="k">未記録</div><div class="v" id="mTodo">0</div></div>
+  <div class="metric ok"><div class="k">記録済み</div><div class="v" id="mDone">0</div></div>
+  <div class="metric alert"><div class="k">未対応申し送り</div><div class="v" id="mHandoff">0</div></div>
+  <div class="metric"><div class="k">今日の出納入力</div><div class="v" id="mCash">0</div></div>
+</div></section>
+<section class="card"><div class="section-head"><div class="section-title">未記録一覧</div><div class="toolbar"><button class="btn" id="reloadBtn">更新</button><a class="btn" href="../assignment/">担当割当へ</a></div></div><div id="todoList" class="list"></div></section>
+<section class="card"><div class="section-head"><div class="section-title">今日の担当</div><a class="btn" href="../assignment/">全部見る</a></div><div id="assignList" class="list"></div></section>
+<section class="card"><div class="section-head"><div class="section-title">未対応の申し送り</div><a class="btn" href="../handoff/">申し送りへ</a></div><div id="handoffList" class="list"></div></section>
+</div>
+</div>
+<script src="../common-nav.js?v=20261007-1"></script>
+<script>
+const CFG={url:'https://pagamoaxhqszojxrpxyu.supabase.co',key:'sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT'};
+const sb=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let user=null,org=null,memberships=[],orgs=[];
+function jstDate(){const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`}
+function fmtDate(d){const x=new Date(d+'T12:00:00');return `${x.getMonth()+1}/${x.getDate()}（${'日月火水木金土'[x.getDay()]}）`}
+function hhmm(t){return String(t||'').slice(0,5)}
+function order(t){const [h,m]=hhmm(t).split(':').map(Number),v=h*60+m;return v>=1020?v:v<240?v+1440:v+2880}
+function clientLabel(c){return c?`${c.code}${c.display_name?' '+c.display_name:''}`:'利用者'}
+function showError(msg){$('#loadingCard').classList.add('hidden');$('#main').classList.add('hidden');$('#errorCard').classList.remove('hidden');$('#errorText').textContent=msg}
+async function loadOrg(){
+  const u=await sb.auth.getUser();if(u.error||!u.data.user)throw new Error('ログインが必要です。AI記録画面からログインしてください。');user=u.data.user;
+  const m=await sb.from('organization_members').select('organization_id,user_id,role,staff_name,created_at').eq('user_id',user.id).order('created_at');if(m.error)throw m.error;memberships=m.data||[];if(!memberships.length)throw new Error('所属事業所がありません。AI記録画面で事業所設定をしてください。');
+  const ids=memberships.map(x=>x.organization_id);const o=await sb.from('organizations').select('id,name,is_active').in('id',ids);if(o.error)throw o.error;orgs=(o.data||[]).filter(x=>x.is_active);const saved=localStorage.getItem('activeOrganizationId');org=orgs.find(x=>x.id===saved)||orgs[0];if(!org)throw new Error('利用できる事業所がありません。');localStorage.setItem('activeOrganizationId',org.id);
+  $('#orgSwitch').innerHTML=orgs.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');$('#orgSwitch').value=org.id;
+}
+async function loadToday(){
+  const d=jstDate();$('#todayLabel').textContent=`${fmtDate(d)}　${org.name}`;
+  const [c,s,a,r,h,k]=await Promise.all([
+    sb.from('clients').select('id,code,display_name').eq('organization_id',org.id).eq('is_active',true),
+    sb.from('client_service_slots').select('client_id,service_time,label').eq('organization_id',org.id).eq('is_active',true),
+    sb.from('staff_assignments').select('id,client_id,service_date,service_time,assigned_staff_name,memo').eq('organization_id',org.id).eq('service_date',d),
+    sb.from('care_records').select('id,assignment_id,client_id,service_date,service_time').eq('organization_id',org.id).eq('service_date',d),
+    sb.from('handoff_entries').select('id,client_id,service_date,body,is_important,carry_over,due_date,due_time,scope,resolved').eq('organization_id',org.id).eq('resolved',false).lte('service_date',d).limit(50),
+    sb.from('cashbook_entries').select('id').eq('organization_id',org.id).eq('tx_date',d)
+  ]);
+  const bad=[c,s,a,r,h,k].find(x=>x.error);if(bad)throw bad.error;
+  const clients=c.data||[],slots=s.data||[],assignments=(a.data||[]).sort((x,y)=>order(x.service_time)-order(y.service_time)),records=r.data||[],handoffs=h.data||[];
+  const cmap=new Map(clients.map(x=>[x.id,x])),smap=new Map(slots.map(x=>[`${x.client_id}|${hhmm(x.service_time)}`,x]));
+  const recorded=x=>records.some(z=>z.assignment_id===x.id||(z.client_id===x.client_id&&z.service_date===x.service_date&&hhmm(z.service_time)===hhmm(x.service_time)));
+  const todo=assignments.filter(x=>!recorded(x));
+  $('#mAssign').textContent=assignments.length;$('#mTodo').textContent=todo.length;$('#mDone').textContent=assignments.length-todo.length;$('#mHandoff').textContent=handoffs.length;$('#mCash').textContent=(k.data||[]).length;
+  $('#todoList').innerHTML=todo.length?todo.map(x=>assignmentRow(x,false,cmap,smap)).join(''):'<div class="empty">今日の未記録はありません。</div>';
+  $('#assignList').innerHTML=assignments.length?assignments.map(x=>assignmentRow(x,recorded(x),cmap,smap)).join(''):'<div class="empty">今日の担当登録はありません。</div>';
+  handoffs.sort((x,y)=>Number(y.is_important)-Number(x.is_important)||String(x.due_date||x.service_date).localeCompare(String(y.due_date||y.service_date)));
+  $('#handoffList').innerHTML=handoffs.length?handoffs.slice(0,8).map(x=>`<div class="row handoff${x.is_important?' important':''}" style="grid-template-columns:1fr"><div><div class="name">${x.is_important?'重要・':''}${x.scope==='general'?'全体':esc(clientLabel(cmap.get(x.client_id)))}</div><div class="meta">${esc(fmtDate(x.service_date))}${x.due_date?`　期限 ${esc(fmtDate(x.due_date))}${x.due_time?' '+esc(hhmm(x.due_time)):''}`:''}</div><div class="body">${esc(x.body)}</div></div></div>`).join(''):'<div class="empty">未対応の申し送りはありません。</div>';
+  $('#loadingCard').classList.add('hidden');$('#errorCard').classList.add('hidden');$('#main').classList.remove('hidden');
+}
+function assignmentRow(x,done,cmap,smap){
+  const c=cmap.get(x.client_id),slot=smap.get(`${x.client_id}|${hhmm(x.service_time)}`),qs=new URLSearchParams({from:'assignment',assignment:x.id,client:c?.code||'',date:x.service_date,time:hhmm(x.service_time),staff:x.assigned_staff_name||'',memo:x.memo||'',label:slot?.label||''});
+  return `<div class="row"><div class="time">${esc(hhmm(x.service_time).replace(/^0/,''))}</div><div><div class="name">${esc(clientLabel(c))}</div><div class="meta">担当：${esc(x.assigned_staff_name||'未設定')}${x.memo?`<br>${esc(x.memo)}`:''}</div></div><div class="actions"><span class="status${done?' done':''}">${done?'✓ 記録済み':'未記録'}</span>${done?'':`<a class="btn primary" href="../?${qs.toString()}">AI記録作成</a>`}</div></div>`
+}
+async function refresh(){try{$('#loadingCard').classList.remove('hidden');$('#main').classList.add('hidden');await loadToday()}catch(e){console.error(e);showError(e.message||'読み込みに失敗しました。')}}
+$('#orgSwitch').onchange=async e=>{localStorage.setItem('activeOrganizationId',e.target.value);org=orgs.find(x=>x.id===e.target.value);await refresh()};$('#reloadBtn').onclick=refresh;
+(async()=>{try{await loadOrg();await loadToday();setInterval(()=>{if(org)loadToday().catch(()=>{})},60000)}catch(e){console.error(e);showError(e.message||'読み込みに失敗しました。')}})();
+</script>
+</body>
+</html>
