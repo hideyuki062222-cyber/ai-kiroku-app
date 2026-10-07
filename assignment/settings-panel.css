@@ -1,0 +1,11 @@
+#scheduleSettingsToggle{display:none;align-items:center;gap:5px;background:#eef2f7;color:#344054;border:0;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:900;white-space:nowrap}
+#scheduleSettingsOverlay{position:fixed;inset:0;z-index:6500;background:rgba(15,23,42,.46);display:none;align-items:flex-end;justify-content:center;padding:0}
+#scheduleSettingsOverlay.open{display:flex}
+#scheduleSettingsSheet{width:min(760px,100%);max-height:88vh;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -18px 50px rgba(15,23,42,.22);overflow:auto;padding-bottom:calc(18px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+#scheduleSettingsSheetHead{position:sticky;top:0;z-index:2;background:rgba(255,255,255,.98);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e5e7eb}
+#scheduleSettingsSheetTitle{font-size:16px;font-weight:950}
+#scheduleSettingsClose{border:0;border-radius:9px;background:#eef2f7;color:#344054;padding:8px 12px;font-size:12px;font-weight:900}
+#scheduleSettingsSheet .card{margin:0!important;border-radius:0!important;box-shadow:none!important;padding:14px!important}
+body.schedule-settings-open{overflow:hidden}
+@media(min-width:761px){#scheduleSettingsOverlay{align-items:center;padding:18px}#scheduleSettingsSheet{border-radius:18px;max-height:86vh}}
+@media(max-width:520px){#scheduleSettingsToggle{padding:7px 9px;font-size:11px}#scheduleSettingsSheet{max-height:92vh}#scheduleSettingsSheetHead{padding:10px 12px}#scheduleSettingsSheetTitle{font-size:15px}#scheduleSettingsSheet .card{padding:12px!important}.settings-client{padding:9px!important;margin-top:7px!important}}
