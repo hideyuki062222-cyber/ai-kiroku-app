@@ -53,7 +53,21 @@ body{margin:0;background:#f5f7fb;color:#222;font-family:-apple-system,BlinkMacSy
 
   h=h.replace("</style>",`
   @media(max-width:650px){.app-nav{grid-template-columns:repeat(2,1fr)!important}}
+  .security-readonly{opacity:.82}
+  .security-readonly input:disabled,.security-readonly textarea:disabled{background:#f8fafc;color:#475467}
 </style>`);
+
+  h=h.replace(
+'  <section class="card">\n    <label>利用者登録・変更</label>',
+'  <section class="card" id="clientAdminCard">\n    <label>利用者登録・変更</label>'
+  );
+  h=h.replace(
+'  <section class="card">\n    <label>利用者プロフィール</label>',
+'  <section class="card" id="profileAdminCard">\n    <label>利用者プロフィール</label>'
+  );
+  h=h.replace('placeholder="8文字以上を推奨"','placeholder="12文字以上を推奨"');
+  h=h.replace('password.length < 8','password.length < 12');
+  h=h.replace('メールアドレスと8文字以上のパスワードを入力してください。','メールアドレスと12文字以上のパスワードを入力してください。');
 
   const card=`
   <section class="card hidden" id="assignmentContextCard">
@@ -76,6 +90,25 @@ ${card}
   }
 
   const helper=`
+function applySecurityRoleUi(role){
+  const isAdmin=role==="admin";
+  const clientCard=document.getElementById("clientAdminCard");
+  if(clientCard) clientCard.classList.toggle("hidden",!isAdmin);
+  const profileCard=document.getElementById("profileAdminCard");
+  if(profileCard){
+    profileCard.classList.toggle("security-readonly",!isAdmin);
+    profileCard.querySelectorAll("input,textarea").forEach(el=>{el.disabled=!isAdmin;});
+    profileCard.querySelectorAll("button").forEach(el=>{el.classList.toggle("hidden",!isAdmin);});
+    let note=profileCard.querySelector(".security-role-note");
+    if(!note){
+      note=document.createElement("div");note.className="notice security-role-note";
+      const firstNotice=profileCard.querySelector(".notice");
+      if(firstNotice) firstNotice.after(note); else profileCard.prepend(note);
+    }
+    note.textContent=isAdmin?"管理者としてプロフィールを編集できます。":"一般職員はプロフィールを閲覧のみできます。変更は管理者が行います。";
+  }
+}
+
 function applyAssignmentContext(){
   const q=new URLSearchParams(location.search);
   if(q.get("from")!=="assignment") return;
@@ -135,6 +168,16 @@ function applyAssignmentContext(){
   }
 
   async function loadCloudHistory(){`
+  );
+
+  h=h.replace(
+`    hide(overlay());
+    hide(staffAdminCard());
+    loadMyStaffName();`,
+`    hide(overlay());
+    hide(staffAdminCard());
+    if(window.applySecurityRoleUi) window.applySecurityRoleUi(membership.role);
+    loadMyStaffName();`
   );
 
   h=h.replace(
