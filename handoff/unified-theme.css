@@ -1,0 +1,15 @@
+/* Unified visual treatment for Handoff: match the assignment/dashboard family without changing business logic. */
+:root{--navy:#111827!important;--blue:#2563eb!important;--bg:#f5f7fb!important;--line:#e2e8f0!important;--text:#172033!important;--muted:#667085!important}
+body{background:#f5f7fb!important;color:#172033!important}
+.top{position:sticky!important;top:0!important;z-index:30!important;background:rgba(255,255,255,.98)!important;border-bottom:1px solid #e2e8f0!important;padding:10px 12px!important;box-shadow:0 2px 10px rgba(15,23,42,.04)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.topline{max-width:1050px!important;gap:10px!important}.brand{font-size:20px!important;color:#111827!important}.sub{color:#667085!important}
+.org-switch{border:1px solid #d8dee9!important;border-radius:9px!important;color:#111827!important;background:#fff!important}
+.app-nav{display:flex!important;grid-template-columns:none!important;gap:4px!important;background:#eef2f7!important;border-radius:12px!important;padding:4px!important;overflow-x:auto!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important}.app-nav::-webkit-scrollbar{display:none!important}
+.app-tab{flex:1 0 auto!important;min-width:68px!important;color:#526175!important;padding:8px 7px!important;border-radius:9px!important;font-size:12px!important;font-weight:850!important;text-align:center!important}.app-tab.active{background:#fff!important;color:#111827!important;box-shadow:0 1px 4px rgba(0,0,0,.10)!important}
+.wrap{max-width:1050px!important;padding:12px 12px 82px!important}.card{border:0!important;border-radius:18px!important;padding:16px!important;margin-bottom:12px!important;box-shadow:0 4px 18px rgba(0,0,0,.06)!important}
+.btn{border-radius:10px!important;font-weight:800!important}.btn.primary{background:#111827!important;color:#fff!important}
+.segment{border-radius:10px!important}.seg.active{background:#111827!important;border-color:#111827!important}.chip.active{background:#eff6ff!important;border-color:#bfdbfe!important;color:#1d4ed8!important}
+.client{padding:11px 4px!important}.client-code{font-size:16px!important}.client-open{background:#eef2f7!important;color:#273142!important}.note{border-left-color:#111827!important}
+.fab{background:#111827!important;box-shadow:0 8px 24px rgba(17,24,39,.28)!important}
+@media(max-width:760px){.top{position:sticky!important}.topline{align-items:flex-start!important;flex-direction:column!important}.header-right{width:100%!important;display:block!important}.app-nav{width:100%!important;margin-top:4px!important}.utility-actions{margin-top:6px!important;justify-content:flex-end!important}.wrap{padding:8px 9px 78px!important}.card{padding:12px!important;border-radius:14px!important}}
+@media(max-width:520px){.app-tab{min-width:66px!important;padding:8px 6px!important;font-size:11.5px!important}.brand{font-size:18px!important}.client{padding:9px 2px!important}.client-code{font-size:15px!important}.preview-line{padding:6px 8px!important;font-size:12px!important}}
