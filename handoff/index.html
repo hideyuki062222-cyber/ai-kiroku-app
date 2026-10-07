@@ -20,10 +20,9 @@
  if(!h){document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');return}
  h=h.replace('grid-template-columns:repeat(3,auto)','grid-template-columns:repeat(4,auto)');
  h=h.replace('.app-nav{grid-template-columns:repeat(3,1fr);width:100%}', '.app-nav{grid-template-columns:repeat(2,1fr);width:100%}');
- h=h.replace(
- `<nav class="app-nav" aria-label="アプリ切替">\n      <a class="app-tab active" href="./">申し送り</a>\n      <a class="app-tab" href="../">AI記録</a>\n      <a class="app-tab" href="../cashbook/">出納帳</a>\n    </nav>`,
- `<nav class="app-nav" aria-label="アプリ切替">\n      <a class="app-tab" href="../assignment/">担当割当</a>\n      <a class="app-tab active" href="./">申し送り</a>\n      <a class="app-tab" href="../">AI記録</a>\n      <a class="app-tab" href="../cashbook/">出納帳</a>\n    </nav>`
- );
+ if(!h.includes('../assignment/')){
+   h=h.replace(/(<nav class="app-nav" aria-label="アプリ切替">\s*)/, '$1<a class="app-tab" href="../assignment/">担当割当</a>\n      ');
+ }
  document.open();document.write(h);document.close();
 })();
 </script>
