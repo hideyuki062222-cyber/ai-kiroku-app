@@ -8,7 +8,7 @@
 <style>body{margin:0;background:#f5f7fb;color:#222;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Yu Gothic",sans-serif}.loading{max-width:560px;margin:70px auto;background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.08)}.loading h1{font-size:20px;margin:0 0 8px}.loading p{font-size:13px;color:#667085;line-height:1.7}</style>
 </head>
 <body>
-<div class="loading"><h1>時間別 担当割当</h1><p id="loadMsg">担当割当と利用者別出力を読み込んでいます…</p></div>
+<div class="loading"><h1>時間別 担当割当</h1><p id="loadMsg">担当割当を読み込んでいます…</p></div>
 <script>
 (async()=>{
  const sources=[
@@ -18,8 +18,8 @@
  let h='',lastError=null;
  for(const url of sources){try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);h=await r.text();if(h.includes('時間別 担当割当'))break;}catch(e){lastError=e}}
  if(!h){document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');return}
- h=h.replace('</head>','<link rel="stylesheet" href="./output-addon.css?v=20261007-2"></head>');
- h=h.replace('</body>','<script src="./output-addon.js?v=20261007-2"><\/script><script src="./local-date-fix.js?v=20261007-2"><\/script><script src="../common-nav.js?v=20261007-1"><\/script></body>');
+ h=h.replace('</head>','<link rel="stylesheet" href="./output-addon.css?v=20261007-2"><link rel="stylesheet" href="./ux-addon.css?v=20261007-1"></head>');
+ h=h.replace('</body>','<script src="./output-addon.js?v=20261007-2"><\/script><script src="./local-date-fix.js?v=20261007-2"><\/script><script src="../common-nav.js?v=20261007-1"><\/script><script src="./ux-addon.js?v=20261007-1"><\/script></body>');
  document.open();document.write(h);document.close();
 })();
 </script>
