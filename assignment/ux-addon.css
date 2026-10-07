@@ -1,25 +1,60 @@
-/* Mobile-first assignment workflow: controls stay where the user is working. */
-#assignmentQuickBar{position:fixed;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4200;width:min(760px,calc(100% - 20px));background:rgba(255,255,255,.98);border:1px solid #cbd5e1;border-radius:17px;padding:10px 11px;box-shadow:0 14px 42px rgba(17,24,39,.24);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:block}
-.assignment-quick-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.assignment-quick-count{font-size:13px;font-weight:950;color:#1d4ed8}.assignment-quick-hint{font-size:11px;color:#667085}
-.assignment-quick-controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;align-items:center}
-#assignmentQuickStaff{min-height:46px;font-size:15px;font-weight:800;border:1px solid #b9c4d3;border-radius:11px;padding:9px 10px;background:#fff}
-#assignmentQuickSave,#assignmentQuickClear{min-height:46px;border:0;border-radius:11px;padding:9px 15px;font-weight:900;font-size:13px;white-space:nowrap}
+/* Compact, mobile-first assignment workflow */
+#assignmentQuickBar{position:fixed;left:50%;bottom:calc(5px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4200;width:min(760px,calc(100% - 12px));background:rgba(255,255,255,.98);border:1px solid #cbd5e1;border-radius:13px;padding:7px 8px;box-shadow:0 10px 28px rgba(17,24,39,.20);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:block}
+.assignment-quick-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px}.assignment-quick-count{font-size:11px;font-weight:950;color:#1d4ed8}.assignment-quick-hint{font-size:10px;color:#667085}
+.assignment-quick-controls{display:grid;grid-template-columns:minmax(0,1fr) 82px 58px;gap:5px;align-items:center}
+#assignmentQuickStaff{min-height:38px;font-size:14px;font-weight:800;border:1px solid #b9c4d3;border-radius:9px;padding:6px 8px;background:#fff}
+#assignmentQuickSave,#assignmentQuickClear{min-height:38px;border:0;border-radius:9px;padding:6px 7px;font-weight:900;font-size:11px;white-space:nowrap}
 #assignmentQuickSave{background:#111827;color:#fff}#assignmentQuickSave:disabled{opacity:.38;cursor:not-allowed}#assignmentQuickClear{background:#eef2f7;color:#344054}
-.slot{position:relative;transition:border-color .12s,background .12s,transform .08s}.slot:active{transform:scale(.992)}.slot.selected{border-color:#2563eb!important;background:#eff6ff!important;box-shadow:0 0 0 2px rgba(37,99,235,.12)!important}.slot.selected::after{content:'✓ 選択中';position:absolute;right:7px;top:7px;background:#2563eb;color:#fff;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900;pointer-events:none}
-body.assignment-quick-ready .wrap{padding-bottom:calc(148px + env(safe-area-inset-bottom))!important}
-#assignmentUxBadge{display:inline-flex;align-items:center;margin-top:9px;padding:5px 8px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:900}
+.slot{position:relative;transition:border-color .12s,background .12s,transform .08s}.slot:active{transform:scale(.992)}.slot.selected{border-color:#2563eb!important;background:#eff6ff!important;box-shadow:0 0 0 1px rgba(37,99,235,.12)!important}.slot.selected::after{content:'✓';position:absolute;right:5px;top:5px;background:#2563eb;color:#fff;border-radius:999px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;pointer-events:none}
+body.assignment-quick-ready .wrap{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
+#assignmentUxBadge{display:inline-flex;align-items:center;margin-top:6px;padding:3px 6px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:900}
+
 @media(max-width:760px){
-  /* Mobile: remove duplicate top assignment controls. Date/reload/status remain at the top. */
+  /* Header and top controls */
+  .wrap{padding:7px!important}
+  header{padding:10px 11px!important;margin-bottom:7px!important;border-radius:13px!important}
+  header h1{font-size:18px!important;margin-bottom:2px!important}
+  header .sub{display:none!important}
+  header .app-nav{margin-top:7px!important}
+  .wrap>header+section.card{padding:9px 10px!important;margin-bottom:7px!important;border-radius:13px!important}
+  .wrap>header+section.card .grid{display:block!important}
+  .wrap>header+section.card label{font-size:11px!important;margin-bottom:4px!important}
+  #assignDate{padding:7px 9px!important;font-size:14px!important;min-height:36px!important}
   #staffSelect{display:none!important}
   #staffSelect+*{display:none!important}
   #saveSelectedBtn,#clearSelectedBtn{display:none!important}
-  .slot{min-height:84px}
-  .memo-input{font-size:16px!important}
-}
-@media(max-width:520px){
-  #assignmentQuickBar{bottom:calc(5px + env(safe-area-inset-bottom));width:calc(100% - 10px);border-radius:15px;padding:9px}
-  .assignment-quick-controls{grid-template-columns:minmax(0,1fr) 104px}
-  #assignmentQuickClear{grid-column:1/-1;min-height:34px;padding:5px 10px}
+  .wrap>header+section.card .summary{margin-top:5px!important;gap:4px!important}
+  .wrap>header+section.card .summary span{padding:3px 6px!important;font-size:9px!important}
+  .wrap>header+section.card .actions{margin-top:5px!important}
+  #reloadBtn{padding:6px 9px!important;font-size:10px!important}
+  .wrap>header+section.card>.notice{display:none!important}
+  #assignmentUxBadge{display:none!important}
+
+  /* Schedule card: maximize visible rows */
+  section.card:has(#schedule){padding:6px!important;margin-bottom:7px!important;border-radius:12px!important}
+  #timeOrderBadge{display:none!important}
+  #schedule .section-title{margin:5px 0 3px!important;padding:5px 7px!important;border-radius:7px!important;font-size:11px!important;line-height:1.2!important}
+  #schedule .time-row{grid-template-columns:43px minmax(0,1fr)!important;gap:4px!important;padding:3px 0!important}
+  #schedule .time-box{min-height:54px!important;border-radius:7px!important;font-size:12px!important;padding:3px!important}
+  #schedule .slots{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important}
+  #schedule .slot{min-height:54px!important;padding:6px!important;border-radius:8px!important}
+  #schedule .slot-name{font-size:11px!important;line-height:1.25!important;padding-right:18px!important}
+  #schedule .slot-meta{font-size:9px!important;line-height:1.25!important;margin-top:2px!important}
+  #schedule .slot-status{margin-top:3px!important;padding:2px 5px!important;font-size:8px!important}
+  #schedule .slot-buttons{gap:3px!important;margin-top:3px!important}
+  #schedule .slot-buttons button{padding:4px 5px!important;font-size:9px!important;border-radius:6px!important}
+  #schedule .memo-input{display:none!important;margin-top:4px!important;padding:5px 6px!important;font-size:16px!important;min-height:31px!important;border-radius:7px!important}
+  #schedule .slot.selected .memo-input{display:block!important}
+
+  /* Fixed assignment bar */
+  #assignmentQuickBar{width:calc(100% - 8px);bottom:calc(4px + env(safe-area-inset-bottom));padding:6px;border-radius:12px}
+  .assignment-quick-head{margin-bottom:4px}
   .assignment-quick-hint{display:none}
-  body.assignment-quick-ready .wrap{padding-bottom:calc(175px + env(safe-area-inset-bottom))!important}
+  body.assignment-quick-ready .wrap{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
+}
+
+@media(max-width:340px){
+  #schedule .slots{grid-template-columns:1fr!important}
+  .assignment-quick-controls{grid-template-columns:minmax(0,1fr) 74px 50px}
+  #assignmentQuickSave,#assignmentQuickClear{font-size:10px;padding:5px 4px}
 }
