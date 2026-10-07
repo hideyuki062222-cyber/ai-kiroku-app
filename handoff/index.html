@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#16345b">
 <title>申し送り | COZY支援システム</title>
-<style>body{margin:0;background:#f5f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.loading{max-width:560px;margin:70px auto;background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 30px #0002}.loading h1{font-size:20px;margin:0 0 8px}.loading p{font-size:13px;color:#677489;line-height:1.7}</style>
+<style>body{margin:0;background:#f4f6f9;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}.loading{max-width:560px;margin:70px auto;background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 30px #0002}.loading h1{font-size:20px;margin:0 0 8px}.loading p{font-size:13px;color:#677489;line-height:1.7}</style>
 </head>
 <body>
-<div class="loading"><h1>申し送り</h1><p id="loadMsg">最新の申し送り画面を読み込んでいます…</p></div>
+<div class="loading"><h1>申し送り</h1><p id="loadMsg">申し送り画面を読み込んでいます…</p></div>
 <script>
 (async()=>{
  const sources=[
@@ -16,23 +16,39 @@
   'https://cdn.jsdelivr.net/gh/hideyuki062222-cyber/ai-kiroku-app@91b47bf1827139706f49f970a1ec6c5126d46134/handoff/index.html'
  ];
  let h='',lastError=null;
- for(const url of sources){try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);h=await r.text();if(h.includes('デジタル申し送り'))break;}catch(e){lastError=e}}
- if(!h){document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');return}
+ for(const url of sources){
+   try{
+     const r=await fetch(url,{cache:'no-store'});
+     if(!r.ok)throw new Error('HTTP '+r.status);
+     h=await r.text();
+     if(h.includes('デジタル申し送り'))break;
+   }catch(e){lastError=e}
+ }
+ if(!h){
+   document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');
+   return;
+ }
 
- // 共通メニューを元HTMLの段階で直接差し替える。common-nav.jsが失敗しても担当割当へ移動できる。
- h=h.replace(/<nav class="app-nav" aria-label="アプリ切替">[\s\S]*?<\/nav>/,
- `<nav class="app-nav" aria-label="メインメニュー">
+ // 申し送り本来の画面は触らず、上部ナビだけを直接5項目に置換する。
+ const nav=`<nav class="app-nav handoff-safe-nav" aria-label="メインメニュー">
         <a class="app-tab" href="../dashboard/">今日</a>
         <a class="app-tab" href="../assignment/">担当割当</a>
         <a class="app-tab active" href="./" aria-current="page">申し送り</a>
         <a class="app-tab" href="../">AI記録</a>
         <a class="app-tab" href="../cashbook/">出納帳</a>
-      </nav>`);
+      </nav>`;
+ h=h.replace(/<nav class="app-nav" aria-label="アプリ切替">[\s\S]*?<\/nav>/,nav);
 
- // 他画面と同じ白・グレー基調の共通デザインを後勝ちで適用。
- h=h.replace('</head>','<link rel="stylesheet" href="./unified-theme.css?v=20261007-1"></head>');
- // 共通ナビは二重の安全策。直接差し替え済みなので、読み込めなくても主要リンクは残る。
- h=h.replace('</body>','<script src="../common-nav.js?v=20261007-2"><\/script></body>');
+ // 他の専用レイアウトへ影響しない、ナビだけの最小CSS。
+ h=h.replace('</head>',`<style id="handoffSafeNavStyle">
+ .handoff-safe-nav{display:flex!important;grid-template-columns:none!important;gap:4px!important;background:#eef2f7!important;border-radius:12px!important;padding:4px!important;overflow-x:auto!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;width:100%!important}
+ .handoff-safe-nav::-webkit-scrollbar{display:none!important}
+ .handoff-safe-nav .app-tab{flex:0 0 auto!important;min-width:72px!important;text-align:center!important;padding:8px 8px!important;font-size:12px!important;white-space:nowrap!important;border-radius:9px!important}
+ .handoff-safe-nav .app-tab.active{background:#fff!important;color:#111827!important;box-shadow:0 1px 4px rgba(0,0,0,.10)!important}
+ @media(max-width:560px){.handoff-safe-nav .app-tab{min-width:68px!important;padding:8px 7px!important;font-size:11.5px!important}}
+ </style></head>`);
+
+ // unified-theme.css / common-nav.js は読み込まない。申し送り固有UIとの競合を避ける。
  document.open();document.write(h);document.close();
 })();
 </script>
