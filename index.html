@@ -120,8 +120,8 @@ function applyAssignmentContext(){
 }
 `;
   if(!h.includes("function applyAssignmentContext()")){
-    const marker="refreshUserSelect();\\n</scr"+"ipt>";
-    const replacement=helper+"\\nrefreshUserSelect();\\n</scr"+"ipt>";
+    const marker="refreshUserSelect();"+String.fromCharCode(10)+"</scr"+"ipt>";
+    const replacement=helper+String.fromCharCode(10)+"refreshUserSelect();"+String.fromCharCode(10)+"</scr"+"ipt>";
     h=h.replace(marker,replacement);
   }
 
