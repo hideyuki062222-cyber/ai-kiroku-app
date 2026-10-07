@@ -207,6 +207,7 @@ function applyAssignmentContext(){
     await loadCloudHistory();`
   );
 
+  h=h.replace('</body>','<script src="./common-nav.js?v=20261007-1"><\/script></body>');
   document.open();
   document.write(h);
   document.close();
