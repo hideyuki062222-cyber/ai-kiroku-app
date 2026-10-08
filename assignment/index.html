@@ -18,8 +18,8 @@
  let h='',lastError=null;
  for(const url of sources){try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);h=await r.text();if(h.includes('時間別 担当割当'))break;}catch(e){lastError=e}}
  if(!h){document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');return}
- h=h.replace('</head>','<link rel="stylesheet" href="./output-addon.css?v=20261007-15"><link rel="stylesheet" href="./ux-addon.css?v=20261007-15"><link rel="stylesheet" href="./settings-panel.css?v=20261007-15"></head>');
- h=h.replace('</body>','<script src="./output-addon.js?v=20261007-15"><\/script><script src="./local-date-fix.js?v=20261007-15"><\/script><script src="../common-nav.js?v=20261007-15"><\/script><script src="./ux-addon.js?v=20261007-15"><\/script><script src="./time-sort-addon.js?v=20261007-15"><\/script><script src="./settings-panel.js?v=20261007-15"><\/script><script src="./release-check.js?v=20261007-15"><\/script></body>');
+ h=h.replace('</head>','<link rel="stylesheet" href="./output-addon.css?v=20261008-1"><link rel="stylesheet" href="./ux-addon.css?v=20261008-1"><link rel="stylesheet" href="./settings-panel.css?v=20261008-1"></head>');
+ h=h.replace('</body>','<script src="./output-addon.js?v=20261008-1"><\/script><script src="./local-date-fix.js?v=20261008-1"><\/script><script src="../common-nav.js?v=20261008-1"><\/script><script src="./ux-addon.js?v=20261008-1"><\/script><script src="./offline-staff-addon.js?v=20261008-1"><\/script><script src="./time-sort-addon.js?v=20261008-1"><\/script><script src="./settings-panel.js?v=20261008-1"><\/script><script src="./release-check.js?v=20261008-1"><\/script></body>');
  document.open();document.write(h);document.close();
 })();
 </script>
