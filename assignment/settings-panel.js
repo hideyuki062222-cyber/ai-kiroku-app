@@ -14,6 +14,13 @@
     button.textContent='⚙ 利用者・時間設定';
     topActions.appendChild(button);
 
+    const staffLink=document.createElement('a');
+    staffLink.id='offlineStaffManageLink';
+    staffLink.href='../staff/';
+    staffLink.textContent='👥 職員管理';
+    staffLink.style.cssText='display:none;align-items:center;text-decoration:none;background:#eef2f7;color:#344054;border-radius:9px;padding:9px 11px;font-size:12px;font-weight:900;white-space:nowrap';
+    topActions.appendChild(staffLink);
+
     const overlay=document.createElement('div');
     overlay.id='scheduleSettingsOverlay';
     overlay.innerHTML=`<div id="scheduleSettingsSheet" role="dialog" aria-modal="true" aria-labelledby="scheduleSettingsSheetTitle"><div id="scheduleSettingsSheetHead"><div id="scheduleSettingsSheetTitle">利用者・サービス時間設定</div><button type="button" id="scheduleSettingsClose">閉じる</button></div></div>`;
@@ -32,6 +39,7 @@
         if(typeof membership==='undefined'||!membership)return false;
         const admin=membership.role==='admin';
         button.style.display=admin?'inline-flex':'none';
+        staffLink.style.display=admin?'inline-flex':'none';
         if(!admin)close();
         return true;
       }catch(e){return false;}
