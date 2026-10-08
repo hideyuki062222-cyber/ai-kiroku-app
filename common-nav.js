@@ -15,6 +15,13 @@
     if(p.includes('/cashbook/')) return 'cashbook';
     return 'record';
   }
+  function loadPageAddons(){
+    if(currentKey()!=='record'||document.getElementById('staffCompactScript')) return;
+    const s=document.createElement('script');
+    s.id='staffCompactScript';
+    s.src=BASE+'staff-compact.js?v=20261008-1';
+    document.head.appendChild(s);
+  }
   function addStyle(){
     if(document.getElementById('cozyCommonNavStyle')) return;
     const s=document.createElement('style');
@@ -37,6 +44,7 @@
     nav.innerHTML=items.map(([key,label,href])=>`<a class="app-tab${key===cur?' active':''}" href="${href}"${key===cur?' aria-current="page"':''}>${label}</a>`).join('');
     return true;
   }
+  loadPageAddons();
   if(!apply()){
     const mo=new MutationObserver(()=>{if(apply())mo.disconnect()});
     mo.observe(document.documentElement,{childList:true,subtree:true});
