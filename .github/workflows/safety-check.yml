@@ -29,5 +29,7 @@ jobs:
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest
       - name: Run safety contract tests
         run: python -m pytest -q tests/test_system_safety.py
