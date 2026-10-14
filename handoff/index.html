@@ -29,7 +29,6 @@
    return;
  }
 
- // 申し送り本来の画面は触らず、上部ナビだけを直接5項目に置換する。
  const nav=`<nav class="app-nav handoff-safe-nav" aria-label="メインメニュー">
         <a class="app-tab" href="../dashboard/">今日</a>
         <a class="app-tab" href="../assignment/">担当割当</a>
@@ -38,8 +37,9 @@
         <a class="app-tab" href="../cashbook/">出納帳</a>
       </nav>`;
  h=h.replace(/<nav class="app-nav" aria-label="アプリ切替">[\s\S]*?<\/nav>/,nav);
+ h=h.replace('password.length<6','password.length<12');
+ h=h.replace('メールアドレスと6文字以上のパスワードを入力してください。','メールアドレスと12文字以上のパスワードを入力してください。');
 
- // 他の専用レイアウトへ影響しない、ナビだけの最小CSS。
  h=h.replace('</head>',`<style id="handoffSafeNavStyle">
  .handoff-safe-nav{display:flex!important;grid-template-columns:none!important;gap:4px!important;background:#eef2f7!important;border-radius:12px!important;padding:4px!important;overflow-x:auto!important;scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;width:100%!important}
  .handoff-safe-nav::-webkit-scrollbar{display:none!important}
@@ -48,7 +48,7 @@
  @media(max-width:560px){.handoff-safe-nav .app-tab{min-width:68px!important;padding:8px 7px!important;font-size:11.5px!important}}
  </style></head>`);
 
- // unified-theme.css / common-nav.js は読み込まない。申し送り固有UIとの競合を避ける。
+ h=h.replace('</body>','<script src="./safety-addon.js?v=20261014-2"><\/script></body>');
  document.open();document.write(h);document.close();
 })();
 </script>
