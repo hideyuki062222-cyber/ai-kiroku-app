@@ -29,7 +29,7 @@ def test_assignment_context_fails_closed_until_trusted():
     guard = text("assignment-context-guard.js")
     assert "assignment-context-guard.js?v=20261014-1" in common
     assert "lockAssignmentFlowButtons" in common
-    assert "__assignmentContextGuardReady" in common
+    assert "__assignmentContextGuardReady" in guard
     assert "ctx.assignmentId===assignmentId" in guard
     assert "!!ctx.clientId" in guard
     assert "!!ctx.organizationId" in guard
@@ -115,6 +115,32 @@ def test_cashbook_requires_explicit_client_before_showing_or_saving_records():
     assert "if(!selectedClientId)" in addon
     assert "cashbook/safety-addon.js?v=20261014-3" in common
     assert "common-nav.js?v=20261014-3" in wrapper
+
+
+def test_room_number_is_separate_from_resident_identity():
+    sql = text("supabase/20261014_room_resident_separation.sql")
+    manage = text("manage/index.html")
+    assert "add column if not exists room_number" in sql
+    assert "clients_one_active_resident_per_room" in sql
+    assert "display_name = '空室'" in sql
+    assert "newRoomNumber" in manage
+    assert "newResidentName" in manage
+    assert "internalResidentCode" in manage
+    assert "room_number:room" in manage
+    assert "以前その部屋にいた人を復元・名前変更して使い回さない" in manage
+    assert "退去済み・旧データ" in manage
+
+
+def test_room_labels_are_loaded_across_shared_pages():
+    common = text("common-nav.js")
+    room_ui = text("client-room-ui.js")
+    handoff = text("handoff/index.html")
+    assert "client-room-ui.js?v=20261014-1" in common
+    assert "../client-room-ui.js?v=20261014-1" in handoff
+    assert "room_number" in room_ui
+    assert "window.clientLabel=wrapped" in room_ui
+    assert "clientAdminCard" in room_ui
+    assert "利用者の入退居は事業所管理" in room_ui
 
 
 def test_legacy_integrated_pages_are_retired():

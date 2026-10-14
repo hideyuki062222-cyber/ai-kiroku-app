@@ -61,6 +61,7 @@
   }
   function loadPageAddons(){
     const key=currentKey();
+    loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
     if(key==='record'){
       lockAssignmentFlowButtons();
       loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
