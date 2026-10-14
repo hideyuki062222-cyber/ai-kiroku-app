@@ -51,7 +51,7 @@
  // The source page contains a literal "</body>" inside the print-PDF JavaScript string.
  // Injecting with String.replace('</body>', ...) would hit that string first and corrupt
  // the running script on Safari/iPhone. Always target the real final body closing tag.
- const addon='<script src="./safety-addon.js?v=20261014-3"><\/script>';
+ const addon='<script src="./safety-addon.js?v=20261014-4"><\/script>';
  const bodyClose=h.lastIndexOf('</body>');
  if(bodyClose>=0) h=h.slice(0,bodyClose)+addon+h.slice(bodyClose);
  else h+=addon;
