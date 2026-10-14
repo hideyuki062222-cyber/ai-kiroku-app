@@ -24,6 +24,21 @@ def test_record_entrypoint_loads_current_safety_bundle():
     assert 'q.get("memo")' not in html
 
 
+def test_assignment_context_fails_closed_until_trusted():
+    common = text("common-nav.js")
+    guard = text("assignment-context-guard.js")
+    assert "assignment-context-guard.js?v=20261014-1" in common
+    assert "lockAssignmentFlowButtons" in common
+    assert "__assignmentContextGuardReady" in common
+    assert "ctx.assignmentId===assignmentId" in guard
+    assert "!!ctx.clientId" in guard
+    assert "!!ctx.organizationId" in guard
+    assert "__formalSaveWrapped" in guard
+    assert "#recordCommitButton" in guard
+    assert "stopImmediatePropagation" in guard
+    assert "記録の作成・保存を停止しています" in guard
+
+
 def test_assignment_passes_only_assignment_id_to_record_page():
     addon = text("assignment/safety-addon.js")
     assert "new URLSearchParams({from:'assignment',assignment:a.id})" in addon

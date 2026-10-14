@@ -3,7 +3,7 @@ name: Safety Check
 on:
   push:
     branches:
-      - fix/ai-record-safety
+      - 'fix/**'
   pull_request:
     branches:
       - main
@@ -26,6 +26,7 @@ jobs:
         run: |
           node --check common-nav.js
           node --check record-safety.js
+          node --check assignment-context-guard.js
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
