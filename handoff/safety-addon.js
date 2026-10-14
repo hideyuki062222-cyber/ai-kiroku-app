@@ -22,6 +22,27 @@
         if(error){alert('削除できませんでした: '+error.message);return}await loadEntries();
       };
     }
+
+    // The floating "+申し送り" button must never silently choose the first client
+    // or reuse a previously viewed client. Require an explicit selection each time.
+    const originalOpenEntry=window.openEntry;
+    if(typeof originalOpenEntry==='function'&&!originalOpenEntry.__handoffClientSafety){
+      const wrapped=function(cid=null){
+        const explicitTarget=cid!==null&&cid!==undefined&&String(cid)!=='';
+        const result=originalOpenEntry(cid);
+        if(!explicitTarget){
+          const select=document.getElementById('entryClient');
+          if(select)select.value='';
+          if(typeof updateEntryClientButton==='function')updateEntryClientButton();
+          const status=document.getElementById('entryStatus');
+          if(status)status.textContent='利用者または「全体申し送り・備考」を選択してください。';
+        }
+        return result;
+      };
+      wrapped.__handoffClientSafety=true;
+      window.openEntry=wrapped;
+    }
+
     const oldSignup=window.signup;
     if(typeof oldSignup==='function'&&!oldSignup.__handoffSafety){
       const wrapped=async function(...a){
