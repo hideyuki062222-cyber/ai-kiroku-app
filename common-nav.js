@@ -48,7 +48,7 @@
     return q.get('from')==='assignment';
   }
   function lockAssignmentFlowButtons(){
-    if(!assignmentFlowRequested())return;
+    if(!assignmentFlowRequested()||window.__assignmentContextGuardReady===true)return;
     document.querySelectorAll('button').forEach(btn=>{
       const text=(btn.textContent||'').trim();
       if(text==='AIで記録作成'||text==='別の文章を作る'||btn.id==='recordCommitButton')btn.disabled=true;
