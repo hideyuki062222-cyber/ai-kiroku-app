@@ -42,6 +42,18 @@
     if(p.includes('/cashbook/')) return 'cashbook';
     return 'record';
   }
+  function assignmentFlowRequested(){
+    if(currentKey()!=='record')return false;
+    const q=new URLSearchParams(location.search);
+    return q.get('from')==='assignment';
+  }
+  function lockAssignmentFlowButtons(){
+    if(!assignmentFlowRequested())return;
+    document.querySelectorAll('button').forEach(btn=>{
+      const text=(btn.textContent||'').trim();
+      if(text==='AIで記録作成'||text==='別の文章を作る'||btn.id==='recordCommitButton')btn.disabled=true;
+    });
+  }
   function loadScript(id,src){
     if(document.getElementById(id)) return;
     const s=document.createElement('script');
@@ -50,8 +62,10 @@
   function loadPageAddons(){
     const key=currentKey();
     if(key==='record'){
+      lockAssignmentFlowButtons();
       loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
       loadScript('recordSafetyScript',BASE+'record-safety.js?v=20261014-2');
+      if(assignmentFlowRequested()) loadScript('assignmentContextGuardScript',BASE+'assignment-context-guard.js?v=20261014-1');
     }else if(key==='cashbook'){
       loadScript('cashbookSafetyScript',BASE+'cashbook/safety-addon.js?v=20261014-2');
     }
@@ -84,6 +98,7 @@
   if(!hasSupabaseAuthToken()) clearSensitiveCache();
   wrapLogout('cloudLogout');
   wrapLogout('logout');
+  lockAssignmentFlowButtons();
   loadPageAddons();
   if(!apply()){
     const mo=new MutationObserver(()=>{if(apply())mo.disconnect()});
@@ -93,6 +108,7 @@
   setTimeout(()=>{
     wrapLogout('cloudLogout');
     wrapLogout('logout');
+    lockAssignmentFlowButtons();
     const overlay=document.getElementById('authOverlay');
     const login=document.getElementById('loginPanel');
     if(overlay&&!overlay.classList.contains('hidden')&&login&&!login.classList.contains('hidden')) clearSensitiveCache();
