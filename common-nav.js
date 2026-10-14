@@ -70,6 +70,7 @@
       if(typeof saveFn!=='function') return originalGenerate.apply(this,args);
 
       let capturedRecord=null;
+      let generationFailed=false;
       const currentAddHistory=window.addHistory;
       recordSaveBusy=true;
       setGenerateButtonsDisabled(true);
@@ -78,12 +79,17 @@
       try{
         setRecordSaveStatus('記録文を作成しています…');
         await originalGenerate.apply(this,args);
+      }catch(e){
+        generationFailed=true;
+        console.error('AI記録の生成処理に失敗しました',e);
+        setRecordSaveStatus('記録文の作成中にエラーが発生しました。もう一度お試しください。',true);
       }finally{
         window.addHistory=currentAddHistory;
         window.cloudSaveRecord=saveFn;
       }
 
       try{
+        if(generationFailed) return;
         if(!capturedRecord){
           setRecordSaveStatus('');
           return;
@@ -94,7 +100,7 @@
       }catch(e){
         console.error('AI記録のクラウド保存に失敗しました',e);
         setRecordSaveStatus('保存できていません。通信状態を確認して、もう一度お試しください。',true);
-        alert('記録文は作成されましたが、クラウド履歴に保存できていません。通信状態を確認して、もう一度「AIで記録作成」を押してください。');
+        alert('記録文は作成されましたが、クラウド履歴への保存を確認できませんでした。通信状態と履歴を確認してから、必要に応じてもう一度お試しください。');
       }finally{
         recordSaveBusy=false;
         setGenerateButtonsDisabled(false);
