@@ -48,6 +48,7 @@ def test_handoff_only_allows_workflow_state_columns():
     addon = text("handoff/safety-addon.js")
     assert ".eq('organization_id',membership.organization_id)" in addon
     assert "updated_at:new Date" not in addon
+    assert "12文字以上" in addon
 
 
 def test_assignment_rls_uses_real_organization_comparisons():
