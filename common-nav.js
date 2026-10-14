@@ -67,7 +67,7 @@
       loadScript('recordSafetyScript',BASE+'record-safety.js?v=20261014-2');
       if(assignmentFlowRequested()) loadScript('assignmentContextGuardScript',BASE+'assignment-context-guard.js?v=20261014-1');
     }else if(key==='cashbook'){
-      loadScript('cashbookSafetyScript',BASE+'cashbook/safety-addon.js?v=20261014-2');
+      loadScript('cashbookSafetyScript',BASE+'cashbook/safety-addon.js?v=20261014-3');
     }
   }
   function addStyle(){
