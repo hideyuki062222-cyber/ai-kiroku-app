@@ -5,8 +5,28 @@ begin;
 
 -- Handoff: members may change workflow state only. The body, target client,
 -- author, date, importance and other content cannot be edited directly.
+create or replace function private.handoff_workflow_audit_stamp()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'not_authenticated';
+  end if;
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists handoff_workflow_audit_stamp on public.handoff_entries;
+create trigger handoff_workflow_audit_stamp
+before update on public.handoff_entries
+for each row execute function private.handoff_workflow_audit_stamp();
+
 revoke update on table public.handoff_entries from authenticated;
-grant update (carry_over, resolved, updated_at) on table public.handoff_entries to authenticated;
+grant update (carry_over, resolved) on table public.handoff_entries to authenticated;
 
 -- Cashbook: audit identity must come from the authenticated session, not the browser payload.
 create or replace function private.cashbook_entry_audit_stamp()
@@ -68,6 +88,10 @@ as $$
 begin
   if auth.uid() is null then
     raise exception 'not_authenticated';
+  end if;
+  if tg_op = 'UPDATE' then
+    new.organization_id := old.organization_id;
+    new.client_id := old.client_id;
   end if;
   new.updated_by := auth.uid();
   new.updated_at := now();
