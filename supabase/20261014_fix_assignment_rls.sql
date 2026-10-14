@@ -10,8 +10,8 @@ for insert
 to authenticated
 with check (
   private.is_org_member(staff_assignments.organization_id)
-  and staff_assignments.created_by = auth.uid()
-  and staff_assignments.updated_by = auth.uid()
+  and staff_assignments.created_by = (select auth.uid())
+  and staff_assignments.updated_by = (select auth.uid())
   and exists (
     select 1
     from public.clients c
@@ -50,7 +50,7 @@ using (
 )
 with check (
   private.is_org_member(staff_assignments.organization_id)
-  and staff_assignments.updated_by = auth.uid()
+  and staff_assignments.updated_by = (select auth.uid())
   and exists (
     select 1
     from public.clients c
