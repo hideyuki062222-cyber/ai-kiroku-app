@@ -43,9 +43,11 @@ def test_dashboard_passes_only_assignment_id():
 def test_handoff_only_allows_workflow_state_columns():
     sql = text("supabase/20261014_handoff_cashbook_safety.sql")
     assert "revoke update on table public.handoff_entries from authenticated" in sql
-    assert "grant update (carry_over, resolved, updated_at)" in sql
+    assert "grant update (carry_over, resolved)" in sql
+    assert "handoff_workflow_audit_stamp" in sql
     addon = text("handoff/safety-addon.js")
     assert ".eq('organization_id',membership.organization_id)" in addon
+    assert "updated_at:new Date" not in addon
 
 
 def test_assignment_rls_uses_real_organization_comparisons():
@@ -56,6 +58,7 @@ def test_assignment_rls_uses_real_organization_comparisons():
     assert "c.organization_id = c.organization_id" not in sql
     assert "m.organization_id = m.organization_id" not in sql
     assert "s.organization_id = s.organization_id" not in sql
+    assert "(select auth.uid())" in sql
 
 
 def test_cashbook_has_server_side_audit_stamp_and_client_freeze():
@@ -63,6 +66,8 @@ def test_cashbook_has_server_side_audit_stamp_and_client_freeze():
     assert "cashbook_entry_audit_stamp" in sql
     assert "new.created_by := v_uid" in sql
     assert "new.created_by_name" in sql
+    assert "new.organization_id := old.organization_id" in sql
+    assert "cashbook_account_audit_stamp" in sql
     addon = text("cashbook/safety-addon.js")
     assert "clientSelect.disabled=true" in addon
     assert "12文字以上" in addon
