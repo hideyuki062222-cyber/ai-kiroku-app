@@ -4,13 +4,13 @@
     if(!ready()){setTimeout(boot,120);return}
     window.toggleCarry=async(id,v)=>{
       try{
-        const {error}=await db.from('handoff_entries').update({carry_over:v,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',membership.organization_id);
+        const {error}=await db.from('handoff_entries').update({carry_over:v}).eq('id',id).eq('organization_id',membership.organization_id);
         if(error)throw error;await loadEntries();
       }catch(e){console.error(e);alert('申し送りの継続設定を変更できませんでした。再読み込みしてお試しください。')}
     };
     window.toggleResolved=async(id,v)=>{
       try{
-        const {error}=await db.from('handoff_entries').update({resolved:v,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',membership.organization_id);
+        const {error}=await db.from('handoff_entries').update({resolved:v}).eq('id',id).eq('organization_id',membership.organization_id);
         if(error)throw error;await loadEntries();
       }catch(e){console.error(e);alert('申し送りの対応状態を変更できませんでした。再読み込みしてお試しください。')}
     };
