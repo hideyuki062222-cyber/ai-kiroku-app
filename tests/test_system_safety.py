@@ -105,6 +105,18 @@ def test_cashbook_has_server_side_audit_stamp_and_client_freeze():
     assert "12文字以上" in addon
 
 
+def test_cashbook_requires_explicit_client_before_showing_or_saving_records():
+    addon = text("cashbook/safety-addon.js")
+    common = text("common-nav.js")
+    wrapper = text("cashbook/index.html")
+    assert "利用者を選択してください" in addon
+    assert "selectedClientId=null" in addon
+    assert "explicitClientChosen" in addon
+    assert "if(!selectedClientId)" in addon
+    assert "cashbook/safety-addon.js?v=20261014-3" in common
+    assert "common-nav.js?v=20261014-3" in wrapper
+
+
 def test_legacy_integrated_pages_are_retired():
     for path in ("integrated/index.html", "integrated/fixed.html"):
         html = text(path)
