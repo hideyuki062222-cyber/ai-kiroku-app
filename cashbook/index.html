@@ -18,7 +18,7 @@
  let h='',lastError=null;
  for(const url of sources){try{const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);h=await r.text();if(h.includes('利用者 金銭出納帳'))break;}catch(e){lastError=e}}
  if(!h){document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');return}
- h=h.replace('</body>','<script src="../common-nav.js?v=20261007-1"><\/script></body>');
+ h=h.replace('</body>','<script src="../common-nav.js?v=20261014-2"><\/script></body>');
  document.open();document.write(h);document.close();
 })();
 </script>

@@ -7,6 +7,33 @@
     ['record','AI記録',BASE],
     ['cashbook','出納帳',BASE+'cashbook/']
   ];
+  const SENSITIVE_CACHE_KEYS=['aiKirokuUsers','aiKirokuProfiles','activeOrganizationId'];
+
+  function clearSensitiveCache(){
+    try{SENSITIVE_CACHE_KEYS.forEach(key=>localStorage.removeItem(key));}catch(_e){}
+  }
+  function hasSupabaseAuthToken(){
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i)||'';
+        if(key.startsWith('sb-')&&key.endsWith('-auth-token')){
+          const value=localStorage.getItem(key);
+          if(value&&value!=='null'&&value!=='{}') return true;
+        }
+      }
+    }catch(_e){}
+    return false;
+  }
+  function wrapLogout(name){
+    const original=window[name];
+    if(typeof original!=='function'||original.__cacheSafetyWrapped) return;
+    const wrapped=async function(...args){
+      clearSensitiveCache();
+      return original.apply(this,args);
+    };
+    wrapped.__cacheSafetyWrapped=true;
+    window[name]=wrapped;
+  }
   function currentKey(){
     const p=location.pathname;
     if(p.includes('/dashboard/')) return 'today';
@@ -15,12 +42,19 @@
     if(p.includes('/cashbook/')) return 'cashbook';
     return 'record';
   }
-  function loadPageAddons(){
-    if(currentKey()!=='record'||document.getElementById('staffCompactScript')) return;
+  function loadScript(id,src){
+    if(document.getElementById(id)) return;
     const s=document.createElement('script');
-    s.id='staffCompactScript';
-    s.src=BASE+'staff-compact.js?v=20261008-1';
-    document.head.appendChild(s);
+    s.id=id;s.src=src;document.head.appendChild(s);
+  }
+  function loadPageAddons(){
+    const key=currentKey();
+    if(key==='record'){
+      loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
+      loadScript('recordSafetyScript',BASE+'record-safety.js?v=20261014-2');
+    }else if(key==='cashbook'){
+      loadScript('cashbookSafetyScript',BASE+'cashbook/safety-addon.js?v=20261014-2');
+    }
   }
   function addStyle(){
     if(document.getElementById('cozyCommonNavStyle')) return;
@@ -30,6 +64,8 @@
       .app-nav.cozy-common-nav{display:flex!important;grid-template-columns:none!important;gap:4px!important;overflow-x:auto!important;max-width:none!important;width:100%!important;scrollbar-width:none;-webkit-overflow-scrolling:touch}
       .app-nav.cozy-common-nav::-webkit-scrollbar{display:none}
       .app-nav.cozy-common-nav .app-tab{flex:1 0 auto!important;min-width:68px!important;text-align:center!important;padding:8px 7px!important;font-size:12px!important;white-space:nowrap!important}
+      .app-nav.cozy-common-nav .app-tab.active{background:#fff!important;color:#111827!important;box-shadow:0 1px 4px rgba(0,0,0,.1)!important}
+      button:disabled{opacity:.55!important;cursor:not-allowed!important}
       @media(max-width:520px){.app-nav.cozy-common-nav .app-tab{min-width:66px!important;padding:8px 6px!important;font-size:11.5px!important}}
     `;
     document.head.appendChild(s);
@@ -44,10 +80,21 @@
     nav.innerHTML=items.map(([key,label,href])=>`<a class="app-tab${key===cur?' active':''}" href="${href}"${key===cur?' aria-current="page"':''}>${label}</a>`).join('');
     return true;
   }
+
+  if(!hasSupabaseAuthToken()) clearSensitiveCache();
+  wrapLogout('cloudLogout');
+  wrapLogout('logout');
   loadPageAddons();
   if(!apply()){
     const mo=new MutationObserver(()=>{if(apply())mo.disconnect()});
     mo.observe(document.documentElement,{childList:true,subtree:true});
     setTimeout(()=>mo.disconnect(),10000);
   }
+  setTimeout(()=>{
+    wrapLogout('cloudLogout');
+    wrapLogout('logout');
+    const overlay=document.getElementById('authOverlay');
+    const login=document.getElementById('loginPanel');
+    if(overlay&&!overlay.classList.contains('hidden')&&login&&!login.classList.contains('hidden')) clearSensitiveCache();
+  },1500);
 })();

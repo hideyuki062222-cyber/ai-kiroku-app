@@ -112,44 +112,12 @@ function applySecurityRoleUi(role){
 function applyAssignmentContext(){
   const q=new URLSearchParams(location.search);
   if(q.get("from")!=="assignment") return;
-  const ctx={
-    assignmentId:q.get("assignment")||"",
-    client:q.get("client")||"",
-    date:q.get("date")||"",
-    time:q.get("time")||"",
-    staff:q.get("staff")||"",
-    memo:q.get("memo")||"",
-    label:q.get("label")||""
-  };
-  window.assignmentContext=ctx;
+  const assignmentId=q.get("assignment")||"";
+  window.assignmentContext={assignmentId};
   const card=document.getElementById("assignmentContextCard");
   const text=document.getElementById("assignmentContextText");
   if(card) card.classList.remove("hidden");
-  if(text) text.textContent=(ctx.date||"")+" "+(ctx.time||"")+" / "+(ctx.client||"")+" / 担当："+(ctx.staff||"未設定")+(ctx.memo?" / メモ："+ctx.memo:"");
-  const userSel=document.getElementById("user");
-  const profileSel=document.getElementById("profileUser");
-  if(ctx.client && users.includes(ctx.client)){
-    if(userSel) userSel.value=ctx.client;
-    if(profileSel){profileSel.value=ctx.client;loadProfile();}
-  }
-  const inputEl=document.getElementById("input");
-  if(inputEl && ctx.memo && !inputEl.value.trim()){
-    inputEl.value=ctx.memo;
-    const count=document.getElementById("inputCount");
-    if(count) count.textContent=inputEl.value.length+"文字";
-  }
-  const label=ctx.label||"";
-  const map=[
-    ["起床","起床介助"],["就寝","就寝介助"],["排泄","トイレ介助"],["トイレ","トイレ介助"],
-    ["食介","食事介助"],["食事","食事介助"],["入浴","入浴介助"],["更衣","更衣介助"],
-    ["服薬","服薬介助・確認"],["口腔","口腔ケア"],["家事","家事援助"],["通院","通院等介助"]
-  ];
-  for(const pair of map){
-    if(label.includes(pair[0])){
-      const cb=[...document.querySelectorAll('input[name="serviceContent"]')].find(x=>x.value===pair[1]);
-      if(cb) cb.checked=true;
-    }
-  }
+  if(text) text.textContent=assignmentId?"担当情報をクラウドから安全に確認しています…":"担当情報を確認できません。担当割当から開き直してください。";
 }
 `;
   if(!h.includes("function applyAssignmentContext()")){
@@ -181,6 +149,24 @@ function applyAssignmentContext(){
   );
 
   h=h.replace(
+`    // オフライン時の参照用に端末にもキャッシュ
+    saveUsers();
+    saveProfiles();
+    refreshUserSelect();`,
+`    // 利用者プロフィールは共有クラウドを正とし、端末へ恒久保存しない。
+    try{localStorage.removeItem("aiKirokuUsers");localStorage.removeItem("aiKirokuProfiles");}catch(e){}
+    refreshUserSelect();`
+  );
+  h=h.replace(
+`      profiles[code] = {...p};
+      saveProfiles();
+      document.getElementById("profileStatus").textContent=`,
+`      profiles[code] = {...p};
+      try{localStorage.removeItem("aiKirokuProfiles");}catch(e){}
+      document.getElementById("profileStatus").textContent=`
+  );
+
+  h=h.replace(
 `      support_method_snapshot:record.supportMethodSnapshot || "",
       visit_note:record.visitNote || "",
       care_note:record.careNote || ""
@@ -207,7 +193,7 @@ function applyAssignmentContext(){
     await loadCloudHistory();`
   );
 
-  h=h.replace('</body>','<script src="./common-nav.js?v=20261007-1"><\/script></body>');
+  h=h.replace('</body>','<script src="./common-nav.js?v=20261014-2"><\/script></body>');
   document.open();
   document.write(h);
   document.close();
