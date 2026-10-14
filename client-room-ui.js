@@ -33,8 +33,8 @@
   }
   function patchOptions(){
     document.querySelectorAll('option').forEach(opt=>{
-      const row=rowFor(opt.value);
-      if(row)opt.textContent=labelFor(row);
+      const row=rowFor(opt.value);if(!row)return;
+      const label=labelFor(row);if(opt.textContent!==label)opt.textContent=label;
     });
   }
   function patchTextNodes(){
@@ -58,7 +58,7 @@
   }
   function retireLegacyResidentEditors(){
     const card=document.getElementById('clientAdminCard');
-    if(card)card.style.display='none';
+    if(card&&card.style.display!=='none')card.style.display='none';
 
     const old=document.getElementById('newClientCode');
     if(old){
@@ -66,7 +66,8 @@
       if(add&&!add.querySelector('.room-manage-link')){
         add.innerHTML='<a class="btn secondary room-manage-link" href="../manage/" style="text-decoration:none;display:inline-block">利用者の入退居は事業所管理で行う</a>';
       }
-      const st=document.getElementById('clientManageStatus');if(st)st.textContent='部屋番号と利用者本人を分けて管理するため、追加・退去は事業所管理から行ってください。';
+      const msg='部屋番号と利用者本人を分けて管理するため、追加・退去は事業所管理から行ってください。';
+      const st=document.getElementById('clientManageStatus');if(st&&st.textContent!==msg)st.textContent=msg;
       const list=document.getElementById('clientManageList');
       if(list&&!list.querySelector('.room-manage-link'))list.innerHTML='<div class="small" style="padding:12px"><a class="room-manage-link" href="../manage/">事業所管理で利用者を確認する</a></div>';
     }
@@ -79,7 +80,7 @@
     retireLegacyResidentEditors();
   }
   function schedule(){
-    if(scheduled)return;scheduled=true;setTimeout(apply,60);
+    if(scheduled)return;scheduled=true;setTimeout(apply,80);
   }
   async function load(){
     if(!window.supabase)return false;
