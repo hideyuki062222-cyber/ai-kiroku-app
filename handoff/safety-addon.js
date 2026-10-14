@@ -22,6 +22,17 @@
         if(error){alert('削除できませんでした: '+error.message);return}await loadEntries();
       };
     }
+    const oldSignup=window.signup;
+    if(typeof oldSignup==='function'&&!oldSignup.__handoffSafety){
+      const wrapped=async function(...a){
+        const email=document.getElementById('email')?.value?.trim()||'';
+        const password=document.getElementById('password')?.value||'';
+        const msg=document.getElementById('authmsg');
+        if(!email||password.length<12){if(msg)msg.textContent='メールアドレスと12文字以上のパスワードを入力してください。';return}
+        return oldSignup(...a);
+      };
+      wrapped.__handoffSafety=true;window.signup=wrapped;
+    }
     const oldLogout=window.logout;
     if(typeof oldLogout==='function'&&!oldLogout.__handoffSafety){
       const wrapped=async(...a)=>{try{localStorage.removeItem('aiKirokuUsers');localStorage.removeItem('aiKirokuProfiles');localStorage.removeItem('activeOrganizationId')}catch(_e){}return oldLogout(...a)};
