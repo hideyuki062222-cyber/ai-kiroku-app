@@ -5,10 +5,44 @@
   }
   function boot(){
     const clientSelect=document.getElementById('clientSelect');
+    let explicitClientChosen=false;
+
+    function clearInitialClientSelection(){
+      if(explicitClientChosen||!clientSelect||!clientSelect.options.length)return;
+      if(!clientSelect.querySelector('option[value=""]')){
+        const opt=document.createElement('option');
+        opt.value='';
+        opt.textContent='利用者を選択してください';
+        clientSelect.insertBefore(opt,clientSelect.firstChild);
+      }
+      clientSelect.value='';
+      try{selectedClientId=null;account=null;entries=[];}catch(_e){}
+      const ids=['currentBalance','monthIncome','monthExpense'];
+      ids.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='¥0'});
+      const history=document.getElementById('history');
+      if(history)history.innerHTML='<div class="empty">利用者を選択すると出納履歴を表示します。</div>';
+      const status=document.getElementById('saveStatus');
+      if(status)status.textContent='利用者を選択してください。';
+    }
+
+    // The legacy page auto-selects the first active client. Keep clearing that implicit
+    // choice until the staff member intentionally selects a client from the dropdown.
+    let attempts=0;
+    const initialGuard=setInterval(()=>{
+      attempts+=1;
+      clearInitialClientSelection();
+      if(explicitClientChosen||attempts>=20)clearInterval(initialGuard);
+    },150);
+
     const originalSave=window.saveEntry;
     if(!originalSave.__cashSafety){
       const wrapped=async function(...args){
         if(wrapped.busy)return;
+        if(!selectedClientId){
+          const st=document.getElementById('saveStatus');
+          if(st)st.textContent='利用者を選択してください。';
+          return;
+        }
         wrapped.busy=true;
         const selectedAtStart=typeof selectedClientId!=='undefined'?selectedClientId:null;
         if(clientSelect)clientSelect.disabled=true;
@@ -41,6 +75,12 @@
     if(!originalChange.__cashSafety){
       const wrapped=async function(id,...args){
         try{if(typeof closeEdit==='function')closeEdit()}catch(_e){}
+        if(!id){
+          explicitClientChosen=false;
+          clearInitialClientSelection();
+          return;
+        }
+        explicitClientChosen=true;
         return originalChange.call(this,id,...args);
       };
       wrapped.__cashSafety=true;window.changeClient=wrapped;
