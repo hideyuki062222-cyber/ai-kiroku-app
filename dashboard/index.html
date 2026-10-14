@@ -31,11 +31,11 @@
 <section class="card"><div class="section-head"><div class="section-title">未対応の申し送り</div><a class="btn" href="../handoff/">申し送りへ</a></div><div id="handoffList" class="list"></div></section>
 </div>
 </div>
-<script src="../common-nav.js?v=20261007-1"></script>
+<script src="../common-nav.js?v=20261014-2"></script>
 <script>
 const CFG={url:'https://pagamoaxhqszojxrpxyu.supabase.co',key:'sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT'};
 const sb=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[m]));
 let user=null,org=null,memberships=[],orgs=[];
 function jstDate(){const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`}
 function fmtDate(d){const x=new Date(d+'T12:00:00');return `${x.getMonth()+1}/${x.getDate()}（${'日月火水木金土'[x.getDay()]}）`}
@@ -51,12 +51,13 @@ async function loadOrg(){
 }
 async function loadToday(){
   const d=jstDate();$('#todayLabel').textContent=`${fmtDate(d)}　${org.name}`;
+  const handoffFilter=`service_date.eq.${d},and(carry_over.eq.true,service_date.lt.${d})`;
   const [c,s,a,r,h,k]=await Promise.all([
     sb.from('clients').select('id,code,display_name').eq('organization_id',org.id).eq('is_active',true),
     sb.from('client_service_slots').select('client_id,service_time,label').eq('organization_id',org.id).eq('is_active',true),
     sb.from('staff_assignments').select('id,client_id,service_date,service_time,assigned_staff_name,memo').eq('organization_id',org.id).eq('service_date',d),
     sb.from('care_records').select('id,assignment_id,client_id,service_date,service_time').eq('organization_id',org.id).eq('service_date',d),
-    sb.from('handoff_entries').select('id,client_id,service_date,body,is_important,carry_over,due_date,due_time,scope,resolved').eq('organization_id',org.id).eq('resolved',false).lte('service_date',d).limit(50),
+    sb.from('handoff_entries').select('id,client_id,service_date,body,is_important,carry_over,due_date,due_time,scope,resolved').eq('organization_id',org.id).eq('resolved',false).or(handoffFilter).limit(50),
     sb.from('cashbook_entries').select('id').eq('organization_id',org.id).eq('tx_date',d)
   ]);
   const bad=[c,s,a,r,h,k].find(x=>x.error);if(bad)throw bad.error;
@@ -72,7 +73,7 @@ async function loadToday(){
   $('#loadingCard').classList.add('hidden');$('#errorCard').classList.add('hidden');$('#main').classList.remove('hidden');
 }
 function assignmentRow(x,done,cmap,smap){
-  const c=cmap.get(x.client_id),slot=smap.get(`${x.client_id}|${hhmm(x.service_time)}`),qs=new URLSearchParams({from:'assignment',assignment:x.id,client:c?.code||'',date:x.service_date,time:hhmm(x.service_time),staff:x.assigned_staff_name||'',memo:x.memo||'',label:slot?.label||''});
+  const c=cmap.get(x.client_id),qs=new URLSearchParams({from:'assignment',assignment:x.id});
   return `<div class="row"><div class="time">${esc(hhmm(x.service_time).replace(/^0/,''))}</div><div><div class="name">${esc(clientLabel(c))}</div><div class="meta">担当：${esc(x.assigned_staff_name||'未設定')}${x.memo?`<br>${esc(x.memo)}`:''}</div></div><div class="actions"><span class="status${done?' done':''}">${done?'✓ 記録済み':'未記録'}</span>${done?'':`<a class="btn primary" href="../?${qs.toString()}">AI記録作成</a>`}</div></div>`
 }
 async function refresh(){try{$('#loadingCard').classList.remove('hidden');$('#main').classList.add('hidden');await loadToday()}catch(e){console.error(e);showError(e.message||'読み込みに失敗しました。')}}
