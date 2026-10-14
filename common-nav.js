@@ -24,105 +24,15 @@
     }catch(_e){}
     return false;
   }
-  function hardenLogout(){
-    const original=window.cloudLogout;
-    if(typeof original!=='function'||original.__aiSafetyWrapped) return;
+  function wrapLogout(name){
+    const original=window[name];
+    if(typeof original!=='function'||original.__cacheSafetyWrapped) return;
     const wrapped=async function(...args){
       clearSensitiveCache();
       return original.apply(this,args);
     };
-    wrapped.__aiSafetyWrapped=true;
-    window.cloudLogout=wrapped;
-  }
-  function ensureRecordSaveStatus(){
-    let el=document.getElementById('recordSaveStatus');
-    if(el) return el;
-    const count=document.getElementById('careResultCount');
-    if(!count) return null;
-    el=document.createElement('div');
-    el.id='recordSaveStatus';
-    el.className='notice';
-    el.setAttribute('role','status');
-    el.setAttribute('aria-live','polite');
-    count.after(el);
-    return el;
-  }
-  function setRecordSaveStatus(text,isError=false){
-    const el=ensureRecordSaveStatus();
-    if(!el) return;
-    el.textContent=text||'';
-    el.style.color=isError?'#b42318':'#667085';
-    el.style.fontWeight=text?'700':'';
-  }
-  function setGenerateButtonsDisabled(disabled){
-    document.querySelectorAll('button').forEach(btn=>{
-      const text=(btn.textContent||'').trim();
-      if(text==='AIで記録作成'||text==='別の文章を作る') btn.disabled=disabled;
-    });
-  }
-  let recordSaveBusy=false;
-  function hardenRecordSaving(){
-    const originalGenerate=window.generate;
-    if(typeof originalGenerate!=='function'||originalGenerate.__aiSafetyWrapped) return;
-    const wrapped=async function(...args){
-      if(recordSaveBusy) return;
-      const saveFn=window.cloudSaveRecord;
-      if(typeof saveFn!=='function') return originalGenerate.apply(this,args);
-
-      let capturedRecord=null;
-      let generationFailed=false;
-      const currentAddHistory=window.addHistory;
-      recordSaveBusy=true;
-      setGenerateButtonsDisabled(true);
-      window.addHistory=()=>{};
-      window.cloudSaveRecord=async record=>{capturedRecord=record;};
-      try{
-        setRecordSaveStatus('記録文を作成しています…');
-        await originalGenerate.apply(this,args);
-      }catch(e){
-        generationFailed=true;
-        console.error('AI記録の生成処理に失敗しました',e);
-        setRecordSaveStatus('記録文の作成中にエラーが発生しました。もう一度お試しください。',true);
-      }finally{
-        window.addHistory=currentAddHistory;
-        window.cloudSaveRecord=saveFn;
-      }
-
-      try{
-        if(generationFailed) return;
-        if(!capturedRecord){
-          setRecordSaveStatus('');
-          return;
-        }
-        setRecordSaveStatus('クラウド履歴へ保存しています…');
-        await saveFn(capturedRecord);
-        setRecordSaveStatus('✓ クラウド履歴へ保存しました。');
-      }catch(e){
-        console.error('AI記録のクラウド保存に失敗しました',e);
-        setRecordSaveStatus('保存できていません。通信状態を確認して、もう一度お試しください。',true);
-        alert('記録文は作成されましたが、クラウド履歴への保存を確認できませんでした。通信状態と履歴を確認してから、必要に応じてもう一度お試しください。');
-      }finally{
-        recordSaveBusy=false;
-        setGenerateButtonsDisabled(false);
-      }
-    };
-    wrapped.__aiSafetyWrapped=true;
-    window.generate=wrapped;
-  }
-  function markShortenedTextUnsaved(){
-    const original=window.shortenCareResult;
-    if(typeof original!=='function'||original.__aiSafetyWrapped) return;
-    const wrapped=function(...args){
-      const before=document.getElementById('careResult')?.textContent||'';
-      const result=original.apply(this,args);
-      const after=document.getElementById('careResult')?.textContent||'';
-      if(after&&after!==before){
-        setRecordSaveStatus('※ ②を短くした内容は、クラウド履歴にはまだ保存されていません。');
-      }
-      return result;
-    };
-    wrapped.__aiSafetyWrapped=true;
-    window.shortenCareResult=wrapped;
+    wrapped.__cacheSafetyWrapped=true;
+    window[name]=wrapped;
   }
   function currentKey(){
     const p=location.pathname;
@@ -132,12 +42,19 @@
     if(p.includes('/cashbook/')) return 'cashbook';
     return 'record';
   }
-  function loadPageAddons(){
-    if(currentKey()!=='record'||document.getElementById('staffCompactScript')) return;
+  function loadScript(id,src){
+    if(document.getElementById(id)) return;
     const s=document.createElement('script');
-    s.id='staffCompactScript';
-    s.src=BASE+'staff-compact.js?v=20261008-1';
-    document.head.appendChild(s);
+    s.id=id;s.src=src;document.head.appendChild(s);
+  }
+  function loadPageAddons(){
+    const key=currentKey();
+    if(key==='record'){
+      loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
+      loadScript('recordSafetyScript',BASE+'record-safety.js?v=20261014-2');
+    }else if(key==='cashbook'){
+      loadScript('cashbookSafetyScript',BASE+'cashbook/safety-addon.js?v=20261014-2');
+    }
   }
   function addStyle(){
     if(document.getElementById('cozyCommonNavStyle')) return;
@@ -165,9 +82,8 @@
   }
 
   if(!hasSupabaseAuthToken()) clearSensitiveCache();
-  hardenLogout();
-  hardenRecordSaving();
-  markShortenedTextUnsaved();
+  wrapLogout('cloudLogout');
+  wrapLogout('logout');
   loadPageAddons();
   if(!apply()){
     const mo=new MutationObserver(()=>{if(apply())mo.disconnect()});
@@ -175,9 +91,8 @@
     setTimeout(()=>mo.disconnect(),10000);
   }
   setTimeout(()=>{
-    hardenLogout();
-    hardenRecordSaving();
-    markShortenedTextUnsaved();
+    wrapLogout('cloudLogout');
+    wrapLogout('logout');
     const overlay=document.getElementById('authOverlay');
     const login=document.getElementById('loginPanel');
     if(overlay&&!overlay.classList.contains('hidden')&&login&&!login.classList.contains('hidden')) clearSensitiveCache();
