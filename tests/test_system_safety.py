@@ -66,6 +66,14 @@ def test_handoff_only_allows_workflow_state_columns():
     assert "12文字以上" in addon
 
 
+def test_handoff_wrapper_injects_addon_at_real_final_body_tag():
+    wrapper = text("handoff/index.html")
+    assert "lastIndexOf('</body>')" in wrapper
+    assert "h=h.slice(0,bodyClose)+addon+h.slice(bodyClose)" in wrapper
+    assert "h.replace('</body>'" not in wrapper
+    assert "safety-addon.js?v=20261014-3" in wrapper
+
+
 def test_assignment_rls_uses_real_organization_comparisons():
     sql = text("supabase/20261014_fix_assignment_rls.sql")
     assert "c.organization_id = staff_assignments.organization_id" in sql
