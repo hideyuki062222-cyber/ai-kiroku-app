@@ -66,12 +66,20 @@ def test_handoff_only_allows_workflow_state_columns():
     assert "12文字以上" in addon
 
 
+def test_handoff_requires_explicit_target_for_floating_new_entry():
+    addon = text("handoff/safety-addon.js")
+    assert "originalOpenEntry" in addon
+    assert "if(!explicitTarget)" in addon
+    assert "select.value=''" in addon
+    assert "利用者または「全体申し送り・備考」を選択してください。" in addon
+
+
 def test_handoff_wrapper_injects_addon_at_real_final_body_tag():
     wrapper = text("handoff/index.html")
     assert "lastIndexOf('</body>')" in wrapper
     assert "h=h.slice(0,bodyClose)+addon+h.slice(bodyClose)" in wrapper
     assert "h.replace('</body>'" not in wrapper
-    assert "safety-addon.js?v=20261014-3" in wrapper
+    assert "safety-addon.js?v=20261014-4" in wrapper
 
 
 def test_assignment_rls_uses_real_organization_comparisons():
