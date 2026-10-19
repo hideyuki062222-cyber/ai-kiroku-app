@@ -136,4 +136,4 @@ $('year').value=new Date().getFullYear();$('month').value=new Date().getMonth()+
 let autosaveLoading=true;
 function saveAttendance(){}
 function clearWorkbookYellow(source){const h=exportHighlightStyles(source);for(const path of Object.keys(source)){if(!/^xl\/worksheets\/sheet\d+\.xml$/.test(path))continue;const d=xml(source[path]);for(let i=10;i<=40;i++)for(const col of 'GH'){const c=cell(d,col+i);if(c)c.setAttribute('s',h.style(c.getAttribute('s'),false))}source[path]=enc.encode(new XMLSerializer().serializeToString(d))}source['xl/styles.xml']=h.bytes()}
-</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="cloud.js"></script><script src="../common-nav.js?v=20261019-attendance"></script></html>
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="cloud.js?v=20261019-2"></script><script src="../common-nav.js?v=20261019-attendance"></script></html>
