@@ -28,7 +28,7 @@ async function cloudBuild(period,records,preferred){
  $('upload').closest('details').hidden=!cloudAdmin();document.getElementById('legacyAttendanceLink')?.remove();if(cloudAdmin()){const p=document.createElement('p');p.id='legacyAttendanceLink';p.innerHTML='<strong>初回移行：</strong>旧版で入力済みのデータはまだ自動転送されません。<a href="https://kizuna-attendance-e77cd1.hideyuki062222.chatgpt.site" target="_blank" rel="noopener">旧KIZUNA出勤簿を開く</a> → 入力に使った端末でExcelを保存 → この画面で取り込んでください。過去月が複数ある場合は各月を保存してください。';$('upload').closest('details').prepend(p);}$('export').textContent=cloudAdmin()?'表示月・全スタッフのExcelを保存':'自分のExcelを保存';
  for(const [i,option]of [...$('staff').options].entries()){const person=cloudStaff[i];option.textContent=person.staff_name+(person.is_active?'':'（停止中）')+' ['+person.id.slice(0,6)+']';}syncCalendarStaff();
  $('saveInfo').textContent='「変更を保存」でクラウドに保存します。年月・スタッフを確認してください。過去の旧版データは管理者によるExcel移行が必要です。';
- cloudReady=true;cloudBaseline=cloudSignature();cloudStatus('保存済みの内容を読み込みました。');$('cloudGate').hidden=true;$('cloudControls').hidden=false;
+ cloudReady=true;document.body.classList.add('attendance-ready');cloudBaseline=cloudSignature();cloudStatus('保存済みの内容を読み込みました。');$('cloudGate').hidden=true;$('cloudControls').hidden=false;
 }
 async function cloudLoad(period=cloudPeriod(),preferred){
  cloudLock(true);try{
@@ -38,7 +38,7 @@ async function cloudLoad(period=cloudPeriod(),preferred){
   if(!cloudAdmin()&&cloudStaff.length!==1)throw Error('本人の職員情報を一意に確認できません。管理者に連絡してください。');
   const records=await cloudAll(attendanceDBClient.from('attendance_months').select('*').eq('organization_id',cloudOrg.id).eq('period',period).order('staff_id'));
   await cloudBuild(period,records,preferred);
- }catch(e){cloudReady=false;$('work').hidden=true;$('cloudGate').hidden=false;$('cloudStatus').textContent=e.message;throw e;}finally{cloudLock(false);}
+ }catch(e){cloudReady=false;document.body.classList.remove('attendance-ready');$('work').hidden=true;$('cloudGate').hidden=false;$('cloudStatus').textContent=e.message;throw e;}finally{cloudLock(false);}
 }
 async function cloudWrite(person,period,draft,prior){
  for(const r of draft.rows){const error=validRow(r);if(error)throw Error(error);}
@@ -76,7 +76,7 @@ document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(a&&
 for(const event of ['input','change','click','submit'])document.addEventListener(event,()=>queueMicrotask(()=>{if(cloudReady&&!cloudBusy&&cloudDirty())cloudStatus('未保存の変更があります。「変更を保存」を押してください。');}));
 attendanceDBClient.auth.onAuthStateChange((event,session)=>{if(cloudUser&&(!session||session.user.id!==cloudUser.id)){cloudReady=false;document.querySelector('main').replaceChildren();location.reload();}});
 (async()=>{try{
- cloudUser=cloudCheck(await attendanceDBClient.auth.getUser()).user;if(!cloudUser)throw Error('AI記録と同じアカウントでログインしてください。');
+ const authResult=await attendanceDBClient.auth.getUser();if(authResult.error||!authResult.data?.user)throw Error('AI記録と同じアカウントでログインしてください。');cloudUser=authResult.data.user;
  cloudMemberships=cloudCheck(await attendanceDBClient.from('organization_members').select('organization_id,role').eq('user_id',cloudUser.id));
  cloudOrgs=cloudCheck(await attendanceDBClient.from('organizations').select('id,name,is_active').in('id',cloudMemberships.map(m=>m.organization_id)).eq('is_active',true));
  cloudOrg=cloudOrgs.find(o=>o.id===localStorage.getItem('activeOrganizationId'))||cloudOrgs[0];if(!cloudOrg)throw Error('利用できる事業所がありません。');
