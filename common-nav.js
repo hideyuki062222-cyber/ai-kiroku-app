@@ -1,10 +1,12 @@
 (()=>{
   const BASE='/ai-kiroku-app/';
+  const ATTENDANCE='https://kizuna-attendance-e77cd1.hideyuki062222.chatgpt.site';
   const items=[
     ['today','今日',BASE+'dashboard/'],
     ['assignment','担当割当',BASE+'assignment/'],
     ['handoff','申し送り',BASE+'handoff/'],
     ['record','AI記録',BASE],
+    ['attendance','出勤簿',ATTENDANCE],
     ['cashbook','出納帳',BASE+'cashbook/']
   ];
   const SENSITIVE_CACHE_KEYS=['aiKirokuUsers','aiKirokuProfiles','activeOrganizationId'];
