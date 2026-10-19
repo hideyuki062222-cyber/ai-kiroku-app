@@ -34,6 +34,7 @@
         <a class="app-tab" href="../assignment/">担当割当</a>
         <a class="app-tab active" href="./" aria-current="page">申し送り</a>
         <a class="app-tab" href="../">AI記録</a>
+        <a class="app-tab" href="https://kizuna-attendance-e77cd1.hideyuki062222.chatgpt.site">出勤簿</a>
         <a class="app-tab" href="../cashbook/">出納帳</a>
       </nav>`;
  h=h.replace(/<nav class="app-nav" aria-label="アプリ切替">[\s\S]*?<\/nav>/,nav);
@@ -48,9 +49,6 @@
  @media(max-width:560px){.handoff-safe-nav .app-tab{min-width:68px!important;padding:8px 7px!important;font-size:11.5px!important}}
  </style></head>`);
 
- // The source page contains a literal "</body>" inside the print-PDF JavaScript string.
- // Injecting with String.replace('</body>', ...) would hit that string first and corrupt
- // the running script on Safari/iPhone. Always target the real final body closing tag.
  const addon='<script src="../client-room-ui.js?v=20261014-1"><\/script><script src="./safety-addon.js?v=20261014-4"><\/script>';
  const bodyClose=h.lastIndexOf('</body>');
  if(bodyClose>=0) h=h.slice(0,bodyClose)+addon+h.slice(bodyClose);
