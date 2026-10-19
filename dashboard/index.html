@@ -18,7 +18,7 @@
 </header>
 <section class="card" id="loadingCard"><div class="loading">今日の情報を読み込んでいます…</div></section>
 <section class="card hidden" id="errorCard"><div class="error" id="errorText"></div><div style="margin-top:10px"><a class="btn primary" href="../">AI記録でログインする</a></div></section>
-<div id="main" class="hidden">
+<div id="main" class="hidden"><section class="card"><div class="section-head"><div class="section-title">自分の勤務・出勤簿</div><a class="btn primary" href="../attendance/">出勤簿を入力</a></div><div id="myAttendance">読み込み中…</div><div id="attendanceMissing" hidden></div></section>
 <section class="card"><div class="metrics">
   <div class="metric"><div class="k">今日の担当</div><div class="v" id="mAssign">0</div></div>
   <div class="metric alert"><div class="k">未記録</div><div class="v" id="mTodo">0</div></div>
@@ -31,7 +31,7 @@
 <section class="card"><div class="section-head"><div class="section-title">未対応の申し送り</div><a class="btn" href="../handoff/">申し送りへ</a></div><div id="handoffList" class="list"></div></section>
 </div>
 </div>
-<script src="../common-nav.js?v=20261019-1"></script>
+<script src="../common-nav.js?v=20261019-attendance"></script>
 <script>
 const CFG={url:'https://pagamoaxhqszojxrpxyu.supabase.co',key:'sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT'};
 const sb=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -70,7 +70,18 @@ async function loadToday(){
   $('#assignList').innerHTML=assignments.length?assignments.map(x=>assignmentRow(x,recorded(x),cmap,smap)).join(''):'<div class="empty">今日の担当登録はありません。</div>';
   handoffs.sort((x,y)=>Number(y.is_important)-Number(x.is_important)||String(x.due_date||x.service_date).localeCompare(String(y.due_date||y.service_date)));
   $('#handoffList').innerHTML=handoffs.length?handoffs.slice(0,8).map(x=>`<div class="row handoff${x.is_important?' important':''}" style="grid-template-columns:1fr"><div><div class="name">${x.is_important?'重要・':''}${x.scope==='general'?'全体':esc(clientLabel(cmap.get(x.client_id)))}</div><div class="meta">${esc(fmtDate(x.service_date))}${x.due_date?`　期限 ${esc(fmtDate(x.due_date))}${x.due_time?' '+esc(hhmm(x.due_time)):''}`:''}</div><div class="body">${esc(x.body)}</div></div></div>`).join(''):'<div class="empty">未対応の申し送りはありません。</div>';
+  await loadAttendanceToday(d);
   $('#loadingCard').classList.add('hidden');$('#errorCard').classList.add('hidden');$('#main').classList.remove('hidden');
+}
+async function loadAttendanceToday(d){
+ const box=$('#myAttendance'),missing=$('#attendanceMissing');box.textContent='読み込み中…';missing.hidden=true;missing.replaceChildren();
+ try{
+  const admin=memberships.find(m=>m.organization_id===org.id)?.role==='admin';let q=sb.from('organization_staff').select('id,staff_name,linked_user_id').eq('organization_id',org.id).eq('is_active',true);if(!admin)q=q.eq('linked_user_id',user.id);
+  const [people,months]=await Promise.all([q,sb.from('attendance_months').select('staff_id,rows').eq('organization_id',org.id).eq('period',d.slice(0,7)+'-01')]);if(people.error)throw people.error;if(months.error)throw months.error;
+  const entries=new Map((months.data||[]).map(m=>[m.staff_id,m.rows[Number(d.slice(-2))-1]]));const me=(people.data||[]).find(p=>p.linked_user_id===user.id),r=me&&entries.get(me.id);const entered=r&&(r.t||r.g||r.h||r.s!=null);const hm=n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0');
+  box.textContent=!me?'本人の職員紐付けがありません。管理者に確認してください。':!entered?'今日の出勤簿は未入力です。':r.s!=null?`今日の出勤簿：${hm(r.s)}〜${r.e>=1440?'翌':''}${hm(r.e%1440)}（休憩${r.b}分）`:`今日の出勤簿：${r.t||r.g||'入力済み'}`;
+  if(admin){const unentered=(people.data||[]).filter(p=>{const x=entries.get(p.id);return !x||!(x.t||x.g||x.h||x.s!=null)});missing.hidden=false;missing.innerHTML=`<h3>当日の出勤簿が未入力：${unentered.length}人</h3><p class="sub">出勤予定者だけではなく、稼働中の全職員が対象です。休みも入力すると一覧から外れます。</p><p>${unentered.map(p=>esc(p.staff_name)).join('、')||'全員入力済み'}</p><a class="btn" href="../attendance/">スタッフを切り替えて確認</a>`;}
+ }catch(e){box.textContent='出勤簿を確認できません：'+e.message;}
 }
 function assignmentRow(x,done,cmap,smap){
   const c=cmap.get(x.client_id),qs=new URLSearchParams({from:'assignment',assignment:x.id});

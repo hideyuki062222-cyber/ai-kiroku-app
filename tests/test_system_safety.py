@@ -18,7 +18,7 @@ def test_record_requires_explicit_formal_save():
 
 def test_record_entrypoint_loads_current_safety_bundle():
     html = text("index.html")
-    assert "common-nav.js?v=20261014-2" in html
+    assert "common-nav.js?v=20261019-attendance" in html
     assert "担当情報をクラウドから安全に確認しています" in html
     assert 'q.get("client")' not in html
     assert 'q.get("memo")' not in html
@@ -114,7 +114,7 @@ def test_cashbook_requires_explicit_client_before_showing_or_saving_records():
     assert "explicitClientChosen" in addon
     assert "if(!selectedClientId)" in addon
     assert "cashbook/safety-addon.js?v=20261014-3" in common
-    assert "common-nav.js?v=20261014-3" in wrapper
+    assert "common-nav.js?v=20261019-attendance" in wrapper
 
 
 def test_room_number_is_separate_from_resident_identity():

@@ -1,6 +1,6 @@
 (()=>{
   const BASE='/ai-kiroku-app/';
-  const ATTENDANCE='https://kizuna-attendance-e77cd1.hideyuki062222.chatgpt.site';
+  const ATTENDANCE=BASE+'attendance/';
   const items=[
     ['today','今日',BASE+'dashboard/'],
     ['assignment','担当割当',BASE+'assignment/'],
@@ -42,6 +42,8 @@
     if(p.includes('/assignment/')) return 'assignment';
     if(p.includes('/handoff/')) return 'handoff';
     if(p.includes('/cashbook/')) return 'cashbook';
+    if(p.includes('/attendance/')) return 'attendance';
+    if(p.includes('/staff/')) return 'staff';
     return 'record';
   }
   function assignmentFlowRequested(){

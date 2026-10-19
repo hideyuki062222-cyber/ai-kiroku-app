@@ -12,15 +12,15 @@
     if(!organization?.id){setTimeout(boot,180);return;}
 
     fillStaff=function(){
-      const account='<option value="">担当者を選択</option>'+members.map(m=>`<option value="${m.user_id}">${esc(staffName(m))}</option>`).join('');
-      const activeOffline=roster.filter(x=>x.is_active).map(x=>`<option value="offline:${x.id}">${esc(x.staff_name)}（ログインなし）</option>`).join('');
-      const allOffline=roster.map(x=>`<option value="offline:${x.id}">${esc(x.staff_name)}（ログインなし${x.is_active?'':'・停止中'}）</option>`).join('');
+      const account='<option value="">担当者を選択</option>'+members.filter(m=>roster.some(s=>s.linked_user_id===m.user_id&&s.is_active)).map(m=>`<option value="${m.user_id}">${esc(roster.find(s=>s.linked_user_id===m.user_id)?.staff_name||staffName(m))}</option>`).join('');
+      const activeOffline=roster.filter(x=>x.is_active&&!x.linked_user_id).map(x=>`<option value="offline:${x.id}">${esc(x.staff_name)}（ログインなし）</option>`).join('');
+      const allOffline=roster.filter(x=>!x.linked_user_id).map(x=>`<option value="offline:${x.id}">${esc(x.staff_name)}（ログインなし${x.is_active?'':'・停止中'}）</option>`).join('');
       mainStaff.innerHTML=account+activeOffline;
       editStaff.innerHTML=account+allOffline;
     };
 
     async function loadRoster(){
-      const {data,error}=await sb.from('organization_staff').select('id,staff_name,is_active,sort_order').eq('organization_id',organization.id).order('is_active',{ascending:false}).order('sort_order').order('staff_name');
+      const {data,error}=await sb.from('organization_staff').select('id,staff_name,linked_user_id,is_active,sort_order').eq('organization_id',organization.id).order('is_active',{ascending:false}).order('sort_order').order('staff_name');
       if(error){console.warn('offline staff load failed',error);return;}
       roster=data||[];fillStaff();
       document.dispatchEvent(new CustomEvent('offlineStaffLoaded'));
@@ -31,7 +31,7 @@
         return s?{assigned_user_id:null,assigned_staff_id:s.id,assigned_staff_name:s.staff_name}:null;
       }
       const m=members.find(x=>x.user_id===value);
-      return m?{assigned_user_id:value,assigned_staff_id:null,assigned_staff_name:staffName(m)}:null;
+      return m?{assigned_user_id:value,assigned_staff_id:roster.find(s=>s.linked_user_id===value)?.id||null,assigned_staff_name:roster.find(s=>s.linked_user_id===value)?.staff_name||staffName(m)}:null;
     }
 
     mainSave.onclick=async()=>{
@@ -49,7 +49,7 @@
     if(originalOpen){
       openEdit=function(a,slot){
         originalOpen(a,slot);
-        if(a?.assigned_staff_id){
+        if(a?.assigned_staff_id&&!a?.assigned_user_id){
           editStaff.value='offline:'+a.assigned_staff_id;
         }else if(a?.assigned_user_id){
           editStaff.value=a.assigned_user_id;
