@@ -26,7 +26,7 @@ async function cloudBuild(period,records,preferred){
  selectedOffice='all';refreshStaffChoices(Math.max(0,cloudStaff.findIndex(s=>s.id===preferred)));loadStaff(false);
  $('office').closest('label').hidden=true;$('staff').closest('label').hidden=!cloudAdmin();document.querySelector('.staff-nav').hidden=!cloudAdmin();
  $('upload').closest('details').hidden=!cloudAdmin();document.getElementById('legacyAttendanceLink')?.remove();if(cloudAdmin()){const p=document.createElement('p');p.id='legacyAttendanceLink';p.innerHTML='<strong>初回移行：</strong>旧版で入力済みのデータはまだ自動転送されません。<a href="https://kizuna-attendance-e77cd1.hideyuki062222.chatgpt.site" target="_blank" rel="noopener">旧KIZUNA出勤簿を開く</a> → 入力に使った端末でExcelを保存 → この画面で取り込んでください。過去月が複数ある場合は各月を保存してください。';$('upload').closest('details').prepend(p);}$('export').textContent=cloudAdmin()?'表示月・全スタッフのExcelを保存':'自分のExcelを保存';
- for(const [i,option]of [...$('staff').options].entries()){const person=cloudStaff[i];option.textContent=person.staff_name+(person.is_active?'':'（停止中）')+' ['+person.id.slice(0,6)+']';}syncCalendarStaff();
+ for(const [i,option]of [...$('staff').options].entries()){const person=cloudStaff[i];option.textContent=person.staff_name+(person.is_active?'':'（停止中）');}syncCalendarStaff();
  $('saveInfo').textContent='「変更を保存」でクラウドに保存します。年月・スタッフを確認してください。過去の旧版データは管理者によるExcel移行が必要です。';
  cloudReady=true;document.body.classList.add('attendance-ready');cloudBaseline=cloudSignature();cloudStatus('保存済みの内容を読み込みました。');$('cloudGate').hidden=true;$('cloudControls').hidden=false;
 }
