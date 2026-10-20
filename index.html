@@ -193,6 +193,8 @@ function applyAssignmentContext(){
     await loadCloudHistory();`
   );
 
+  h=h.replace('<section class="card hidden" id="staffAdminCard">\n    <label>職員管理</label>', '<section class="card hidden" id="staffAdminCard"><details id="staffAdminDetails"><summary style="cursor:pointer;padding:8px 0;font-weight:800;font-size:16px">職員管理（必要なときに開く）</summary>');
+  h=h.replace('<div id="staffList" class="staff-list"></div>\n  </section>', '<div id="staffList" class="staff-list"></div></details></section>');
   const historyStart=h.indexOf('  async function loadCloudHistory(){');
   const historyEnd=h.indexOf('  function renderStaffRows(',historyStart);
   if(historyStart<0||historyEnd<0)throw new Error('履歴画面の更新箇所を確認できません。');
