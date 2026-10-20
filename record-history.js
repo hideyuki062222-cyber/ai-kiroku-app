@@ -1,5 +1,8 @@
 (()=>{
  let serial=0;
+ const openedTargets=new Set();
+ const link=new URLSearchParams(location.search);
+ const targetId=link.get('from')==='record'?link.get('record'):null;
  const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
  const copyControl=(label,text)=>{
   const wrap=el('div'),button=el('button',label),status=el('span');
@@ -29,7 +32,8 @@
   const calendar=el('div');calendar.id='recordHistoryCalendar';calendar.style.cssText='display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px';
   const status=el('p');status.setAttribute('role','status');const list=el('div'),refresh=el('button','記録を更新');refresh.type='button';
   host.append(label,select,hint,dateLabel,date,toolbar,calendar,refresh,status,list);
-  let month=date.value.slice(0,7),request=0,dayRequest=0,counts=new Map();
+  let month=date.value.slice(0,7),request=0,dayRequest=0,counts=new Map(),targetRecord=null;
+  let revealTarget=!!targetId&&!openedTargets.has(member.organization_id+'|'+targetId);
   const base=()=>db.from('care_records').select('id,service_date,service_time,assignment_id').eq('organization_id',member.organization_id).eq('client_id',select.value).not('assignment_id','is',null).not('service_time','is',null);
   function draw(){
    calendar.replaceChildren();monthTitle.textContent=month.replace('-','年')+'月';
@@ -52,6 +56,13 @@
      const {data,error}=await db.from('care_records').select('id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).not('assignment_id','is',null).not('service_time','is',null).order('service_time',{ascending:true}).order('id',{ascending:true}).range(offset,offset+499);
      if(!current()||seq!==dayRequest)return;if(error)throw error;rows.push(...(data||[]));if((data||[]).length<500)break;offset+=500;
     }
+    // Older records without assignment_id are shown only when opened by their exact ID.
+    if(targetRecord&&!targetRecord.assignment_id&&targetRecord.client_id===id&&targetRecord.service_date===chosen){
+     const legacy=await db.from('care_records').select('id,client_id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).eq('id',targetRecord.id).maybeSingle();
+     if(!current()||seq!==dayRequest)return;if(legacy.error)throw legacy.error;
+     if(legacy.data&&!rows.some(r=>r.id===legacy.data.id))rows.push(legacy.data);
+    }
+    rows.sort((a,b)=>String(a.service_time).localeCompare(String(b.service_time))||String(a.id).localeCompare(String(b.id)));
     const authors=new Map(),authorIds=[...new Set(rows.map(r=>r.created_by).filter(Boolean))];
     for(let i=0;i<authorIds.length;i+=100){
      try{
@@ -64,13 +75,23 @@
     const groups=new Map();for(const row of rows){const key=String(row.service_time).slice(0,5);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
     for(const [time,records]of groups){
      const details=el('details');details.className='history-item';const summary=el('summary',time+' ／ '+records.length+'件');summary.style.cssText='padding:16px 4px;cursor:pointer;font-weight:700';details.append(summary);
-     records.forEach((row,i)=>{const article=el('article');article.style.cssText='border-top:1px solid #ddd;padding:12px 0;overflow-wrap:anywhere';article.append(el('strong',chosen+' '+time+' ／ 記録'+(i+1)+(row.service_type?' ／ '+row.service_type:'')));
+     records.forEach((row,i)=>{const article=el('article');article.style.cssText='border-top:1px solid #ddd;padding:12px 0;overflow-wrap:anywhere';article.dataset.recordId=row.id;article.append(el('strong',chosen+' '+time+' ／ 記録'+(i+1)+(row.service_type?' ／ '+row.service_type:'')));
       article.append(el('p','記録者：'+(authors.get(row.created_by)||'確認できません（退職・氏名未登録など）')));
       for(const [title,value]of [['訪問時の状態・様子・体調',row.visit_note],['支援中・介護者が実施したこと',row.care_note]]){article.append(el('h3',title));const p=el('p',value||'記載なし');p.style.cssText='white-space:pre-wrap;line-height:1.8';article.append(p);if(value)article.append(copyControl(title+'をコピー',value));}
       article.append(copyControl('この記録をまとめてコピー','【訪問時】\n'+(row.visit_note||'')+'\n\n【支援中】\n'+(row.care_note||'')));
       const saved=el('small','保存日時：'+new Date(row.created_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}));article.append(saved);details.append(article);
+      if(row.id===targetId){
+       details.open=true;article.classList.add('record-target');article.tabIndex=-1;article.style.cssText+=';border:3px solid #2563eb;border-radius:12px;background:#eff6ff;padding:14px;scroll-margin-top:24px';
+       const marker=el('p','✓ 今日の担当から開いた記録');marker.style.cssText='font-weight:800;color:#1d4ed8';article.prepend(marker);
+      }
      });list.append(details);
     }
+    const target=[...list.querySelectorAll('[data-record-id]')].find(n=>n.dataset.recordId===targetId);
+    if(revealTarget&&target){
+     revealTarget=false;openedTargets.add(member.organization_id+'|'+targetId);
+     requestAnimationFrame(()=>{if(current()&&seq===dayRequest&&target.isConnected){target.focus({preventScroll:true});target.scrollIntoView({block:'start',behavior:'auto'});}});
+    }
+    if(revealTarget&&!target){status.textContent='指定された保存済み記録を確認できません。今日の担当から開き直してください。';return;}
     status.textContent=chosen+'：'+(rows.length?groups.size+'枠・'+rows.length+'件（サービス予定時間順）':'担当割当から保存された記録はありません。');
    }catch(e){if(current()&&seq===dayRequest)status.textContent='記録を読み込めませんでした。「記録を更新」で再試行してください。';}
   }
@@ -92,6 +113,19 @@
    const {data,error}=await db.from('clients').select('id,code,display_name,is_active').eq('organization_id',member.organization_id).order('code');
    if(!current())return;if(error)throw error;select.append(new Option('利用者を選択',''));
    for(const c of data||[])select.append(new Option(c.code+(c.display_name?' '+c.display_name:'')+(c.is_active?'':'（利用終了）'),c.id));
+   if(revealTarget){
+    const result=await db.from('care_records').select('id,client_id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('id',targetId).maybeSingle();
+    if(!current())return;
+    const row=result.data,person=data?.find(c=>c.id===row?.client_id);
+    if(result.error||!row||!person||!row.service_date||!row.service_time||(link.get('assignment')&&row.assignment_id&&row.assignment_id!==link.get('assignment'))){
+     status.textContent='指定された保存済み記録を確認できません。削除・閲覧権限・選択中の事業所を確認し、今日の担当から開き直してください。';
+     host.tabIndex=-1;host.focus({preventScroll:true});host.scrollIntoView({block:'start'});return;
+    }
+    targetRecord=row;select.value=person.id;date.value=row.service_date;month=date.value.slice(0,7);
+    const userSelect=document.getElementById('user');
+    if(userSelect&&[...userSelect.options].some(o=>o.value===person.code)){userSelect.value=person.code;userSelect.dispatchEvent(new Event('change',{bubbles:true}));}
+    await loadMonth();return;
+   }
    const chosen=oldOrg===member.organization_id&&data?.some(c=>c.id===previous)?previous:data?.find(c=>c.code===document.getElementById('user')?.value)?.id;
    select.value=chosen||'';await loadMonth();
   }catch(e){if(current())status.textContent='利用者を読み込めませんでした。画面を再読み込みしてください。';}

@@ -90,7 +90,9 @@ async function loadToday(){
   const bad=[c,s,a,r,h,k,me].find(x=>x.error);if(bad)throw bad.error;
   const clients=c.data||[],slots=s.data||[],assignments=filterMyAssignments((a.data||[]).filter(x=>inAssignmentPeriod(x,period)),user.id,(me.data||[]).map(x=>x.id),scope).sort(chronologicalAssignments),records=r.data||[],handoffs=h.data||[];
   const cmap=new Map(clients.map(x=>[x.id,x])),smap=new Map(slots.map(x=>[`${x.client_id}|${hhmm(x.service_time)}`,x]));
-  const recorded=x=>records.some(z=>z.assignment_id===x.id||(z.client_id===x.client_id&&z.service_date===x.service_date&&hhmm(z.service_time)===hhmm(x.service_time)));
+  // Prefer the explicit assignment link; legacy time matching must never use another assignment's record.
+  records.sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+  const recorded=x=>records.find(z=>z.assignment_id===x.id&&z.client_id===x.client_id)||records.find(z=>!z.assignment_id&&z.client_id===x.client_id&&z.service_date===x.service_date&&hhmm(z.service_time)===hhmm(x.service_time));
   const todo=assignments.filter(x=>!recorded(x));
   $('#mAssign').textContent=assignments.length;$('#mTodo').textContent=todo.length;$('#mDone').textContent=assignments.length-todo.length;$('#mHandoff').textContent=handoffs.length;$('#mCash').textContent=(k.data||[]).length;
   $('#todoList').innerHTML=todo.length?todo.map(x=>assignmentRow(x,false,cmap,smap)).join(''):'<div class="empty">この勤務範囲の未記録はありません。</div>';
@@ -112,8 +114,8 @@ async function loadAttendanceToday(d){
  }catch(e){box.textContent='出勤簿を確認できません：'+e.message;}
 }
 function assignmentRow(x,done,cmap,smap){
-  const c=cmap.get(x.client_id),qs=new URLSearchParams({from:'assignment',assignment:x.id});
-  return `<div class="row"><div class="time"><div style="font-size:11px;margin-bottom:4px">${esc(fmtDate(x.service_date))}</div>${esc(hhmm(x.service_time).replace(/^0/,''))}</div><div><div class="name">${esc(clientLabel(c))}</div><div class="meta">担当：${esc(x.assigned_staff_name||'未設定')}${x.memo?`<br>${esc(x.memo)}`:''}</div></div><div class="actions"><span class="status${done?' done':''}">${done?'✓ 記録済み':'未記録'}</span>${done?'':`<a class="btn primary" href="../?${qs.toString()}">AI記録作成</a>`}</div></div>`
+  const c=cmap.get(x.client_id),qs=done?new URLSearchParams({from:'record',record:done.id,assignment:x.id}):new URLSearchParams({from:'assignment',assignment:x.id});
+  return `<div class="row"><div class="time"><div style="font-size:11px;margin-bottom:4px">${esc(fmtDate(x.service_date))}</div>${esc(hhmm(x.service_time).replace(/^0/,''))}</div><div><div class="name">${esc(clientLabel(c))}</div><div class="meta">担当：${esc(x.assigned_staff_name||'未設定')}${x.memo?`<br>${esc(x.memo)}`:''}</div></div><div class="actions"><span class="status${done?' done':''}">${done?'✓ 記録済み':'未記録'}</span><a class="btn primary" style="min-height:44px;margin:6px 0 0 8px;padding:12px" href="../?${qs.toString()}">${done?'記録を見る':'AI記録作成'}</a></div></div>`
 }
 async function refresh(){try{$('#loadingCard').classList.remove('hidden');$('#main').classList.add('hidden');await loadToday()}catch(e){console.error(e);showError(e.message||'読み込みに失敗しました。')}}
 $('#orgSwitch').onchange=async e=>{localStorage.setItem('activeOrganizationId',e.target.value);org=orgs.find(x=>x.id===e.target.value);await refresh()};$('#reloadBtn').onclick=refresh;$('#assignmentScope').onchange=refresh;

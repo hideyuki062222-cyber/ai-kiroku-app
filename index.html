@@ -205,7 +205,7 @@ function applyAssignmentContext(){
   h=h.replace('<div id="history">','<div id="history" style="scroll-margin-top:24px">');
   h=h.replace('<select id="user"', '<a href="#history" style="display:block;padding:12px 0;font-weight:700">利用者ごとの記録を確認 ↓</a><select id="user"');
   h=h.replace('作成履歴（クラウド共有）','利用者ごとの保存済み記録');
-  h=h.replace('</head>','<script src="./record-history.js?v=20261021-1"><\/script></head>');
+  h=h.replace('</head>','<script src="./record-history.js?v=20261021-record-link"><\/script></head>');
   h=h.replace('</body>','<script src="./common-nav.js?v=20261020-services"><\/script></body>');
   document.open();
   document.write(h);
