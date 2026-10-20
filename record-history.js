@@ -1,6 +1,20 @@
 (()=>{
  let serial=0;
  const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
+ const copyControl=(label,text)=>{
+  const wrap=el('div'),button=el('button',label),status=el('span');
+  button.type='button';button.style.cssText='margin:6px 8px 6px 0;min-height:44px';status.setAttribute('role','status');
+  button.onclick=async()=>{
+   button.disabled=true;status.textContent='';wrap.querySelector('textarea')?.remove();
+   try{
+    if(!navigator.clipboard?.writeText)throw new Error('clipboard unavailable');
+    await navigator.clipboard.writeText(text);status.textContent='コピーしました';
+   }catch(e){
+    status.textContent='自動コピーできませんでした。下の文章を選択してコピーしてください。';
+    const field=el('textarea');field.value=text;field.readOnly=true;field.setAttribute('aria-label',label+'用の文章');field.style.cssText='width:100%;min-height:120px';wrap.append(field);field.focus();field.select();
+   }finally{button.disabled=false;}
+  };wrap.append(button,status);return wrap;
+ };
  const japanToday=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  window.renderClientRecordHistory=async(db,member)=>{
   const host=document.getElementById('history');if(!host)return;
@@ -35,14 +49,25 @@
    try{
     let rows=[],offset=0;
     while(true){
-     const {data,error}=await db.from('care_records').select('id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).not('assignment_id','is',null).not('service_time','is',null).order('service_time',{ascending:true}).order('id',{ascending:true}).range(offset,offset+499);
+     const {data,error}=await db.from('care_records').select('id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).not('assignment_id','is',null).not('service_time','is',null).order('service_time',{ascending:true}).order('id',{ascending:true}).range(offset,offset+499);
      if(!current()||seq!==dayRequest)return;if(error)throw error;rows.push(...(data||[]));if((data||[]).length<500)break;offset+=500;
     }
+    const authors=new Map(),authorIds=[...new Set(rows.map(r=>r.created_by).filter(Boolean))];
+    for(let i=0;i<authorIds.length;i+=100){
+     try{
+      const result=await db.from('organization_members').select('user_id,staff_name').eq('organization_id',member.organization_id).in('user_id',authorIds.slice(i,i+100));
+      if(!current()||seq!==dayRequest)return;
+      if(!result.error)for(const person of result.data||[])if(person.staff_name?.trim())authors.set(person.user_id,person.staff_name.trim());
+     }catch(e){/* Keep the records visible; never substitute the assigned staff member. */}
+    }
+    if(!current()||seq!==dayRequest)return;
     const groups=new Map();for(const row of rows){const key=String(row.service_time).slice(0,5);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(row);}
     for(const [time,records]of groups){
      const details=el('details');details.className='history-item';const summary=el('summary',time+' ／ '+records.length+'件');summary.style.cssText='padding:16px 4px;cursor:pointer;font-weight:700';details.append(summary);
      records.forEach((row,i)=>{const article=el('article');article.style.cssText='border-top:1px solid #ddd;padding:12px 0;overflow-wrap:anywhere';article.append(el('strong',chosen+' '+time+' ／ 記録'+(i+1)+(row.service_type?' ／ '+row.service_type:'')));
-      for(const [title,value]of [['訪問時の状態・様子・体調',row.visit_note],['支援中・介護者が実施したこと',row.care_note]]){article.append(el('h3',title));const p=el('p',value||'記載なし');p.style.cssText='white-space:pre-wrap;line-height:1.8';article.append(p);}
+      article.append(el('p','記録者：'+(authors.get(row.created_by)||'確認できません（退職・氏名未登録など）')));
+      for(const [title,value]of [['訪問時の状態・様子・体調',row.visit_note],['支援中・介護者が実施したこと',row.care_note]]){article.append(el('h3',title));const p=el('p',value||'記載なし');p.style.cssText='white-space:pre-wrap;line-height:1.8';article.append(p);if(value)article.append(copyControl(title+'をコピー',value));}
+      article.append(copyControl('この記録をまとめてコピー','【訪問時】\n'+(row.visit_note||'')+'\n\n【支援中】\n'+(row.care_note||'')));
       const saved=el('small','保存日時：'+new Date(row.created_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}));article.append(saved);details.append(article);
      });list.append(details);
     }
