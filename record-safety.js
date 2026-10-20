@@ -174,10 +174,10 @@
       if(error||!a)throw error||new Error('担当情報がありません');
       const [{data:c,error:ce},{data:s,error:se}]=await Promise.all([
         db.from('clients').select('id,code,display_name').eq('id',a.client_id).eq('organization_id',a.organization_id).single(),
-        db.from('client_service_slots').select('label').eq('organization_id',a.organization_id).eq('client_id',a.client_id).eq('service_time',a.service_time).maybeSingle()
+        db.from('client_service_slots').select('label,service_contents').eq('organization_id',a.organization_id).eq('client_id',a.client_id).eq('service_time',a.service_time).maybeSingle()
       ]);
       if(ce||!c)throw ce||new Error('利用者情報がありません');
-      if(se)console.warn(se);
+      if(se)throw se;
       const ctx={assignmentId:a.id,client:c.code,date:a.service_date,time:String(a.service_time||'').slice(0,5),staff:a.assigned_staff_name||'',memo:a.memo||'',label:s?.label||'',clientId:c.id,organizationId:a.organization_id};
       window.assignmentContext=ctx;
       const card=q('assignmentContextCard'),text=q('assignmentContextText');if(card)card.classList.remove('hidden');
@@ -186,7 +186,12 @@
       if(userSel&&[...userSel.options].some(o=>o.value===ctx.client))userSel.value=ctx.client;
       if(profileSel&&[...profileSel.options].some(o=>o.value===ctx.client)){profileSel.value=ctx.client;try{window.loadProfile?.()}catch(_e){}}
       const input=q('input');if(input&&ctx.memo&&!input.value.trim()){input.value=ctx.memo;const cnt=q('inputCount');if(cnt)cnt.textContent=input.value.length+'文字'}
-      applyServiceLabel(ctx.label);
+      const serviceChecks=[...document.querySelectorAll('input[name="serviceContent"]')];
+      serviceChecks.forEach(cb=>{cb.checked=false;});
+      if(Array.isArray(s?.service_contents)){
+        serviceChecks.forEach(cb=>{cb.checked=s.service_contents.includes(cb.value);});
+      }else applyServiceLabel(ctx.label);
+      serviceChecks.forEach(cb=>cb.dispatchEvent(new Event('change',{bubbles:true})));
       history.replaceState(null,'',location.pathname+'?'+new URLSearchParams({from:'assignment',assignment:id}).toString());
     }catch(e){
       console.error('assignment context load failed',e);
