@@ -19,7 +19,7 @@
 <section class="card" id="loadingCard"><div class="loading">今日の情報を読み込んでいます…</div></section>
 <section class="card hidden" id="errorCard"><div class="error" id="errorText"></div><div style="margin-top:10px"><a class="btn primary" href="../">AI記録でログインする</a></div></section>
 <div id="main" class="hidden"><section class="card"><div class="section-head"><div class="section-title">自分の勤務・出勤簿</div><a class="btn primary" href="../attendance/">出勤簿を入力</a></div><div id="myAttendance">読み込み中…</div><div id="attendanceMissing" hidden></div></section>
-<section class="card"><label for="assignmentScope" style="font-weight:800">担当の表示</label> <select id="assignmentScope" class="org"><option value="mine">自分の担当だけ</option><option value="all">全員の担当</option></select><p class="sub">担当・未記録・記録済みの件数と一覧を切り替えます。申し送りは事業所共通です。</p><div class="metrics">
+<section class="card"><div class="toolbar" style="margin-bottom:12px;align-items:center"><label for="workPeriod">表示する勤務</label><select id="workPeriod" class="org"><option value="day">日勤（当日）</option><option value="night">夜勤（17:30〜翌9:30）</option></select><label for="workDate">勤務開始日</label><input id="workDate" class="org" type="date"></div><p class="sub" id="workPeriodLabel"></p><label for="assignmentScope" style="font-weight:800">担当の表示</label> <select id="assignmentScope" class="org"><option value="mine">自分の担当だけ</option><option value="all">全員の担当</option></select><p class="sub">担当・未記録・記録済みの件数と一覧を切り替えます。申し送りは事業所共通です。</p><div class="metrics">
   <div class="metric"><div class="k">今日の担当</div><div class="v" id="mAssign">0</div></div>
   <div class="metric alert"><div class="k">未記録</div><div class="v" id="mTodo">0</div></div>
   <div class="metric ok"><div class="k">記録済み</div><div class="v" id="mDone">0</div></div>
@@ -52,29 +52,53 @@ async function loadOrg(){
 function filterMyAssignments(rows,userId,staffIds,scope){
  return scope==='all'?rows:rows.filter(row=>row.assigned_user_id===userId||(!row.assigned_user_id&&staffIds.includes(row.assigned_staff_id)));
 }
+function addDateDays(date,days){return new Date(Date.parse(date+'T00:00:00Z')+days*86400000).toISOString().slice(0,10)}
+function nightStartDate(today,minutes){return minutes<=570?addDateDays(today,-1):today}
+function assignmentPeriod(mode,date){return {mode,start:date,end:mode==='night'?addDateDays(date,1):date}}
+function inAssignmentPeriod(row,period){
+ const time=String(row.service_time||'').slice(0,5);
+ if(period.mode!=='night')return row.service_date===period.start;
+ return (row.service_date===period.start&&time>='17:30')||(row.service_date===period.end&&time&&time<='09:30');
+}
+function chronologicalAssignments(a,b){return (a.service_date+'T'+a.service_time).localeCompare(b.service_date+'T'+b.service_time)}
+let todayLoadVersion=0;
+function initializeWorkPeriod(){
+ let mode='day';try{mode=localStorage.getItem('dashboardWorkPeriod')==='night'?'night':'day'}catch(e){}
+ $('#workPeriod').value=mode;setDefaultWorkDate();
+}
+function setDefaultWorkDate(){
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+ $('#workDate').value=$('#workPeriod').value==='night'?nightStartDate(jstDate(),Number(parts.hour)*60+Number(parts.minute)):jstDate();
+}
 async function loadToday(){
+  const version=++todayLoadVersion,selectedOrg=org.id,scope=$('#assignmentScope').value;
+  const period=assignmentPeriod($('#workPeriod').value,$('#workDate').value||jstDate());
+  const periodText=period.mode==='night'?fmtDate(period.start)+' 17:30 〜 '+fmtDate(period.end)+' 9:30':fmtDate(period.start)+'（当日）';
+  $('#workPeriodLabel').textContent='担当の表示範囲：'+periodText+'。出勤簿・申し送り・出納件数は本日分です。';
   const d=jstDate();$('#todayLabel').textContent=`${fmtDate(d)}　${org.name}`;
   const handoffFilter=`service_date.eq.${d},and(carry_over.eq.true,service_date.lt.${d})`;
   const [c,s,a,r,h,k,me]=await Promise.all([
     sb.from('clients').select('id,code,display_name').eq('organization_id',org.id).eq('is_active',true),
     sb.from('client_service_slots').select('client_id,service_time,label').eq('organization_id',org.id).eq('is_active',true),
-    sb.from('staff_assignments').select('id,client_id,service_date,service_time,assigned_staff_name,assigned_user_id,assigned_staff_id,memo').eq('organization_id',org.id).eq('service_date',d),
-    sb.from('care_records').select('id,assignment_id,client_id,service_date,service_time').eq('organization_id',org.id).eq('service_date',d),
+    sb.from('staff_assignments').select('id,client_id,service_date,service_time,assigned_staff_name,assigned_user_id,assigned_staff_id,memo').eq('organization_id',selectedOrg).gte('service_date',period.start).lte('service_date',period.end),
+    sb.from('care_records').select('id,assignment_id,client_id,service_date,service_time').eq('organization_id',selectedOrg).gte('service_date',period.start).lte('service_date',period.end),
     sb.from('handoff_entries').select('id,client_id,service_date,body,is_important,carry_over,due_date,due_time,scope,resolved').eq('organization_id',org.id).eq('resolved',false).or(handoffFilter).limit(50),
     sb.from('cashbook_entries').select('id').eq('organization_id',org.id).eq('tx_date',d),
     sb.from('organization_staff').select('id').eq('organization_id',org.id).eq('linked_user_id',user.id).eq('is_active',true)
   ]);
+  if(version!==todayLoadVersion||org.id!==selectedOrg)return;
   const bad=[c,s,a,r,h,k,me].find(x=>x.error);if(bad)throw bad.error;
-  const clients=c.data||[],slots=s.data||[],assignments=filterMyAssignments(a.data||[],user.id,(me.data||[]).map(x=>x.id),$('#assignmentScope').value).sort((x,y)=>order(x.service_time)-order(y.service_time)),records=r.data||[],handoffs=h.data||[];
+  const clients=c.data||[],slots=s.data||[],assignments=filterMyAssignments((a.data||[]).filter(x=>inAssignmentPeriod(x,period)),user.id,(me.data||[]).map(x=>x.id),scope).sort(chronologicalAssignments),records=r.data||[],handoffs=h.data||[];
   const cmap=new Map(clients.map(x=>[x.id,x])),smap=new Map(slots.map(x=>[`${x.client_id}|${hhmm(x.service_time)}`,x]));
   const recorded=x=>records.some(z=>z.assignment_id===x.id||(z.client_id===x.client_id&&z.service_date===x.service_date&&hhmm(z.service_time)===hhmm(x.service_time)));
   const todo=assignments.filter(x=>!recorded(x));
   $('#mAssign').textContent=assignments.length;$('#mTodo').textContent=todo.length;$('#mDone').textContent=assignments.length-todo.length;$('#mHandoff').textContent=handoffs.length;$('#mCash').textContent=(k.data||[]).length;
-  $('#todoList').innerHTML=todo.length?todo.map(x=>assignmentRow(x,false,cmap,smap)).join(''):'<div class="empty">今日の未記録はありません。</div>';
-  $('#assignList').innerHTML=assignments.length?assignments.map(x=>assignmentRow(x,recorded(x),cmap,smap)).join(''):'<div class="empty">今日の担当登録はありません。</div>';
+  $('#todoList').innerHTML=todo.length?todo.map(x=>assignmentRow(x,false,cmap,smap)).join(''):'<div class="empty">この勤務範囲の未記録はありません。</div>';
+  $('#assignList').innerHTML=assignments.length?assignments.map(x=>assignmentRow(x,recorded(x),cmap,smap)).join(''):'<div class="empty">この勤務範囲の担当登録はありません。</div>';
   handoffs.sort((x,y)=>Number(y.is_important)-Number(x.is_important)||String(x.due_date||x.service_date).localeCompare(String(y.due_date||y.service_date)));
   $('#handoffList').innerHTML=handoffs.length?handoffs.slice(0,8).map(x=>`<div class="row handoff${x.is_important?' important':''}" style="grid-template-columns:1fr"><div><div class="name">${x.is_important?'重要・':''}${x.scope==='general'?'全体':esc(clientLabel(cmap.get(x.client_id)))}</div><div class="meta">${esc(fmtDate(x.service_date))}${x.due_date?`　期限 ${esc(fmtDate(x.due_date))}${x.due_time?' '+esc(hhmm(x.due_time)):''}`:''}</div><div class="body">${esc(x.body)}</div></div></div>`).join(''):'<div class="empty">未対応の申し送りはありません。</div>';
   await loadAttendanceToday(d);
+  if(version!==todayLoadVersion||org.id!==selectedOrg)return;
   $('#loadingCard').classList.add('hidden');$('#errorCard').classList.add('hidden');$('#main').classList.remove('hidden');
 }
 async function loadAttendanceToday(d){
@@ -89,10 +113,11 @@ async function loadAttendanceToday(d){
 }
 function assignmentRow(x,done,cmap,smap){
   const c=cmap.get(x.client_id),qs=new URLSearchParams({from:'assignment',assignment:x.id});
-  return `<div class="row"><div class="time">${esc(hhmm(x.service_time).replace(/^0/,''))}</div><div><div class="name">${esc(clientLabel(c))}</div><div class="meta">担当：${esc(x.assigned_staff_name||'未設定')}${x.memo?`<br>${esc(x.memo)}`:''}</div></div><div class="actions"><span class="status${done?' done':''}">${done?'✓ 記録済み':'未記録'}</span>${done?'':`<a class="btn primary" href="../?${qs.toString()}">AI記録作成</a>`}</div></div>`
+  return `<div class="row"><div class="time"><div style="font-size:11px;margin-bottom:4px">${esc(fmtDate(x.service_date))}</div>${esc(hhmm(x.service_time).replace(/^0/,''))}</div><div><div class="name">${esc(clientLabel(c))}</div><div class="meta">担当：${esc(x.assigned_staff_name||'未設定')}${x.memo?`<br>${esc(x.memo)}`:''}</div></div><div class="actions"><span class="status${done?' done':''}">${done?'✓ 記録済み':'未記録'}</span>${done?'':`<a class="btn primary" href="../?${qs.toString()}">AI記録作成</a>`}</div></div>`
 }
 async function refresh(){try{$('#loadingCard').classList.remove('hidden');$('#main').classList.add('hidden');await loadToday()}catch(e){console.error(e);showError(e.message||'読み込みに失敗しました。')}}
 $('#orgSwitch').onchange=async e=>{localStorage.setItem('activeOrganizationId',e.target.value);org=orgs.find(x=>x.id===e.target.value);await refresh()};$('#reloadBtn').onclick=refresh;$('#assignmentScope').onchange=refresh;
+$('#workPeriod').onchange=()=>{try{localStorage.setItem('dashboardWorkPeriod',$('#workPeriod').value)}catch(e){}setDefaultWorkDate();refresh()};$('#workDate').onchange=()=>{if($('#workDate').value)refresh()};initializeWorkPeriod();
 (async()=>{try{await loadOrg();await loadToday();setInterval(()=>{if(org)loadToday().catch(()=>{})},60000)}catch(e){console.error(e);showError(e.message||'読み込みに失敗しました。')}})();
 </script>
 </body>
