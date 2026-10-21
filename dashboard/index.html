@@ -32,6 +32,7 @@
 </div>
 </div>
 <script src="../common-nav.js?v=20261019-attendance"></script>
+<script src="../dashboard-return.js?v=20261021-1"></script>
 <script>
 const CFG={url:'https://pagamoaxhqszojxrpxyu.supabase.co',key:'sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT'};
 const sb=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -64,7 +65,7 @@ function chronologicalAssignments(a,b){return (a.service_date+'T'+a.service_time
 let todayLoadVersion=0;
 function initializeWorkPeriod(){
  let mode='day';try{mode=localStorage.getItem('dashboardWorkPeriod')==='night'?'night':'day'}catch(e){}
- $('#workPeriod').value=mode;setDefaultWorkDate();
+ $('#workPeriod').value=mode;setDefaultWorkDate();window.restoreDashboardView?.();
 }
 function setDefaultWorkDate(){
  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
@@ -101,7 +102,7 @@ async function loadToday(){
   $('#handoffList').innerHTML=handoffs.length?handoffs.slice(0,8).map(x=>`<div class="row handoff${x.is_important?' important':''}" style="grid-template-columns:1fr"><div><div class="name">${x.is_important?'重要・':''}${x.scope==='general'?'全体':esc(clientLabel(cmap.get(x.client_id)))}</div><div class="meta">${esc(fmtDate(x.service_date))}${x.due_date?`　期限 ${esc(fmtDate(x.due_date))}${x.due_time?' '+esc(hhmm(x.due_time)):''}`:''}</div><div class="body">${esc(x.body)}</div></div></div>`).join(''):'<div class="empty">未対応の申し送りはありません。</div>';
   await loadAttendanceToday(d);
   if(version!==todayLoadVersion||org.id!==selectedOrg)return;
-  $('#loadingCard').classList.add('hidden');$('#errorCard').classList.add('hidden');$('#main').classList.remove('hidden');
+  $('#loadingCard').classList.add('hidden');$('#errorCard').classList.add('hidden');$('#main').classList.remove('hidden');document.dispatchEvent(new Event('dashboard-ready'));
 }
 async function loadAttendanceToday(d){
  const box=$('#myAttendance'),missing=$('#attendanceMissing');box.textContent='読み込み中…';missing.hidden=true;missing.replaceChildren();
