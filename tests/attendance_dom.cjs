@@ -27,7 +27,21 @@ async function scenario(admin){
  assert.equal(read('rows[0].s'),540);assert.equal(read('cloudDirty()'),true);
  await read('cloudSave()');assert.equal(records.length,1);assert.equal(records[0].rows[0].h,'保存テスト');assert.equal(read('cloudDirty()'),false);
  await read('cloudLoad()');assert.equal(read('rows[0].h'),'保存テスト');
- if(admin){el('nextStaff').click();assert.equal(read('rows[0].s'),null);el('prevStaff').click();assert.equal(read('rows[0].h'),'保存テスト');}
+ if(admin){
+  el('nextStaff').click();assert.equal(read('rows[0].s'),null);
+  assert.equal(read('cloudDirty()'),false,'staff navigation must not mark data dirty');
+  const selected=read('cloudPaths.get(current.path)'),period=read('cloudPeriod()');
+  await el('cloudReload').onclick();
+  assert.equal(read('cloudPaths.get(current.path)'),selected,'reload must preserve staff');
+  assert.equal(read('cloudPeriod()'),period,'reload must preserve month');
+  assert.equal(read('cloudDirty()'),false);
+  el('prevStaff').click();assert.equal(read('rows[0].h'),'保存テスト');
+  assert.equal(read('cloudDirty()'),false);
+  el('memo').value='未保存の実変更';el('nextStaff').click();
+  assert.equal(read('cloudDirty()'),true,'navigation must preserve real unsaved changes');
+  el('prevStaff').click();assert.equal(el('memo').value,'未保存の実変更');
+  el('memo').value='';assert.equal(read('cloudDirty()'),false);
+ }
  el('memo').value='通信失敗';fail=true;assert.equal(await read('cloudSave()'),false);assert.equal(read('cloudDirty()'),true);assert.match(el('cloudNotice').textContent,/保存できません/);fail=false;
  records[0].revision++;assert.equal(await read('cloudSave()'),false);assert.match(el('cloudNotice').textContent,/別の端末/);
  await read('cloudLoad()');assert.equal(el('memo').value,'');

@@ -4,7 +4,8 @@ let cloudUser,cloudOrg,cloudMemberships=[],cloudOrgs=[],cloudStaff=[],cloudRecor
 const cloudPeriod=()=>`${$('year').value}-${String($('month').value).padStart(2,'0')}-01`;
 const cloudAdmin=()=>cloudMemberships.find(m=>m.organization_id===cloudOrg?.id)?.role==='admin';
 const cloudPayload=()=>{remember();return sheets.map(s=>({staff:cloudPaths.get(s.path),draft:drafts[s.path]})).filter(x=>x.staff&&x.draft)};
-const cloudSignature=()=>JSON.stringify(cloudPayload());
+// DOM controls return strings; compare normalized dates so navigation is not an edit.
+const cloudSignature=()=>JSON.stringify(cloudPayload().map(({staff,draft})=>({staff,draft:{...draft,year:Number(draft.year),month:Number(draft.month)}})));
 const cloudDirty=()=>cloudReady&&cloudSignature()!==cloudBaseline;
 function cloudStatus(message){$('cloudNotice').textContent=message;$('autosaveStatus').textContent=message;}
 function cloudLock(value){cloudBusy=value;document.body.classList.toggle('cloud-busy',value);for(const id of ['cloudSave','cloudReload','cloudOrg','cloudPrint','export','upload'])$(id).disabled=value;}
@@ -57,7 +58,7 @@ async function cloudSave(){
 }
 async function cloudCanLeave(){if(!cloudDirty())return true;return confirm('未保存の変更があります。破棄して移動しますか？（保存する場合はキャンセルしてください）');}
 $('cloudSave').onclick=cloudSave;
-$('cloudReload').onclick=async()=>{if(await cloudCanLeave())cloudLoad().catch(e=>cloudStatus(e.message));};
+$('cloudReload').onclick=async()=>{if(await cloudCanLeave())await cloudLoad(cloudPeriod(),cloudPaths.get(current?.path)).catch(e=>cloudStatus(e.message));};
 for(const id of ['year','month'])$(id).onchange=async()=>{
  const year=$('year').value,month=$('month').value;$('year').value=shownYear;$('month').value=shownMonth;
  if(!Number.isInteger(+year)||+year<2000||+year>2100||+month<1||+month>12){alert('年月を確認してください。');return;}
