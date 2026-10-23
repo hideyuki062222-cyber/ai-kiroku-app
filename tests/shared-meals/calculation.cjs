@@ -1,0 +1,9 @@
+const assert=require('node:assert/strict'),C=require('../../shared-meals/core.js');
+assert.equal(C.days('2028-02').length,29);assert.equal(C.days('2026-02').length,28);assert.equal(C.days('2026-12').at(-1),'2026-12-31');
+const p={start_date:'2026-10-01',end_date:'2026-10-31',morning:true,lunch:false,evening:true,weekdays:[1,2,3,4,5]};
+assert.equal(C.expected(p,'2026-10-23','morning'),true);assert.equal(C.expected(p,'2026-10-24','morning'),false);assert.equal(C.expected(p,'2026-10-23','lunch'),false);assert.equal(C.expected(p,'2026-11-02','morning'),false);
+const t=C.totals([{meal:'morning',status:'served',unit_price:330},{meal:'lunch',status:'served',unit_price:440},{meal:'evening',status:'served',unit_price:550},{meal:'evening',status:'absent',unit_price:550},{meal:'morning',status:'planned',unit_price:330}]);assert.equal(t.amount,1320);assert.equal(t.absent,1);assert.equal(t.pending,1);assert.equal(t.evening,1);
+assert.equal(C.price([{effective_date:'2026-11-01',morning:400}],'2026-10-23','morning'),330);assert.equal(C.price([{effective_date:'2026-11-01',morning:400}],'2026-11-01','morning'),400);assert.ok(C.csvCell('=cmd').startsWith('"\''));console.log('PASS meal totals, absence, pending, effective dates, schedules, leap year, CSV escaping');
+
+const mixed=C.totals([{meal:'morning',status:'served',unit_price:330},{meal:'morning',status:'served',unit_price:350},{meal:'lunch',status:'served',unit_price:440},{meal:'evening',status:'served',unit_price:550},{meal:'lunch',status:'absent',unit_price:440},{meal:'evening',status:'planned',unit_price:550}]);
+assert.deepEqual(mixed.amounts,{morning:680,lunch:440,evening:550});assert.equal(Object.values(mixed.amounts).reduce((a,b)=>a+b,0),mixed.amount);assert.deepEqual(C.totals([]).amounts,{morning:0,lunch:0,evening:0});console.log('PASS meal subtotals: mixed historical prices, absent/planned exclusion, zero rows');

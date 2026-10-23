@@ -1,0 +1,10 @@
+const {JSDOM,VirtualConsole}=require(process.env.JSDOM_PATH||'jsdom'),fs=require('node:fs'),assert=require('node:assert/strict');
+const html=fs.readFileSync('shared-meals/index.html','utf8').replace(/<script[^>]*>[\s\S]*?<\/script>/g,'');
+const make=()=>new JSDOM(html,{url:'https://meal.example.test/',runScripts:'dangerously',beforeParse(w){w.confirm=()=>true;w.print=()=>{};}});
+const inject=(w,p)=>{const s=w.document.createElement('script');s.textContent=fs.readFileSync(p,'utf8');w.document.body.append(s);};
+(async()=>{let dom=make(),w=dom.window;w.MEAL_CONFIG={};inject(w,'shared-meals/connection.js');inject(w,'shared-meals/core.js');inject(w,'shared-meals/app.js');assert.equal(w.mealDB,null);assert.match(w.document.querySelector('#gate h2').textContent,/接続設定が未完了/);dom.window.close();
+dom=make();w=dom.window;inject(w,'tests/shared-meals/fixture.js');w.mealDB=w.supabase.createClient();inject(w,'shared-meals/core.js');inject(w,'shared-meals/app.js');const tick=()=>new Promise(r=>setTimeout(r,10));for(let i=0;i<100&&w.document.getElementById('app').hidden;i++)await tick();assert.equal(w.document.getElementById('app').hidden,false);
+let el=w.document.querySelector('[data-status]');el.value='served';el.dispatchEvent(new w.Event('change'));await tick();assert.equal(w.mealTest.data.sm_meal_entries[0].status,'served');w.document.querySelector('[data-tab="bill"]').click();assert.match(w.document.getElementById('view').textContent,/朝食代合計/);assert.match(w.document.getElementById('view').textContent,/330円/);w.document.getElementById('printBill').click();assert.match(w.document.getElementById('print').textContent,/朝食代合計/);
+w.document.querySelector('[data-tab="settings"]').click();assert.ok(w.document.getElementById('profileForm'));assert.ok(w.document.getElementById('residentForm'));
+assert.equal(w.document.querySelectorAll('a[href^="../"]').length,0);dom.window.close();console.log('PASS UI: unconfigured fail-closed, standalone links, shared save, meal subtotals, print, resident settings');
+})().catch(e=>{console.error(e);process.exitCode=1;});
