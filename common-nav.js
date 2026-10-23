@@ -7,7 +7,8 @@
     ['handoff','申し送り',BASE+'handoff/'],
     ['record','AI記録',BASE],
     ['attendance','出勤簿',ATTENDANCE],
-    ['cashbook','出納帳',BASE+'cashbook/']
+    ['cashbook','出納帳',BASE+'cashbook/'],
+    ['meals','食事管理',BASE+'meals/']
   ];
   const SENSITIVE_CACHE_KEYS=['aiKirokuUsers','aiKirokuProfiles','activeOrganizationId'];
 
@@ -43,6 +44,7 @@
     if(p.includes('/handoff/')) return 'handoff';
     if(p.includes('/cashbook/')) return 'cashbook';
     if(p.includes('/attendance/')) return 'attendance';
+    if(p.includes('/meals/')) return 'meals';
     if(p.includes('/staff/')) return 'staff';
     return 'record';
   }
