@@ -1,0 +1,35 @@
+-- Transactional test: always ROLLBACK. No real meal records are retained.
+create temp table meal_test as select m.organization_id org,m.user_id admin,(select s.user_id from public.organization_members s where s.organization_id=m.organization_id and s.role='staff' limit 1) staff,gen_random_uuid() client from public.organization_members m where m.role='admin' and exists(select 1 from public.organization_members s where s.organization_id=m.organization_id and s.role='staff') limit 1;
+grant select on meal_test to authenticated;
+create function pg_temp.meal_assert(ok boolean,msg text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception 'FAIL: %',msg;end if;end$$;
+select pg_temp.meal_assert((select count(*)=1 from meal_test),'test membership');
+select set_config('request.jwt.claim.sub',(select admin::text from meal_test),true);
+set local role authenticated;
+insert into public.clients(id,organization_id,code,display_name) select client,org,'meal-test-'||client,'食事検証（ロールバック）' from meal_test;
+insert into public.meal_profiles(client_id,organization_id,start_date) select client,org,date '2026-01-01' from meal_test;
+insert into public.meal_entries(organization_id,client_id,meal_date,meal,status,unit_price) select org,client,date '2026-01-01','morning','served',1 from meal_test;
+select pg_temp.meal_assert((select unit_price=330 and rice_grams=150 and revision=1 from public.meal_entries where client_id=(select client from meal_test)),'server-derived snapshots');
+select set_config('request.jwt.claim.sub',(select staff::text from meal_test),true);
+update public.meal_entries set status='absent',unit_price=999 where client_id=(select client from meal_test) and revision=1;
+select pg_temp.meal_assert((select unit_price=330 and revision=2 and updated_by=(select staff from meal_test) from public.meal_entries where client_id=(select client from meal_test)),'staff update and price protection');
+do $$declare n integer;begin update public.meal_entries set status='served' where client_id=(select client from meal_test) and revision=1;get diagnostics n=row_count;if n<>0 then raise exception 'stale update';end if;update public.meal_profiles set food_form='BAD' where client_id=(select client from meal_test);get diagnostics n=row_count;if n<>0 then raise exception 'staff settings write';end if;end$$;
+select public.meal_fill_month((select org from meal_test),date '2026-01-01',(select client from meal_test));
+select pg_temp.meal_assert((select count(*)=93 from public.meal_entries where client_id=(select client from meal_test)),'31 days x 3');
+select pg_temp.meal_assert((select status='absent' from public.meal_entries where client_id=(select client from meal_test) and meal_date='2026-01-01' and meal='morning'),'fill preserves absence');
+select pg_temp.meal_assert(public.meal_fill_month((select org from meal_test),date '2026-01-01',(select client from meal_test))=0,'idempotent fill');
+do $$begin
+ begin insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) select org,client,date '2099-01-01','morning','served' from meal_test;raise exception 'future accepted';exception when raise_exception then if SQLERRM='future accepted' then raise;end if;end;
+ begin update public.meal_entries set meal='bad' where client_id=(select client from meal_test);raise exception 'identity changed';exception when raise_exception then if SQLERRM='identity changed' then raise;end if;end;
+ begin delete from public.meal_entries where client_id=(select client from meal_test);raise exception 'delete accepted';exception when insufficient_privilege then null;end;
+end$$;
+reset role;
+select set_config('request.jwt.claim.sub',gen_random_uuid()::text,true);
+set local role authenticated;
+select pg_temp.meal_assert((select count(*)=0 from public.meal_entries),'nonmember denied');
+reset role;
+select set_config('request.jwt.claim.sub','',true);
+set local role anon;
+do $$begin begin perform * from public.meal_entries;raise exception 'anon accepted';exception when insufficient_privilege then null;end;end$$;
+reset role;
+select pg_temp.meal_assert((select count(*)>=94 from meal_history.changes),'audit retained');
+select 'PASS: staff/admin RLS, anonymous/nonmember isolation, immutable identity, snapshot price, conflict, monthly fill and audit' as result;
