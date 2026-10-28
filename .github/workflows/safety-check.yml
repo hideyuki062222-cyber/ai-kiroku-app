@@ -33,6 +33,8 @@ jobs:
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
+      - name: Check HTML inline JavaScript syntax
+        run: node tests/html_inline_syntax.cjs
       - name: Check navigation consistency
         run: node tests/navigation_consistency.cjs
       - name: Install test runner
