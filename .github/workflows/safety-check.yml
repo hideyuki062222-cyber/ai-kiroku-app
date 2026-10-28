@@ -26,12 +26,17 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check common-nav.js
+          node --check admin-link.js
           node --check client-room-ui.js
           node --check record-safety.js
           node --check assignment-context-guard.js
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
+      - name: Check HTML inline JavaScript syntax
+        run: node tests/html_inline_syntax.cjs
+      - name: Check navigation consistency
+        run: node tests/navigation_consistency.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
       - name: Run safety contract tests
