@@ -34,7 +34,7 @@
 <script>
 const CFG={url:'https://pagamoaxhqszojxrpxyu.supabase.co',key:'sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT'};
 const db=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[m]));
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 let session=null,memberships=[],orgs=[],org=null,membership=null,staffRows=[],memberRows=[];
 $('#loginBtn').onclick=async()=>{const {error}=await db.auth.signInWithPassword({email:$('#email').value.trim(),password:$('#password').value});$('#authStatus').textContent=error?error.message:'';if(!error)location.reload()};
 async function init(){const {data:{session:s}}=await db.auth.getSession();session=s;if(!session){$('#auth').classList.remove('hidden');return}const m=await db.from('organization_members').select('organization_id,user_id,role,staff_name,created_at').eq('user_id',session.user.id).order('created_at');if(m.error||!m.data?.length){$('#denied').classList.remove('hidden');return}memberships=m.data;const ids=memberships.map(x=>x.organization_id);const o=await db.from('organizations').select('id,name,is_active').in('id',ids);if(o.error)throw o.error;orgs=(o.data||[]).filter(x=>x.is_active);const saved=localStorage.getItem('activeOrganizationId');org=orgs.find(x=>x.id===saved)||orgs[0];if(!org){$('#denied').classList.remove('hidden');return}membership=memberships.find(x=>x.organization_id===org.id);renderOrgSwitch();await loadCurrent();}
