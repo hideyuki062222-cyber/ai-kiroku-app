@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#17365d">
+<meta name="theme-color" content="#111827">
 <title>事業所管理</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="../common-theme.css?v=20261028-1">
 <style>
 *{box-sizing:border-box}
-:root{--navy:#17365d;--blue:#2d6cdf;--bg:#f3f6fa;--line:#dbe3ed;--muted:#6b7788;--text:#172033;--red:#a7253a;--green:#16683f;--amber:#9a6500}
+:root{--navy:#111827;--blue:#2d6cdf;--bg:#f5f7fb;--line:#e2e8f0;--muted:#667085;--text:#172033;--red:#a7253a;--green:#16683f;--amber:#9a6500}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;background:var(--bg);color:var(--text)}
 .hidden{display:none!important}.top{background:#fff;border-bottom:1px solid var(--line);padding:10px 12px;position:sticky;top:0;z-index:20}.topline{max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:19px;font-weight:900}.sub,.small{font-size:12px;color:var(--muted);line-height:1.55}
 .app-nav{display:flex;gap:3px;background:#eef2f7;border-radius:12px;padding:3px;overflow-x:auto;scrollbar-width:none}.app-nav::-webkit-scrollbar{display:none}.app-tab{text-decoration:none;color:#506078;padding:8px 9px;border-radius:9px;font-size:12px;font-weight:850;white-space:nowrap}.app-tab:hover{background:#fff}
@@ -23,7 +24,7 @@ label{display:block;font-size:13px;font-weight:900;margin:0 0 5px}.field{margin:
 </head>
 <body>
 <div id="auth" class="auth hidden"><div class="authbox"><h2 style="margin-top:0">事業所管理</h2><div class="small">AI記録・申し送り・出納帳と同じアカウントです。</div><input id="email" type="email" placeholder="メールアドレス"><input id="password" type="password" placeholder="パスワード"><div class="row"><button class="btn primary" onclick="login()">ログイン</button><button class="btn" onclick="location.href='../'">閉じる</button></div><div id="authStatus" class="status"></div></div></div>
-<header class="top"><div class="topline"><div><div class="brand">事業所管理</div><div class="sub">事業所・職員・利用者をまとめて管理</div></div><nav class="app-nav" aria-label="メインメニュー"><a class="app-tab" href="../dashboard/">今日</a><a class="app-tab" href="../assignment/">担当割当</a><a class="app-tab" href="../handoff/">申し送り</a><a class="app-tab" href="../">AI記録</a><a class="app-tab" href="../cashbook/">出納帳</a></nav></div></header>
+<header class="top"><div class="topline"><div><div class="brand">事業所管理</div><div class="sub">事業所・職員・利用者をまとめて管理</div></div><nav class="app-nav"></nav></div></header>
 <main id="app" class="wrap hidden">
 <section class="card"><div class="title">現在の事業所</div><select id="orgSwitch" class="org-switch" onchange="switchOrg(this.value)"></select><div id="currentRole" class="status"></div></section>
 <section class="card"><div class="title">事業所を追加・参加</div><div class="field"><label>新しい事業所名</label><input id="newOrgName" maxlength="120" placeholder="例：COZY〇〇"></div><button class="btn primary" onclick="createOrg()">新しい事業所を作成</button><div class="divider"></div><div class="field"><label>既存事業所の参加コード</label><input id="joinCode" maxlength="16" placeholder="16文字の参加コード"></div><button class="btn" onclick="joinOrg()">参加コードで参加</button><div id="orgActionStatus" class="status"></div></section>
@@ -60,5 +61,6 @@ async function editResident(id){if(activeMembership?.role!=='admin')return;const
 async function retireResident(id){if(activeMembership?.role!=='admin')return;const x=clients.find(c=>c.id===id);if(!x||!x.is_active)return;if(!confirm('「'+roomLabel(x)+'」を退去扱いにしますか？\n過去のAI記録・申し送り・出納帳は削除されません。'))return;const {error}=await db.from('clients').update({is_active:false,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',activeOrg.id);if(error){document.getElementById('clientStatus').textContent='退去処理できませんでした: '+error.message;return}document.getElementById('clientStatus').textContent='退去済みにしました。過去記録は保持されています。';await loadClients()}
 init();
 </script>
+<script src="../common-nav.js?v=20261028-ui"></script>
 </body>
 </html>
