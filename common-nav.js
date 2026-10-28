@@ -77,7 +77,7 @@
     const key=currentKey();
     loadStyle('brookCommonTheme',THEME);
     loadScript('adminLinkScript',BASE+'admin-link.js?v=20261028-2');
-    if(['record','assignment','handoff','cashbook'].includes(key)) loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
+    if(['record','assignment','cashbook'].includes(key)) loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
     if(key==='record'){
       lockAssignmentFlowButtons();
       loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
