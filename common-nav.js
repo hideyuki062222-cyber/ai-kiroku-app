@@ -46,6 +46,7 @@
     if(p.includes('/attendance/')) return 'attendance';
     if(p.includes('/meals/')) return 'meals';
     if(p.includes('/staff/')) return 'staff';
+    if(p.includes('/admin/')) return 'admin';
     return 'record';
   }
   function assignmentFlowRequested(){
@@ -67,6 +68,7 @@
   }
   function loadPageAddons(){
     const key=currentKey();
+    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261028-1');
     loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
     if(key==='record'){
       lockAssignmentFlowButtons();
