@@ -1,6 +1,7 @@
 (()=>{
   const BASE='/ai-kiroku-app/';
   const ATTENDANCE=BASE+'attendance/';
+  const THEME=BASE+'common-theme.css?v=20261028-1';
   const items=[
     ['today','今日',BASE+'dashboard/'],
     ['assignment','担当割当',BASE+'assignment/'],
@@ -45,7 +46,8 @@
     if(p.includes('/cashbook/')) return 'cashbook';
     if(p.includes('/attendance/')) return 'attendance';
     if(p.includes('/meals/')) return 'meals';
-    if(p.includes('/staff/')) return 'staff';
+    if(p.includes('/staff/')) return 'admin';
+    if(p.includes('/manage/')) return 'admin';
     if(p.includes('/admin/')) return 'admin';
     return 'record';
   }
@@ -66,10 +68,16 @@
     const s=document.createElement('script');
     s.id=id;s.src=src;document.head.appendChild(s);
   }
+  function loadStyle(id,href){
+    if(document.getElementById(id)) return;
+    const l=document.createElement('link');
+    l.id=id;l.rel='stylesheet';l.href=href;document.head.appendChild(l);
+  }
   function loadPageAddons(){
     const key=currentKey();
-    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261028-1');
-    loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
+    loadStyle('brookCommonTheme',THEME);
+    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261028-2');
+    if(['record','assignment','handoff','cashbook'].includes(key)) loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
     if(key==='record'){
       lockAssignmentFlowButtons();
       loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
