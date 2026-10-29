@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {createHandler} from '../../recruitment/server/handler.mjs';
+const env={BROOK_ALLOWED_ORIGINS:'https://jobs.example.invalid',BROOK_INTAKE_ENABLED:'true',TURNSTILE_SECRET_KEY:'fixture-secret',BROOK_CONTACT_HASH_SECRET:'fixture-hmac',SUPABASE_URL:'https://db.example.invalid',SUPABASE_SERVICE_ROLE_KEY:'fixture-service'};
+const body={request_id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',job_id:'33333333-3333-4333-8333-333333333330',full_name:'Test only',email:'test@example.invalid',phone:'',qualifications:'',message:'',consent:true,privacy_version:'v1',captcha_token:'test-token'};
+let dbCalls=0,checkCalls=0;
+const mock=async(url,options)=>{if(url.includes('siteverify')){checkCalls++;return Response.json({success:true,hostname:'jobs.example.invalid',action:'brook_apply'});}dbCalls++;const payload=JSON.parse(options.body);assert(!JSON.stringify(payload).includes('test-token'));assert.equal(payload.p_contact_hash.length,64);assert.equal(payload.p_payload_hash.length,64);return Response.json('dddddddd-dddd-4ddd-8ddd-dddddddddddd');};
+const req=(b=body,origin=env.BROOK_ALLOWED_ORIGINS)=>new Request('https://function.example.invalid',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify(b)});
+let n=0;async function expect(handler,request,status){const res=await handler(request);assert.equal(res.status,status);assert.equal(res.headers.get('Cache-Control'),'no-store');n++;return res;}
+const h=createHandler(env,mock);
+await expect(h,req(),201);assert.equal(dbCalls,1);
+await expect(createHandler({...env,BROOK_INTAKE_ENABLED:'false'},mock),req(),503);
+await expect(h,req(body,'https://evil.invalid'),403);
+await expect(h,req({...body,consent:false}),400);
+await expect(h,req({...body,email:'',phone:''}),400);
+await expect(h,req({...body,website:'bot'}),400);
+await expect(h,req({...body,captcha_token:''}),400);
+await expect(h,req({...body,message:'x'.repeat(20000)}),413);
+await expect(h,req(null),400);
+await expect(createHandler(env,async()=>Response.json({success:true,hostname:'evil.invalid',action:'brook_apply'})),req(),400);
+await expect(createHandler(env,async()=>Response.json({success:true,hostname:'jobs.example.invalid',action:'wrong'})),req(),400);
+await expect(createHandler(env,async()=>{throw Error('offline')}),req(),503);
+assert.equal(dbCalls,1,'invalid or blocked input never reaches database');
+const failDB=async(url,o)=>url.includes('siteverify')?mock(url,o):Response.json({message:'rate limit'},{status:400});
+await expect(createHandler(env,failDB),req(),429);
+const r=await expect(h,new Request('https://function.example.invalid',{method:'OPTIONS',headers:{Origin:env.BROOK_ALLOWED_ORIGINS}}),204);assert.equal(r.headers.get('Access-Control-Allow-Origin'),env.BROOK_ALLOWED_ORIGINS);
+console.log(`${n} intake checks passed; all external calls mocked.`);

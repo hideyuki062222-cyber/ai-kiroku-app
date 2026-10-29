@@ -1,0 +1,1 @@
+{"name":"brook-recruitment-tests","version":"1.0.0","private":true,"scripts":{"test":"cd ../.. && node tests/recruitment/database.cjs && node tests/recruitment/interface.cjs && node tests/recruitment/intake.mjs && node tests/recruitment/api.cjs && node recruitment/check-sql.mjs"},"devDependencies":{"@electric-sql/pglite":"0.3.14","jsdom":"26.1.0"}}

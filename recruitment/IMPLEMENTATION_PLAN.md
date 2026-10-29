@@ -1,17 +1,23 @@
-# BROOK 採用センター 開発計画（未公開）
-## 現状
-- GitHub の作業ブランチ feature/brook-recruitment-draft に試作画面を保存
-- main へのマージなし、Supabase への SQL 適用なし
-- recruitment/index.html は公開用の準備画面（応募受付不可）
-- recruitment/admin/index.html は管理UIのモック（認証・DB接続なし）
-## 実装前に必須
-1. 採用情報を既存の組織単位で管理するか、BROOK本部単位で管理するか確定
-2. 応募者の個人情報の取得項目・利用目的・保存期間・削除手順を確定
-3. SQL設計の job_id と organization_id の整合性を強制し、RLS・GRANTを監査
-4. 公開フォームは anon 直接 INSERT を許可せず、認証不要の応募受付用エンドポイントで入力検証・スパム防止・送信頻度制限を実装
-5. 管理画面は Supabase Auth によるログインとDBのRLSでアクセス制御。フロント画面だけの管理者判定は禁止
-6. 自動返信は送信元ドメイン・メールAPIの無料枠と個人情報取扱いを確認してから実装
-7. 学校への連絡は宛先・内容を確認し、無断一斉送信はしない
-8. 本番DBのバックアップ、テスト用データでの検証、スマホ表示確認後に承認を得て公開
-## 未確定の求人情報
-勤務地・給与・雇用形態・募集人数・開設時期・連絡先は確認まで仮置きせず未掲載。
+# 開発・反映の現在地（2026-10-29）
+
+- feature/brook-recruitment-draft に独立した recruitment 画面・受付サーバー・SQL案・テストを保存。
+- mainマージなし。SupabaseへのSQL適用・Edge Function配備・認証設定変更なし。求人公開なし。
+- index.html/admin/index.htmlは本番用コードだが config.enabled=false。preview.htmlは通信しないメモリ内の確認専用版。
+- database/recruitment_draft.sqlは廃止。誤実行を例外で止める。適用候補は recruitment_head_office_draft.sql のみ。
+- 本番データバックアップは未取得。本番復元試験も未実施。ローカル採用テストDBの復元と混同しない。
+
+## 次の作業
+1. WindowsのPostgreSQL 17対応クライアント/pgAdmin、Session pooler接続情報を確認。パスワードはWindowsの接続欄に入力しチャット・GitHubに置かない。
+2. DB全体・ロール・設定のバックアップを作り、取得ログ・ハッシュ・保管場所を記録。バックアップ原本を変更しない。
+3. 隔離したSupabase互換環境に復元し、表・件数・関数・RLS・ログイン・出力を確認。既存sports-attendanceを試験先にしない。
+4. 採用条件、案内文、担当者、無料の迷惑応募対策設定を確定。
+5. 本番DB変更の具体的差分と復旧結果を示して承認を得る。その後、採用専用SQLと受付サーバーだけを適用。
+6. 全体公開は閉じたまま実ユーザーの権限・送信検証。その後、求人公開の承認を得る。
+
+## 配備メモ（開発者向け）
+- 新規Edge Function名: brook-recruitment-intake。未認証応募を受けるためこの関数だけverify_jwt=false。既存関数は変更しない。
+- 必須環境変数: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY（サーバーのみ）, BROOK_ALLOWED_ORIGINS（完全なoriginリスト）, TURNSTILE_SECRET_KEY, BROOK_CONTACT_HASH_SECRET（ランダム秘密値）, BROOK_INTAKE_ENABLED。
+- 起動スイッチはフロント、Edge、DBの3か所すべて既定で閉。ドメイン/CAPTCHAを本番URLで検証するまで開けない。
+- 依存なしのFetch実装。Deno配備後の実環境動作はまだ未検証。
+- 既存Auth設定は共用するが、ブラウザセッションは独立・メモリのみ。再読込後は再ログイン。
+- 学校送付・メール自動返信・有料アドオン・DB開発ブランチの作成は行わない。
