@@ -1,6 +1,6 @@
 (function(){'use strict';
 const C=BrookCore, $=id=>document.getElementById(id),config=window.BROOK_CONFIG||{},demo=document.body.dataset.mode==='demo',api=new BrookApi(config);
-function initialState(){const value=C.initial();if(demo&&window.BROOK_DRAFT){value.settings.contact_text=window.BROOK_DRAFT.contactText||'';value.templates[0].terms={...value.templates[0].terms,...window.BROOK_DRAFT.terms};for(const l of value.locations)Object.assign(l,window.BROOK_DRAFT.locations?.[l.code]||{});}return value;}
+function initialState(){const value=C.initial();if(demo&&window.BROOK_DRAFT){value.settings.contact_text=window.BROOK_DRAFT.contactText||'';value.settings.privacy_text=window.BROOK_DRAFT.privacyText||'';value.settings.retention_days=window.BROOK_DRAFT.retentionDays||null;value.settings.privacy_version=window.BROOK_DRAFT.privacyVersion||'draft-1';value.templates[0].terms={...value.templates[0].terms,...window.BROOK_DRAFT.terms};for(const l of value.locations)Object.assign(l,window.BROOK_DRAFT.locations?.[l.code]||{});}return value;}
 let state=initialState(),selected=null,admin=false,page='jobs',filter='all',statusFilter='all',search='',requestId=null,formDraft=null,turnstileId=null,dirty=false,loading=false,epoch=0;
 const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text??'');if(cls)n.className=cls;return n;};
 const button=(text,fn,cls='secondary')=>{const b=node('button',text,cls);b.type='button';b.onclick=fn;return b;};
