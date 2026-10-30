@@ -10,10 +10,10 @@ const tick=()=>new Promise(r=>setImmediate(r));
 const submit=async()=>{d.querySelector('form').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();await tick();};
 (async()=>{
  ok(d.querySelectorAll('.cards .panel').length===3,'three locations only');
- ok([...d.querySelectorAll('.salary')].every(e=>e.textContent==='月給255,000〜305,000円（内訳確認中）'),'all three locations inherit shared draft salary');
+ ok([...d.querySelectorAll('.salary')].every(e=>e.textContent==='月給271,020円〜（資格別）'),'all three locations inherit shared draft salary');
  ok(!d.body.textContent.includes('基本給'),'cards show summary rather than full salary breakdown');
  ok(w.BrookCore.initial().templates[0].terms.salary===''&&!w.BrookCore.initial().settings.release_enabled,'production initial data stays blank and disabled');
- click('求人の詳細を見る');click('応募フォームを試す');value('full_name','<img src=x onerror=alert(1)>');value('email','test@example.invalid');d.getElementById('consent').checked=true;await submit();
+ click('求人の詳細を見る');ok(d.body.textContent.includes('実務者研修：278,020円〜')&&d.body.textContent.includes('介護福祉士：285,020円〜')&&d.body.textContent.includes('年末年始手当あり'),'updated qualifications and allowances shown');ok(w.BROOK_DRAFT.locations.sakai.address==='大阪府堺市堺区南清水町1-3-5','Sakai address updated');click('応募フォームを試す');value('full_name','<img src=x onerror=alert(1)>');value('email','test@example.invalid');d.getElementById('consent').checked=true;await submit();
  ok(d.body.textContent.includes('確認用の応募を登録しました'),'preview application confirms');
  click('BROOK本部を試す');ok(d.querySelectorAll('.applicant').length===1,'applicant appears at HQ');ok(!d.querySelector('img'),'applicant text cannot inject HTML');
  d.querySelector('.applicant-body select').value='interview';click('状況・メモを保存');await tick();ok(d.querySelector('.applicant summary').textContent.includes('面接予定'),'status update shown');
@@ -22,6 +22,6 @@ const submit=async()=>{d.querySelector('form').dispatchEvent(new w.Event('submit
  click('求人を探す');click('求人の詳細を見る');ok(d.body.textContent.includes('蒲生だけの確認用給与'),'facility override displayed');
  click('BROOK本部を試す');click('勤務地別設定');click('COZY豊中');ok(!d.getElementById('override-salary').checked,'override does not affect Toyonaka');
  click('ログアウト');ok(d.getElementById('admin-nav').hidden,'logout hides HQ');ok(!d.body.textContent.includes('<img'),'logout clears applicant UI');ok(calls===0,'zero network calls in preview');ok(w.localStorage.length===0&&w.sessionStorage.length===0,'no personal data stored in browser storage');
- click('最初から試す');ok(d.querySelector('.salary').textContent.includes('255,000'),'reset restores sourced draft conditions');
+ click('最初から試す');ok(d.querySelector('.salary').textContent.includes('271,020'),'reset restores sourced draft conditions');
  console.log(`${n} interface checks passed.`);dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
