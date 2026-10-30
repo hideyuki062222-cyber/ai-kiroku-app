@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),{JSDOM}=require
 const source=fs.readFileSync('recruitment/preview.html','utf8').replace(/<script[^>]*src[^>]*><\/script>/g,'');
 const dom=new JSDOM(source,{runScripts:'outside-only',url:'https://preview.example.invalid'}),w=dom.window,d=w.document;
 let calls=0;w.fetch=()=>{calls++;throw Error('preview must never connect')};w.confirm=()=>true;w.scrollTo=()=>{};
-for(const file of ['config.js','core.js','api.js','app.js'])w.eval(fs.readFileSync('recruitment/'+file,'utf8'));
+for(const file of ['config.js','core.js','api.js','draft-terms.js','app.js'])w.eval(fs.readFileSync('recruitment/'+file,'utf8'));
 let n=0;const ok=(v,label)=>{assert(v,label);n++;console.log('PASS '+label);};
 const click=text=>{const b=[...d.querySelectorAll('button')].find(b=>b.textContent===text);assert(b,text);b.click();};
 const value=(id,v)=>{d.getElementById(id).value=v;d.getElementById(id).dispatchEvent(new w.Event('input'));};
@@ -10,6 +10,9 @@ const tick=()=>new Promise(r=>setImmediate(r));
 const submit=async()=>{d.querySelector('form').dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();await tick();};
 (async()=>{
  ok(d.querySelectorAll('.cards .panel').length===3,'three locations only');
+ ok([...d.querySelectorAll('.salary')].every(e=>e.textContent==='月給255,000〜305,000円（内訳確認中）'),'all three locations inherit shared draft salary');
+ ok(!d.body.textContent.includes('基本給'),'cards show summary rather than full salary breakdown');
+ ok(w.BrookCore.initial().templates[0].terms.salary===''&&!w.BrookCore.initial().settings.release_enabled,'production initial data stays blank and disabled');
  click('求人の詳細を見る');click('応募フォームを試す');value('full_name','<img src=x onerror=alert(1)>');value('email','test@example.invalid');d.getElementById('consent').checked=true;await submit();
  ok(d.body.textContent.includes('確認用の応募を登録しました'),'preview application confirms');
  click('BROOK本部を試す');ok(d.querySelectorAll('.applicant').length===1,'applicant appears at HQ');ok(!d.querySelector('img'),'applicant text cannot inject HTML');
@@ -19,5 +22,6 @@ const submit=async()=>{d.querySelector('form').dispatchEvent(new w.Event('submit
  click('求人を探す');click('求人の詳細を見る');ok(d.body.textContent.includes('蒲生だけの確認用給与'),'facility override displayed');
  click('BROOK本部を試す');click('勤務地別設定');click('COZY豊中');ok(!d.getElementById('override-salary').checked,'override does not affect Toyonaka');
  click('ログアウト');ok(d.getElementById('admin-nav').hidden,'logout hides HQ');ok(!d.body.textContent.includes('<img'),'logout clears applicant UI');ok(calls===0,'zero network calls in preview');ok(w.localStorage.length===0&&w.sessionStorage.length===0,'no personal data stored in browser storage');
+ click('最初から試す');ok(d.querySelector('.salary').textContent.includes('255,000'),'reset restores sourced draft conditions');
  console.log(`${n} interface checks passed.`);dom.window.close();
 })().catch(e=>{console.error(e);process.exitCode=1});
