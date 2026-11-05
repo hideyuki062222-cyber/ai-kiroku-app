@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>接続テスト | BROOK採用センター</title><link rel="stylesheet" href="../style.css"></head>
+<body><main style="max-width:640px;margin:auto;padding:24px 16px"><h1>応募受付の接続テスト</h1><p>本部担当者専用です。応募データの保存や求人の公開は行いません。</p>
+<form id="login"><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="username" required><label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password" required><p><button id="login-button">ログインして確認</button></p></form>
+<section id="check-panel" hidden><p>下に確認欄が表示されたら、必要に応じてチェックしてください。</p><div id="challenge"></div><p><button id="check-button" disabled>接続テストを実行</button> <button id="retry-button" class="secondary">確認をやり直す</button></p><button id="logout-button" class="secondary">ログアウト</button></section>
+<p id="result" role="status" aria-live="polite"></p><p><a href="./">本部管理画面へ戻る</a></p></main><script src="../api.js"></script><script src="check.js"></script></body></html>

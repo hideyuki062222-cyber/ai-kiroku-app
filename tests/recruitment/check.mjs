@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {createCheckHandler} from '../../recruitment/server/check.mjs';
+const origin='https://hideyuki062222-cyber.github.io';
+const env={SUPABASE_URL:'https://db.example',SUPABASE_ANON_KEY:'public-test',BROOK_ALLOWED_ORIGINS:origin,BROOK_TURNSTILE_SECRET_KEY:'fake-turnstile',BROOK_CONTACT_HASH_SECRET:'x'.repeat(44)};
+const json=(value,status=200)=>new Response(JSON.stringify(value),{status});
+let passed=0;
+async function run(name,overrides={},status=200){
+ const calls=[];
+ const fetcher=async(url,options={})=>{calls.push(url);assert(!url.includes('recruitment_receive'));if(url.startsWith(env.SUPABASE_URL)){assert(!options.method||options.method==='GET');assert.equal(options.headers.Authorization,'Bearer user-token');assert.equal(options.headers.apikey,'public-test');}if(overrides.fail)throw Error('private error must not leak');if(url.endsWith('/auth/v1/user'))return json({id:'user-id'},overrides.authStatus||200);if(url.includes('recruitment_admins'))return json(overrides.members??[{user_id:'user-id'}]);assert.equal(url,'https://challenges.cloudflare.com/turnstile/v0/siteverify');return json(overrides.captcha??{success:true,action:'brook_apply',hostname:new URL(origin).hostname});};
+ const req=new Request('https://function.example',{method:overrides.method||'POST',headers:{Origin:overrides.origin||origin,'Content-Type':'application/json',...(overrides.anonymous?{}:{Authorization:'Bearer user-token'})},body:overrides.method?undefined:(overrides.raw??JSON.stringify({captcha_token:'test-token'}))});
+ const response=await createCheckHandler({...env,...overrides.env},fetcher)(req);assert.equal(response.status,status,name);const text=await response.text();assert(!text.includes('fake-turnstile'));assert(!text.includes(env.BROOK_CONTACT_HASH_SECRET));assert(!text.includes('private error'));if(overrides.noCalls)assert.equal(calls.length,0);if(overrides.noCaptcha)assert(!calls.some(x=>x.includes('siteverify')));passed++;
+}
+await run('HQ valid challenge succeeds without writes');
+await run('anonymous denied',{anonymous:true,noCalls:true},401);
+await run('wrong origin denied',{origin:'https://bad.example',noCalls:true},403);
+await run('invalid auth denied',{authStatus:401,noCaptcha:true},401);
+await run('non HQ denied',{members:[],noCaptcha:true},403);
+await run('wrong member denied',{members:[{user_id:'other'}],noCaptcha:true},403);
+await run('missing Turnstile secret',{env:{BROOK_TURNSTILE_SECRET_KEY:''},noCaptcha:true},503);
+await run('weak HMAC secret',{env:{BROOK_CONTACT_HASH_SECRET:'short'},noCaptcha:true},503);
+await run('missing public key',{env:{SUPABASE_ANON_KEY:''},noCalls:true},503);
+await run('preflight',{method:'OPTIONS',noCalls:true},204);
+await run('method denied',{method:'GET',noCalls:true},405);
+await run('invalid JSON',{raw:'{',noCaptcha:true},400);
+await run('oversized request',{raw:'x'.repeat(4097),noCaptcha:true},413);
+await run('invalid captcha',{captcha:{success:false}},400);
+await run('wrong action',{captcha:{success:true,action:'other',hostname:new URL(origin).hostname}},400);
+await run('wrong hostname',{captcha:{success:true,action:'brook_apply',hostname:'bad.example'}},400);
+await run('fetch failure sanitized',{fail:true},503);
+console.log(`${passed} read-only diagnostic checks passed`);
