@@ -11,7 +11,7 @@ export function createHandler(env, fetcher=fetch) {
   if(!allowed.includes(origin))return respond(403,'このページからは応募できません。');
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers});
   if(req.method!=='POST')return respond(405,'この操作は利用できません。');
-  if(env.BROOK_INTAKE_ENABLED!=='true'||!env.TURNSTILE_SECRET_KEY||!env.BROOK_CONTACT_HASH_SECRET||!env.SUPABASE_SERVICE_ROLE_KEY||!env.SUPABASE_URL)return respond(503,'応募受付の準備中です。');
+  if(env.BROOK_INTAKE_ENABLED!=='true'||!env.BROOK_TURNSTILE_SECRET_KEY||!env.BROOK_CONTACT_HASH_SECRET||!env.SUPABASE_SERVICE_ROLE_KEY||!env.SUPABASE_URL)return respond(503,'応募受付の準備中です。');
   if(!req.headers.get('Content-Type')?.startsWith('application/json'))return respond(415,'入力形式を確認してください。');
   try{
    // Limit actual bytes, including chunked requests; do not trust Content-Length.
@@ -22,7 +22,7 @@ export function createHandler(env, fetcher=fetch) {
    if(!body||typeof body!=='object'||Array.isArray(body))return respond(400,'応募内容を確認してください。');
    const checked=C.validateApplication(body);if(checked.errors.length||body.website)return respond(400,'応募内容・同意を確認してください。');
    if(typeof body.captcha_token!=='string'||body.captcha_token.length<1||body.captcha_token.length>2048)return respond(400,'送信前の確認をやり直してください。');
-   const verification=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({secret:env.TURNSTILE_SECRET_KEY,response:body.captcha_token}),signal:AbortSignal.timeout(10000)});
+   const verification=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({secret:env.BROOK_TURNSTILE_SECRET_KEY,response:body.captcha_token}),signal:AbortSignal.timeout(10000)});
    if(!verification.ok)return respond(503,'確認機能に接続できません。再試行してください。');
    const check=await verification.json();
    if(check.success!==true||check.action!=='brook_apply'||check.hostname!==new URL(origin).hostname)return respond(400,'送信前の確認をやり直してください。');

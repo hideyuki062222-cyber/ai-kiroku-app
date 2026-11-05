@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {createHandler} from '../../recruitment/server/handler.mjs';
-const env={BROOK_ALLOWED_ORIGINS:'https://jobs.example.invalid',BROOK_INTAKE_ENABLED:'true',TURNSTILE_SECRET_KEY:'fixture-secret',BROOK_CONTACT_HASH_SECRET:'fixture-hmac',SUPABASE_URL:'https://db.example.invalid',SUPABASE_SERVICE_ROLE_KEY:'fixture-service'};
+const env={BROOK_ALLOWED_ORIGINS:'https://jobs.example.invalid',BROOK_INTAKE_ENABLED:'true',BROOK_TURNSTILE_SECRET_KEY:'fixture-secret',BROOK_CONTACT_HASH_SECRET:'fixture-hmac',SUPABASE_URL:'https://db.example.invalid',SUPABASE_SERVICE_ROLE_KEY:'fixture-service'};
 const body={request_id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',job_id:'33333333-3333-4333-8333-333333333330',full_name:'Test only',email:'test@example.invalid',phone:'',qualifications:'',message:'',consent:true,privacy_version:'v1',captcha_token:'test-token'};
 let dbCalls=0,checkCalls=0;
 const mock=async(url,options)=>{if(url.includes('siteverify')){checkCalls++;return Response.json({success:true,hostname:'jobs.example.invalid',action:'brook_apply'});}dbCalls++;const payload=JSON.parse(options.body);assert(!JSON.stringify(payload).includes('test-token'));assert.equal(payload.p_contact_hash.length,64);assert.equal(payload.p_payload_hash.length,64);return Response.json('dddddddd-dddd-4ddd-8ddd-dddddddddddd');};
@@ -23,4 +23,11 @@ assert.equal(dbCalls,1,'invalid or blocked input never reaches database');
 const failDB=async(url,o)=>url.includes('siteverify')?mock(url,o):Response.json({message:'rate limit'},{status:400});
 await expect(createHandler(env,failDB),req(),429);
 const r=await expect(h,new Request('https://function.example.invalid',{method:'OPTIONS',headers:{Origin:env.BROOK_ALLOWED_ORIGINS}}),204);assert.equal(r.headers.get('Access-Control-Allow-Origin'),env.BROOK_ALLOWED_ORIGINS);
+
+const beforeMissing=dbCalls;
+await expect(createHandler({...env,BROOK_TURNSTILE_SECRET_KEY:undefined,TURNSTILE_SECRET_KEY:'legacy-must-not-be-used'},mock),req(),503);
+await expect(createHandler({...env,BROOK_INTAKE_ENABLED:undefined},mock),req(),503);
+await expect(createHandler({...env,BROOK_CONTACT_HASH_SECRET:undefined},mock),req(),503);
+assert.equal(dbCalls,beforeMissing,'missing recruitment settings never reach database');
+
 console.log(`${n} intake checks passed; all external calls mocked.`);
