@@ -35,3 +35,5 @@
  .today-table td:nth-child(2){display:block!important}
  .today-table .meal-person-meta{display:none!important}
 }
+
+.kitchen{border-top:1px solid var(--line);padding-top:10px}.kitchen h3{margin:0 0 8px}.kitchen h3 small{font-size:.8em;color:var(--green)}.kitchen-qty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.kitchen-qty>div{background:var(--mint);border-radius:8px;padding:8px;font-size:13px}.kitchen-qty strong,.kitchen-qty small{display:block;overflow-wrap:anywhere}.kitchen-qty strong{font-size:clamp(15px,3vw,21px)}.kitchen details{font-size:13px;margin:4px 0}
