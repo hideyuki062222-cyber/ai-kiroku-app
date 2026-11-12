@@ -30,7 +30,7 @@
  }
  h=h.replace('password.length<6','password.length<12');
  h=h.replace('メールアドレスと6文字以上のパスワードを入力してください。','メールアドレスと12文字以上のパスワードを入力してください。');
- const addon='<script src="../client-room-ui.js?v=20261014-1"><\/script><script src="./safety-addon.js?v=20261014-4"><\/script><script src="../common-nav.js?v=20261028-ui&nexia=20261112-1"><\/script>';
+ const addon='<script src="../client-room-ui.js?v=20261014-1"><\/script><script src="./safety-addon.js?v=20261014-4"><\/script><script src="../common-nav.js?v=20261028-ui&nexia=20261112-name-1"><\/script>';
  const bodyClose=h.lastIndexOf('</body>');
  if(bodyClose>=0) h=h.slice(0,bodyClose)+addon+h.slice(bodyClose);
  else h+=addon;

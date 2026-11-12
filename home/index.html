@@ -8,7 +8,8 @@
 <title>NEXIA（ネクシア）｜統合業務管理システム</title>
 <link rel="stylesheet" href="./style.css?v=20261112-1">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
-<script defer src="./app.js?v=20261112-1"></script>
+<script defer src="../staff-name.js?v=20261112-1"></script>
+<script defer src="./app.js?v=20261112-name-1"></script>
 </head>
 <body>
 <a class="skip" href="#main">本文へ移動</a>
@@ -38,7 +39,12 @@
         <div><p class="eyebrow" id="today"></p><h2 id="welcomeTitle">毎日の業務を、ここから。</h2><p class="muted" id="identity"></p></div>
         <div class="facility"><label for="organization">利用する施設</label><select id="organization"></select><span id="role" class="role"></span></div>
       </section>
-      <section aria-labelledby="toolsTitle"><div class="section-heading"><h2 id="toolsTitle">業務メニュー</h2><span>必要な業務を選んでください</span></div>
+      <section id="nameRegistration" class="panel login" hidden aria-labelledby="nameTitle">
+        <h2 id="nameTitle">はじめに、職員名を登録してください</h2>
+        <p class="muted" id="nameFacility"></p><p>名前を登録すると、業務メニューを利用できます。</p>
+        <form id="nameForm"><label for="staffName">職員名（氏名） <span>必須</span></label><input id="staffName" name="staffName" type="text" autocomplete="name" maxlength="80" required placeholder="例：山田 太郎"><button class="button primary" id="saveStaffName" type="submit">名前を登録して進む</button><p id="nameStatus" role="status" aria-live="polite"></p></form>
+      </section>
+      <section id="businessMenu" aria-labelledby="toolsTitle"><div class="section-heading"><h2 id="toolsTitle">業務メニュー</h2><span>必要な業務を選んでください</span></div>
         <div class="grid" id="tools">
           <a class="tool featured" href="../dashboard/"><span class="icon" aria-hidden="true">01</span><h3>今日の担当</h3><p>今日の担当・未記録・勤務を確認</p><span class="open" aria-hidden="true">開く →</span></a>
           <a class="tool" href="../?app=record"><span class="icon" aria-hidden="true">02</span><h3>AI記録</h3><p>支援記録の作成・保存・履歴確認</p><span class="open" aria-hidden="true">開く →</span></a>
