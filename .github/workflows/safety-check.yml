@@ -34,11 +34,45 @@ jobs:
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
+          node --check home/app.js
+          node --check tests/nexia_browser.cjs
       - name: Check HTML inline JavaScript syntax
         run: node tests/html_inline_syntax.cjs
       - name: Check navigation consistency
         run: node tests/navigation_consistency.cjs
+      - name: Install DOM test runner
+        run: npm install --prefix "$RUNNER_TEMP/nexia-tests" --no-audit --no-fund --ignore-scripts jsdom@26.1.0
+      - name: Check NEXIA authentication and navigation
+        env:
+          JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
+        run: |
+          node tests/nexia_portal.cjs
+          node tests/nexia_admin_nav.cjs
+          node tests/dashboard_return.cjs
+          node tests/record_link.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
       - name: Run safety contract tests
         run: python -m pytest -q tests/test_system_safety.py tests/test_care_intro.py
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser test runner
+        run: npm install --prefix "$RUNNER_TEMP/nexia-browser" --no-audit --no-fund --ignore-scripts playwright@1.62.1
+      - name: Install Chromium
+        run: node "$RUNNER_TEMP/nexia-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Prepare public application assets
+        run: python tests/prepare_nexia_browser.py --assets "$RUNNER_TEMP/nexia-browser-assets"
+      - name: Check desktop, mobile, authorization UI and exports
+        env:
+          PLAYWRIGHT_PATH: ${{ runner.temp }}/nexia-browser/node_modules/playwright
+          NEXIA_BROWSER_ASSETS: ${{ runner.temp }}/nexia-browser-assets
+        run: node tests/nexia_browser.cjs

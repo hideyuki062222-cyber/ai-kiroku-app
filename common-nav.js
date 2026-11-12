@@ -3,14 +3,17 @@
   const ATTENDANCE=BASE+'attendance/';
   const THEME=BASE+'common-theme.css?v=20261028-1';
   const items=[
-    ['today','今日',BASE+'dashboard/'],
+    ['home','NEXIAトップ',BASE+'home/'],
+    ['today','今日の担当',BASE+'dashboard/'],
     ['assignment','担当割当',BASE+'assignment/'],
     ['handoff','申し送り',BASE+'handoff/'],
-    ['record','AI記録',BASE],
+    ['record','AI記録',BASE+'?app=record'],
     ['attendance','出勤簿',ATTENDANCE],
-    ['cashbook','出納帳',BASE+'cashbook/'],
+    ['cashbook','金銭出納帳',BASE+'cashbook/'],
     ['meals','食事管理',BASE+'meals/']
   ];
+  // Attendance prints its existing navigation. Preserve those labels and column count.
+  const printLabels={today:'今日',cashbook:'出納帳'};
   const SENSITIVE_CACHE_KEYS=['aiKirokuUsers','aiKirokuProfiles','activeOrganizationId'];
 
   function clearSensitiveCache(){
@@ -40,6 +43,7 @@
   }
   function currentKey(){
     const p=location.pathname;
+    if(p.includes('/home/')) return 'home';
     if(p.includes('/dashboard/')) return 'today';
     if(p.includes('/assignment/')) return 'assignment';
     if(p.includes('/handoff/')) return 'handoff';
@@ -76,7 +80,7 @@
   function loadPageAddons(){
     const key=currentKey();
     loadStyle('brookCommonTheme',THEME);
-    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261028-2');
+    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261112-1');
     if(['record','assignment','cashbook'].includes(key)) loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
     if(key==='record'){
       lockAssignmentFlowButtons();
@@ -98,7 +102,9 @@
       .app-nav.cozy-common-nav .app-tab{flex:1 0 auto!important;min-width:68px!important;text-align:center!important;padding:8px 7px!important;font-size:12px!important;white-space:nowrap!important}
       .app-nav.cozy-common-nav .app-tab.active{background:#fff!important;color:#111827!important;box-shadow:0 1px 4px rgba(0,0,0,.1)!important}
       button:disabled{opacity:.55!important;cursor:not-allowed!important}
+      .nexia-print-label{display:none}
       @media(max-width:520px){.app-nav.cozy-common-nav .app-tab{min-width:66px!important;padding:8px 6px!important;font-size:11.5px!important}}
+      @media print{.app-nav.cozy-common-nav .nexia-top-tab,.nexia-screen-label{display:none!important}.nexia-print-label{display:inline!important}}
     `;
     document.head.appendChild(s);
   }
@@ -109,7 +115,7 @@
     const cur=currentKey();
     nav.classList.add('cozy-common-nav');
     nav.setAttribute('aria-label','メインメニュー');
-    nav.innerHTML=items.map(([key,label,href])=>`<a class="app-tab${key===cur?' active':''}" href="${href}"${key===cur?' aria-current="page"':''}>${label}</a>`).join('');
+    nav.innerHTML=items.map(([key,label,href])=>`<a class="app-tab${key===cur?' active':''}${key==='home'?' nexia-top-tab':''}" href="${href}"${key===cur?' aria-current="page"':''}>${printLabels[key]?`<span class="nexia-screen-label">${label}</span><span class="nexia-print-label">${printLabels[key]}</span>`:label}</a>`).join('');
     return true;
   }
 
