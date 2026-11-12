@@ -12,6 +12,8 @@
     ['cashbook','金銭出納帳',BASE+'cashbook/'],
     ['meals','食事管理',BASE+'meals/']
   ];
+  // Attendance prints its existing navigation. Preserve those labels and column count.
+  const printLabels={today:'今日',cashbook:'出納帳'};
   const SENSITIVE_CACHE_KEYS=['aiKirokuUsers','aiKirokuProfiles','activeOrganizationId'];
 
   function clearSensitiveCache(){
@@ -100,7 +102,9 @@
       .app-nav.cozy-common-nav .app-tab{flex:1 0 auto!important;min-width:68px!important;text-align:center!important;padding:8px 7px!important;font-size:12px!important;white-space:nowrap!important}
       .app-nav.cozy-common-nav .app-tab.active{background:#fff!important;color:#111827!important;box-shadow:0 1px 4px rgba(0,0,0,.1)!important}
       button:disabled{opacity:.55!important;cursor:not-allowed!important}
+      .nexia-print-label{display:none}
       @media(max-width:520px){.app-nav.cozy-common-nav .app-tab{min-width:66px!important;padding:8px 6px!important;font-size:11.5px!important}}
+      @media print{.app-nav.cozy-common-nav .nexia-top-tab,.nexia-screen-label{display:none!important}.nexia-print-label{display:inline!important}}
     `;
     document.head.appendChild(s);
   }
@@ -111,7 +115,7 @@
     const cur=currentKey();
     nav.classList.add('cozy-common-nav');
     nav.setAttribute('aria-label','メインメニュー');
-    nav.innerHTML=items.map(([key,label,href])=>`<a class="app-tab${key===cur?' active':''}" href="${href}"${key===cur?' aria-current="page"':''}>${label}</a>`).join('');
+    nav.innerHTML=items.map(([key,label,href])=>`<a class="app-tab${key===cur?' active':''}${key==='home'?' nexia-top-tab':''}" href="${href}"${key===cur?' aria-current="page"':''}>${printLabels[key]?`<span class="nexia-screen-label">${label}</span><span class="nexia-print-label">${printLabels[key]}</span>`:label}</a>`).join('');
     return true;
   }
 
