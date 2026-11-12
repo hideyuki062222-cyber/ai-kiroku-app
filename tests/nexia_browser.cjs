@@ -108,6 +108,7 @@ for(const [label,ready] of [['今日の担当','#main'],['AI記録','#recordHist
    results.push({label:'assignment-pdf',generated:true});
   }
   if(name==='desktop'&&label==='出勤簿'){
+   assert(await page.locator('#cloudControls a[href="../staff/"]').isVisible());
    const downloaded=page.waitForEvent('download');await page.locator('#export').click();const file=await downloaded.catch(async e=>{console.error(JSON.stringify({errors,dialogs,attendance:await page.evaluate(()=>({ready:cloudReady,busy:cloudBusy,dirty:cloudDirty(),notice:document.getElementById('cloudNotice').textContent}))}));throw e});await file.saveAs(path.join(artifact,'attendance.xlsx'));
    await page.evaluate(()=>{window.__prints=0;window.print=()=>window.__prints++});await page.locator('#cloudPrint').click();await page.waitForFunction(()=>window.__prints===1);
    await page.pdf({path:path.join(artifact,'attendance.pdf'),format:'A4',preferCSSPageSize:true,printBackground:true});
@@ -139,7 +140,7 @@ for(const [label,ready] of [['今日の担当','#main'],['AI記録','#recordHist
  await page.locator('#organization').selectOption(B);await page.waitForFunction(id=>localStorage.getItem('activeOrganizationId')===id,B);await page.locator('#portal').waitFor({state:'visible'});assert(!(await page.locator('#admin').isVisible()));await check('home-staff');
  await page.locator('#tools a').filter({has:page.getByRole('heading',{name:'食事管理',exact:true})}).click();await page.locator('#app').waitFor({state:'visible'});assert.equal(await page.locator('#org').inputValue(),B);await page.locator('[data-tab="settings"]').click();await page.locator('#profileForm').waitFor({state:'visible'});assert(await page.locator('#profileForm input[name="food_form"]').isDisabled());assert.equal(await page.locator('#residentEditForm').count(),0);await check('meals-staff');
  await page.getByRole('link',{name:'NEXIAトップ',exact:true}).click();await page.locator('#portal').waitFor({state:'visible'});
- await page.locator('#tools a').filter({has:page.getByRole('heading',{name:'出勤簿',exact:true})}).click();await page.locator('#cloudControls').waitFor({state:'visible'});assert.equal(await page.locator('#cloudOrg').inputValue(),B);assert(!(await page.locator('#staff').isVisible()));assert(await page.locator('#upload').evaluate(e=>e.closest('details').hidden));
+ await page.locator('#tools a').filter({has:page.getByRole('heading',{name:'出勤簿',exact:true})}).click();await page.locator('#cloudControls').waitFor({state:'visible'});assert.equal(await page.locator('#cloudOrg').inputValue(),B);assert(!(await page.locator('#staff').isVisible()));assert(!(await page.locator('#cloudControls a[href="../staff/"]').isVisible()));assert(await page.locator('#upload').evaluate(e=>e.closest('details').hidden));
  if(name==='desktop'){const downloaded=page.waitForEvent('download');await page.locator('#export').click();await (await downloaded).saveAs(path.join(artifact,'attendance-self.xlsx'));}
  await check('attendance-staff');await page.getByRole('link',{name:'NEXIAトップ',exact:true}).click();await page.locator('#portal').waitFor({state:'visible'});
  await page.locator('#organization').selectOption(A);await page.waitForFunction(id=>localStorage.getItem('activeOrganizationId')===id,A);await page.locator('#portal').waitFor({state:'visible'});
