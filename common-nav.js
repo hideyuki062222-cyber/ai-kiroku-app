@@ -3,12 +3,13 @@
   const ATTENDANCE=BASE+'attendance/';
   const THEME=BASE+'common-theme.css?v=20261028-1';
   const items=[
-    ['today','今日',BASE+'dashboard/'],
+    ['home','NEXIAトップ',BASE+'home/'],
+    ['today','今日の担当',BASE+'dashboard/'],
     ['assignment','担当割当',BASE+'assignment/'],
     ['handoff','申し送り',BASE+'handoff/'],
-    ['record','AI記録',BASE],
+    ['record','AI記録',BASE+'?app=record'],
     ['attendance','出勤簿',ATTENDANCE],
-    ['cashbook','出納帳',BASE+'cashbook/'],
+    ['cashbook','金銭出納帳',BASE+'cashbook/'],
     ['meals','食事管理',BASE+'meals/']
   ];
   const SENSITIVE_CACHE_KEYS=['aiKirokuUsers','aiKirokuProfiles','activeOrganizationId'];
@@ -40,6 +41,7 @@
   }
   function currentKey(){
     const p=location.pathname;
+    if(p.includes('/home/')) return 'home';
     if(p.includes('/dashboard/')) return 'today';
     if(p.includes('/assignment/')) return 'assignment';
     if(p.includes('/handoff/')) return 'handoff';
@@ -76,7 +78,7 @@
   function loadPageAddons(){
     const key=currentKey();
     loadStyle('brookCommonTheme',THEME);
-    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261028-2');
+    loadScript('adminLinkScript',BASE+'admin-link.js?v=20261112-1');
     if(['record','assignment','cashbook'].includes(key)) loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');
     if(key==='record'){
       lockAssignmentFlowButtons();

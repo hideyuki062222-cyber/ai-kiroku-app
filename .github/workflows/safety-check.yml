@@ -34,10 +34,21 @@ jobs:
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
+          node --check home/app.js
       - name: Check HTML inline JavaScript syntax
         run: node tests/html_inline_syntax.cjs
       - name: Check navigation consistency
         run: node tests/navigation_consistency.cjs
+      - name: Install DOM test runner
+        run: npm install --prefix "$RUNNER_TEMP/nexia-tests" --no-audit --no-fund --ignore-scripts jsdom@26.1.0
+      - name: Check NEXIA authentication and navigation
+        env:
+          JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
+        run: |
+          node tests/nexia_portal.cjs
+          node tests/nexia_admin_nav.cjs
+          node tests/dashboard_return.cjs
+          node tests/record_link.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
       - name: Run safety contract tests

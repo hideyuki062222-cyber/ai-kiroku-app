@@ -15,6 +15,11 @@ body{margin:0;background:#f5f7fb;color:#222;font-family:-apple-system,BlinkMacSy
 <div class="loading" id="loader"><h1>AI記録作成</h1><p id="loadMsg">担当割当とAI記録を読み込んでいます…</p></div>
 <script>
 (async()=>{
+  // The bare entry opens NEXIA; existing query/hash record links stay intact.
+  if(!location.search && !location.hash){
+    location.replace('./home/');
+    return;
+  }
   const sources=[
     "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/a8fa212e05b08867c5a426d13f05baa8847e4165/index.html",
     "https://cdn.jsdelivr.net/gh/hideyuki062222-cyber/ai-kiroku-app@a8fa212e05b08867c5a426d13f05baa8847e4165/index.html"
@@ -210,7 +215,7 @@ function applyAssignmentContext(){
   h=h.replace('作成履歴（クラウド共有）','利用者ごとの保存済み記録');
   h=h.replace('</head>','<script src="./dashboard-return.js?v=20261021-1"><\/script></head>');
   h=h.replace('</head>','<script src="./record-history.js?v=20261021-record-link"><\/script></head>');
-  h=h.replace('</body>','<script src="./common-nav.js?v=20261020-services"><\/script></body>');
+  h=h.replace('</body>','<script src="./common-nav.js?v=20261020-services&nexia=20261112-1"><\/script></body>');
   document.open();
   document.write(h);
   document.close();
