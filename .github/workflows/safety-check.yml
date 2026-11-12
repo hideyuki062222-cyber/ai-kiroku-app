@@ -35,6 +35,7 @@ jobs:
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
           node --check home/app.js
+          node --check staff-name.js
           node --check tests/nexia_browser.cjs
       - name: Check HTML inline JavaScript syntax
         run: node tests/html_inline_syntax.cjs

@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{
  if(!file.startsWith(serveRoot+path.sep)&&file!==serveRoot){res.writeHead(403).end();return}
  try{if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');const body=fs.readFileSync(file);res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store'});res.end(body)}catch{res.writeHead(404).end()}
 });
-const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,OPTIONS,HEAD','content-type':'application/json'};
+const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,PATCH,OPTIONS,HEAD','content-type':'application/json'};
 function matches(value,filter){
  const dot=filter.indexOf('.'),op=filter.slice(0,dot),v=filter.slice(dot+1);
  if(op==='eq')return String(value)===v;if(op==='in')return v.slice(1,-1).split(',').includes(String(value));
@@ -42,6 +42,7 @@ function matches(value,filter){
 }
 async function scenario(browser,viewport,name){
  const tables=database(),requests=[],blocked=[],errors=[],results=[],dialogs=[];
+ let allowNameWrite=false,failNameSave=false,nameWriteAttempts=0,nameWrites=0;
  const context=await browser.newContext({viewport,isMobile:viewport.width<600,hasTouch:viewport.width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo',acceptDownloads:true});
  const user={id:U,aud:'authenticated',role:'authenticated',email:'synthetic@example.invalid',email_confirmed_at:now,created_at:now,app_metadata:{provider:'email',providers:['email']},user_metadata:{}};
  const exp=Math.floor(Date.now()/1000)+3600;
@@ -60,6 +61,12 @@ async function scenario(browser,viewport,name){
    if(url.pathname.endsWith('/token'))return route.fulfill({status:200,headers,body:JSON.stringify({access_token:token,token_type:'bearer',expires_in:3600,expires_at:exp,refresh_token:'synthetic-refresh',user})});
    if(url.pathname.endsWith('/user'))return route.fulfill({status:200,headers,body:JSON.stringify(user)});
    if(url.pathname.endsWith('/logout'))return route.fulfill({status:204,headers});
+   if(allowNameWrite&&url.pathname==='/rest/v1/organization_members'&&req.method()==='PATCH'){
+    const payload=JSON.parse(req.postData());assert.deepEqual(Object.keys(payload),['staff_name']);assert.equal(url.searchParams.get('user_id'),'eq.'+U);assert([A,B].some(id=>url.searchParams.get('organization_id')==='eq.'+id));nameWriteAttempts++;
+    if(failNameSave){failNameSave=false;return route.fulfill({status:503,headers,body:JSON.stringify({message:'Synthetic save failure'})})}
+    const rows=tables.organization_members.filter(r=>[...url.searchParams].every(([k,v])=>k==='select'||matches(r[k],v)));rows.forEach(r=>r.staff_name=payload.staff_name);nameWrites+=rows.length;
+    return route.fulfill({status:200,headers,body:JSON.stringify(rows)});
+   }
    if(url.pathname.includes('/rpc/list_organization_staff'))return route.fulfill({status:200,headers,body:JSON.stringify(tables.organization_members.filter(m=>m.organization_id===JSON.parse(req.postData()).p_org).map(m=>({...m,email:user.email})))});
    if(url.pathname.startsWith('/rest/v1/')&&['GET','HEAD'].includes(req.method())){
     const table=url.pathname.split('/').pop();let rows=(tables[table]||[]).filter(r=>[...url.searchParams].every(([k,v])=>['select','order','limit','offset','or','and'].includes(k)||matches(r[k],v)));
@@ -94,6 +101,7 @@ async function scenario(browser,viewport,name){
 for(const [label,ready] of [['今日の担当','#main'],['AI記録','#recordHistoryClient'],['担当割当','#schedule .time-row'],['申し送り','#orgLabel'],['出勤簿','#cloudControls'],['食事管理','#app'],['金銭出納帳','#app']]){
   await page.locator('#tools a').filter({has:page.getByRole('heading',{name:label,exact:true})}).click();
   try{await page.locator(ready).first().waitFor({state:'visible',timeout:20000})}catch(e){await page.screenshot({path:path.join(artifact,name+'-failure.png'),fullPage:true});console.error(JSON.stringify({label,url:page.url(),errors,blocked,requests:requests.slice(-12),body:(await page.locator('body').innerText()).slice(0,1200)}));throw e;}await page.locator('.app-nav a').filter({hasText:'NEXIAトップ'}).waitFor({state:'visible'});
+  await page.waitForFunction(()=>window.__nexiaStaffNameReady===true);
   if(label==='申し送り')await page.waitForFunction(()=>document.getElementById('orgLabel').textContent.includes('管理者'));
   if(label==='金銭出納帳'){
    await page.waitForFunction(()=>document.getElementById('clientSelect')?.value==='');
@@ -148,8 +156,20 @@ for(const [label,ready] of [['今日の担当','#main'],['AI記録','#recordHist
  for(const width of (name==='desktop'?[1024,768,560,390,320]:[])){
   await page.setViewportSize({width,height:900});const over=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);assert(over<=1,'top overflow at '+width);results.push({label:'home-responsive',viewport:width,overflow:over});
  }
+ // A legacy assignment URL must request the missing name, save it once and restore the URL.
+ await page.setViewportSize(viewport);tables.organization_members.find(m=>m.organization_id===A).staff_name='';allowNameWrite=true;failNameSave=true;
+ const deep=base+'?from=assignment&assignment='+AS+'&returnDashboard=name-check';
+ await page.goto(deep,{waitUntil:'domcontentloaded'});await page.locator('#nameRegistration').waitFor({state:'visible'});assert(page.url().includes('/home/?next='));assert(!(await page.locator('#businessMenu').isVisible()));assert(!(await page.locator('#admin').isVisible()));
+ await check('required-name');await page.locator('#staffName').fill('　 ');await page.locator('#saveStaffName').click();assert.equal(nameWriteAttempts,0);
+ await page.locator('#staffName').fill('登録した確認職員');await page.locator('#saveStaffName').click();await page.waitForFunction(()=>document.getElementById('nameStatus').textContent.includes('登録できません'));assert(!(await page.locator('#businessMenu').isVisible()));assert.equal(await page.locator('#staffName').inputValue(),'登録した確認職員');
+ await page.locator('#saveStaffName').click();await page.waitForURL(url=>url.pathname==='/ai-kiroku-app/'&&url.searchParams.get('assignment')===AS);await page.waitForFunction(id=>window.__nexiaStaffNameReady===true&&window.assignmentContext?.assignmentId===id,AS);assert.equal(new URL(page.url()).searchParams.get('returnDashboard'),'name-check');assert.equal(nameWrites,1);
+ await page.getByRole('link',{name:'NEXIAトップ',exact:true}).click();await page.locator('#businessMenu').waitFor({state:'visible'});await page.reload();await page.locator('#businessMenu').waitFor({state:'visible'});assert(!(await page.locator('#nameRegistration').isVisible()));
+ tables.organization_members.find(m=>m.organization_id===B).staff_name='氏名未設定';await page.locator('#organization').selectOption(B);await page.locator('#nameRegistration').waitFor({state:'visible'});assert((await page.locator('#nameFacility').innerText()).includes('確認用施設B'));
+ await page.locator('#staffName').fill('施設Bの確認職員');await page.locator('#saveStaffName').click();await page.locator('#businessMenu').waitFor({state:'visible'});assert(!(await page.locator('#admin').isVisible()));assert.equal(tables.organization_members.find(m=>m.organization_id===A).staff_name,'登録した確認職員');assert.equal(tables.organization_members.find(m=>m.organization_id===A).role,'admin');assert.equal(nameWrites,2);
+ results.push({label:'required-name-save-retry-and-deep-link-return',nameWrites,nameWriteAttempts,restored:true});
  await page.getByRole('button',{name:'ログアウト',exact:true}).click();await page.locator('#login').waitFor({state:'visible'});assert(!(await page.locator('#portal').isVisible()));
  assert.deepEqual(blocked,[],'unexpected external calls or writes');assert.deepEqual(errors,[],'uncaught script errors');
+ assert.equal(requests.filter(r=>r.path.endsWith('/token')).length,1);
  const report={name,results,passwordLogins:requests.filter(r=>r.path.endsWith('/token')).length,requests:requests.length,unplannedRequests:blocked,scriptErrors:errors,dialogs};
  fs.writeFileSync(path.join(artifact,`${name}.json`),JSON.stringify(report,null,2));await context.close();return report;
 }

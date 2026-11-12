@@ -79,6 +79,7 @@
   }
   function loadPageAddons(){
     const key=currentKey();
+    loadScript('staffNameRequirementScript',BASE+'staff-name.js?v=20261112-1');
     loadStyle('brookCommonTheme',THEME);
     loadScript('adminLinkScript',BASE+'admin-link.js?v=20261112-1');
     if(['record','assignment','cashbook'].includes(key)) loadScript('clientRoomUiScript',BASE+'client-room-ui.js?v=20261014-1');

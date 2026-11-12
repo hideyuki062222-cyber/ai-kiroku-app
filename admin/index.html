@@ -47,6 +47,6 @@ $('#addStaffBtn').onclick=async()=>{const name=$('#newStaffName').value.trim(),s
 $('#syncMembersBtn').onclick=async()=>{const st=$('#staffActionStatus');const missing=memberRows.filter(a=>!staffRows.some(s=>s.linked_user_id===a.user_id));if(!missing.length){st.textContent='ログイン済み職員はすべて出勤簿・担当割当に追加済みです。';return}if(!confirm(`${missing.length}名を出勤簿・担当割当に追加します。既存のログインなし職員が本人の場合は、あとで「職員管理」で本人紐付けを確認してください。`))return;$('#syncMembersBtn').disabled=true;st.textContent='追加中…';try{const payload=missing.map(a=>({organization_id:org.id,staff_name:(a.staff_name||'氏名未設定').trim()||'氏名未設定',linked_user_id:a.user_id,created_by:session.user.id}));const {error}=await db.from('organization_staff').insert(payload);if(error)throw error;st.textContent=`${missing.length}名を追加しました。`;await Promise.all([loadStaff(),loadCounts()]);}catch(e){st.textContent='追加できませんでした：'+e.message}finally{$('#syncMembersBtn').disabled=false}};
 init().catch(e=>{console.error(e);$('#denied').classList.remove('hidden');$('#denied').innerHTML='<div class="error">管理画面を読み込めませんでした：'+esc(e.message)+'</div>';});
 </script>
-<script src="../common-nav.js?v=20261112-1"></script>
+<script src="../common-nav.js?v=20261112-name-1"></script>
 </body>
 </html>

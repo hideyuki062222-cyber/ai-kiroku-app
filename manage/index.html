@@ -61,6 +61,6 @@ async function editResident(id){if(activeMembership?.role!=='admin')return;const
 async function retireResident(id){if(activeMembership?.role!=='admin')return;const x=clients.find(c=>c.id===id);if(!x||!x.is_active)return;if(!confirm('「'+roomLabel(x)+'」を退去扱いにしますか？\n過去のAI記録・申し送り・出納帳は削除されません。'))return;const {error}=await db.from('clients').update({is_active:false,updated_at:new Date().toISOString()}).eq('id',id).eq('organization_id',activeOrg.id);if(error){document.getElementById('clientStatus').textContent='退去処理できませんでした: '+error.message;return}document.getElementById('clientStatus').textContent='退去済みにしました。過去記録は保持されています。';await loadClients()}
 init();
 </script>
-<script src="../common-nav.js?v=20261028-ui&nexia=20261112-1"></script>
+<script src="../common-nav.js?v=20261028-ui&nexia=20261112-name-1"></script>
 </body>
 </html>
