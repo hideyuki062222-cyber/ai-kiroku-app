@@ -116,12 +116,15 @@ for(const [label,ready] of [['今日の担当','#main'],['AI記録','#recordHist
    const printNavigation=await page.locator('.app-nav').innerText();
    assert(!printNavigation.includes('NEXIAトップ')&&!printNavigation.includes('今日の担当')&&!printNavigation.includes('金銭出納帳'));
    assert(printNavigation.includes('今日')&&printNavigation.includes('出納帳'));
-   await page.emulateMedia({media:'screen'});
+   await page.emulateMedia({media:null});
    results.push({label:'attendance-excel-pdf',generated:true});
   }
   if(name==='desktop'&&label==='金銭出納帳'){
    await page.evaluate(()=>{window.__prints=0;window.print=()=>window.__prints++});await page.getByRole('button',{name:'印刷',exact:true}).click();await page.waitForFunction(()=>window.__prints===1);
+   await page.emulateMedia({media:'print'});
+   assert(await page.locator('#printReport').isVisible());assert(!(await page.locator('.input-card').isVisible()));
    await page.pdf({path:path.join(artifact,'cashbook.pdf'),format:'A4',preferCSSPageSize:true,printBackground:true});
+   await page.emulateMedia({media:null});
    results.push({label:'cashbook-pdf',generated:true});
   }
   await check('feature-'+label);
