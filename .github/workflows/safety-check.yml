@@ -37,12 +37,18 @@ jobs:
           node --check home/app.js
           node --check staff-name.js
           node --check tests/nexia_browser.cjs
+          node --check attendance/cloud.js
+          node --check assignment/offline-staff-addon.js
       - name: Check HTML inline JavaScript syntax
         run: node tests/html_inline_syntax.cjs
       - name: Check navigation consistency
         run: node tests/navigation_consistency.cjs
       - name: Install DOM test runner
-        run: npm install --prefix "$RUNNER_TEMP/nexia-tests" --no-audit --no-fund --ignore-scripts jsdom@26.1.0
+        run: npm install --prefix "$RUNNER_TEMP/nexia-tests" --no-audit --no-fund --ignore-scripts jsdom@26.1.0 @electric-sql/pglite@0.5.16
+      - name: Check canonical staff names, permissions and preserved data in isolated Postgres
+        env:
+          PGLITE_PATH: ${{ runner.temp }}/nexia-tests/node_modules/@electric-sql/pglite
+        run: node tests/staff_name_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
           JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
@@ -51,6 +57,7 @@ jobs:
           node tests/nexia_admin_nav.cjs
           node tests/dashboard_return.cjs
           node tests/record_link.cjs
+          node tests/attendance_dom.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
       - name: Run safety contract tests
