@@ -20,7 +20,7 @@
     };
 
     async function loadRoster(){
-      const {data,error}=await sb.from('organization_staff').select('id,staff_name,linked_user_id,is_active,sort_order').eq('organization_id',organization.id).order('is_active',{ascending:false}).order('sort_order').order('staff_name');
+      const {data,error}=await sb.from('organization_staff_directory').select('id,staff_name,linked_user_id,is_active,sort_order').eq('organization_id',organization.id).order('is_active',{ascending:false}).order('sort_order').order('staff_name');
       if(error){console.warn('offline staff load failed',error);return;}
       roster=data||[];fillStaff();
       document.dispatchEvent(new CustomEvent('offlineStaffLoaded'));

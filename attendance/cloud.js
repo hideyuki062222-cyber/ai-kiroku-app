@@ -34,7 +34,7 @@ async function cloudBuild(period,records,preferred){
 }
 async function cloudLoad(period=cloudPeriod(),preferred){
  cloudLock(true);try{
-  let q=attendanceDBClient.from('organization_staff').select('id,staff_name,linked_user_id,is_active,office_label,employment_type,sort_order').eq('organization_id',cloudOrg.id).order('sort_order').order('id');
+  let q=attendanceDBClient.from('organization_staff_directory').select('id,staff_name,linked_user_id,is_active,office_label,employment_type,sort_order').eq('organization_id',cloudOrg.id).order('sort_order').order('id');
   if(!cloudAdmin())q=q.eq('linked_user_id',cloudUser.id).eq('is_active',true);
   cloudStaff=await cloudAll(q);if(!cloudStaff.length)throw Error('本人と職員の紐付けが未設定、または利用停止中です。管理者に職員管理の確認を依頼してください。');
   if(!cloudAdmin()&&cloudStaff.length!==1)throw Error('本人の職員情報を一意に確認できません。管理者に連絡してください。');

@@ -1,5 +1,5 @@
 const fs=require('fs');
-for(const file of ['index.html','dashboard/index.html','admin/index.html','manage/index.html','handoff/index.html']){
+for(const file of ['index.html','dashboard/index.html','admin/index.html','staff/index.html','manage/index.html','handoff/index.html']){
   const html=fs.readFileSync(file,'utf8');
   const scripts=[...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map(m=>m[1]).filter(Boolean);
   if(!scripts.length)throw new Error(`${file}: inline script が見つかりません`);

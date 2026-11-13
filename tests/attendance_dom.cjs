@@ -9,7 +9,7 @@ async function scenario(admin){
  const clone=x=>structuredClone(x);
  const db={auth:{getUser:async()=>({data:{user:{id:uid}}}),onAuthStateChange:()=>{}},from(table){let filters=[],operation='select',payload,range=null;const query={select(){return this;},eq(k,v){filters.push(x=>x[k]===v);return this;},in(k,v){filters.push(x=>v.includes(x[k]));return this;},order(){return this;},range(a,b){range=[a,b];return this;},insert(x){operation='insert';payload=x;return this;},update(x){operation='update';payload=x;return this;},then(resolve,reject){try{
  if(fail&&['insert','update'].includes(operation))return Promise.resolve({error:{message:'TEST offline'}}).then(resolve,reject);
- let rows=table==='organization_members'?[{organization_id:org,user_id:uid,role:admin?'admin':'staff'}]:table==='organizations'?[{id:org,name:'テスト事業所',is_active:true}]:table==='organization_staff'?people:records;
+ let rows=table==='organization_members'?[{organization_id:org,user_id:uid,role:admin?'admin':'staff'}]:table==='organizations'?[{id:org,name:'テスト事業所',is_active:true}]:table==='organization_staff_directory'?people:records;
  let found=rows.filter(x=>filters.every(f=>f(x)));
  if(operation==='insert'){if(records.some(x=>x.staff_id===payload.staff_id&&x.period===payload.period))return Promise.resolve({error:{message:'duplicate'}}).then(resolve,reject);const x={...clone(payload),revision:1};records.push(x);found=[x];}
  if(operation==='update'){found.forEach(x=>Object.assign(x,clone(payload),{revision:x.revision+1}));}
