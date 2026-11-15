@@ -28,12 +28,12 @@ def main():
         target = assets / (relative.replace("/", "-") + ".pinned.html")
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(target)], check=True)
         manifest.append({"path": relative, "pinned": str(target)})
-    # Frozen production handoff before the two-action UI simplification.
+    # Frozen production handoff before the room list improvement.
     for name in ["index.html", "app.js", "app.css", "core.js"]:
-        target = assets / ("handoff-actions-before-" + name)
-        url = "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/a4263db18002fb6a41be49f0a1e069b8f264a5df/handoff/" + name
+        target = assets / ("handoff-rooms-before-" + name)
+        url = "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/d834ee9211abd6e5289d183e2faf2df1a1ddee5e/handoff/" + name
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(target)], check=True)
-        manifest.append({"path": "handoff-actions-before/" + name, "pinned": str(target)})
+        manifest.append({"path": "handoff-rooms-before/" + name, "pinned": str(target)})
     for version, name in [("2.57.4/dist/umd/supabase.min.js", "supabase-2.57.4.js"), ("2", "supabase-v2.js")]:
         url = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@" + version
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(assets / name)], check=True)
