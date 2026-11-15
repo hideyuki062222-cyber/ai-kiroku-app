@@ -36,6 +36,7 @@ jobs:
           node --check handoff/safety-addon.js
           node --check handoff/app.js
           node --check handoff/core.js
+          node --check handoff/rooms.js
           node --check tests/handoff_browser.cjs
           node --check home/app.js
           node --check staff-name.js
@@ -57,6 +58,7 @@ jobs:
           PGLITE_PATH: ${{ runner.temp }}/nexia-tests/node_modules/@electric-sql/pglite
         run: |
           node tests/handoff_rules.cjs
+          node tests/handoff_rooms.cjs
           node tests/handoff_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
