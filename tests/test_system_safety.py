@@ -55,31 +55,30 @@ def test_dashboard_passes_only_assignment_id():
     assert "carry_over.eq.true" in html
 
 
-def test_handoff_only_allows_workflow_state_columns():
-    sql = text("supabase/20261014_handoff_cashbook_safety.sql")
-    assert "revoke update on table public.handoff_entries from authenticated" in sql
-    assert "grant update (carry_over, resolved)" in sql
-    assert "handoff_workflow_audit_stamp" in sql
-    addon = text("handoff/safety-addon.js")
-    assert ".eq('organization_id',membership.organization_id)" in addon
-    assert "updated_at:new Date" not in addon
-    assert "12文字以上" in addon
+def test_handoff_workflow_writes_use_atomic_rpcs():
+    sql = text("supabase/migrations/20261115082458_handoff_workflow_history.sql")
+    app = text("handoff/app.js")
+    assert "revoke update,delete on public.handoff_entries from authenticated" in sql
+    assert "revoke insert,update,delete on public.handoff_confirmations" in sql
+    assert "handoff_set_confirmation" in app and "handoff_transition" in app
+    assert "p_expected_revision" in app and "p_request_id" in app
+    assert "password.length<12" in app
 
 
 def test_handoff_requires_explicit_target_for_floating_new_entry():
-    addon = text("handoff/safety-addon.js")
-    assert "originalOpenEntry" in addon
-    assert "if(!explicitTarget)" in addon
-    assert "select.value=''" in addon
-    assert "利用者または「全体申し送り・備考」を選択してください。" in addon
+    app = text("handoff/app.js")
+    assert "$('entryClient').value=cid||''" in app
+    assert "利用者または全体を選択" in app
+    assert "crypto.randomUUID()" in app
+    assert "entrySaving" in app
 
 
-def test_handoff_wrapper_injects_addon_at_real_final_body_tag():
-    wrapper = text("handoff/index.html")
-    assert "lastIndexOf('</body>')" in wrapper
-    assert "h=h.slice(0,bodyClose)+addon+h.slice(bodyClose)" in wrapper
-    assert "h.replace('</body>'" not in wrapper
-    assert "safety-addon.js?v=20261014-4" in wrapper
+def test_handoff_is_local_and_retains_navigation():
+    html = text("handoff/index.html")
+    assert './app.js?v=' in html and './core.js?v=' in html
+    assert '../common-nav.js?' in html
+    assert 'raw.githubusercontent.com' not in html
+    assert 'actionDialog' in html and 'countUnread' in html
 
 
 def test_assignment_rls_uses_real_organization_comparisons():
@@ -136,7 +135,8 @@ def test_room_labels_are_loaded_across_shared_pages():
     room_ui = text("client-room-ui.js")
     handoff = text("handoff/index.html")
     assert "client-room-ui.js?v=20261014-1" in common
-    assert "../client-room-ui.js?v=20261014-1" in handoff
+    assert "./app.js?v=" in handoff
+    assert "room_number" in text("handoff/app.js")
     assert "room_number" in room_ui
     assert "window.clientLabel=wrapped" in room_ui
     assert "clientAdminCard" in room_ui

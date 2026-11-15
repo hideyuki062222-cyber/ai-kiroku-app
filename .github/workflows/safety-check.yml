@@ -34,6 +34,9 @@ jobs:
           node --check assignment/safety-addon.js
           node --check cashbook/safety-addon.js
           node --check handoff/safety-addon.js
+          node --check handoff/app.js
+          node --check handoff/core.js
+          node --check tests/handoff_browser.cjs
           node --check home/app.js
           node --check staff-name.js
           node --check tests/nexia_browser.cjs
@@ -49,6 +52,12 @@ jobs:
         env:
           PGLITE_PATH: ${{ runner.temp }}/nexia-tests/node_modules/@electric-sql/pglite
         run: node tests/staff_name_database.cjs
+      - name: Check handoff history, atomic transitions and permissions locally
+        env:
+          PGLITE_PATH: ${{ runner.temp }}/nexia-tests/node_modules/@electric-sql/pglite
+        run: |
+          node tests/handoff_rules.cjs
+          node tests/handoff_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
           JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
@@ -83,4 +92,6 @@ jobs:
         env:
           PLAYWRIGHT_PATH: ${{ runner.temp }}/nexia-browser/node_modules/playwright
           NEXIA_BROWSER_ASSETS: ${{ runner.temp }}/nexia-browser-assets
-        run: node tests/nexia_browser.cjs
+        run: |
+          node tests/nexia_browser.cjs
+          node tests/handoff_browser.cjs

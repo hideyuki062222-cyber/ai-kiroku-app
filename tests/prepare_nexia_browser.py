@@ -17,7 +17,14 @@ def main():
     manifest = []
     for relative in ["index.html", "assignment/index.html", "handoff/index.html", "cashbook/index.html"]:
         source = (ROOT / relative).read_text(encoding="utf-8")
-        url = re.search(r'https://raw\.githubusercontent\.com/[^\s\x22\x27]+', source).group()
+        match = re.search(r'https://raw\.githubusercontent\.com/[^\s\x22\x27]+', source)
+        # Fixed pre-change handoff is used only for before/after browser comparisons.
+        if match:
+            url = match.group()
+        elif relative == "handoff/index.html":
+            url = "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/91b47bf1827139706f49f970a1ec6c5126d46134/handoff/index.html"
+        else:
+            raise ValueError(f"Missing public asset source: {relative}")
         target = assets / (relative.replace("/", "-") + ".pinned.html")
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(target)], check=True)
         manifest.append({"path": relative, "pinned": str(target)})
