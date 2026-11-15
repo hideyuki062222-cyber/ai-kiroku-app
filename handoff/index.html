@@ -3,39 +3,215 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<title>申し送り | COZY支援システム</title>
-<style>body{margin:0;background:#f5f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN",Meiryo,sans-serif}.loading{max-width:560px;margin:70px auto;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;box-shadow:0 2px 10px #00000008}.loading h1{font-size:20px;margin:0 0 8px}.loading p{font-size:13px;color:#667085;line-height:1.7}</style>
+<meta name="theme-color" content="#16345b">
+<title>申し送り | NEXIA</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<link rel="stylesheet" href="../common-theme.css?v=20261028-1"><link rel="stylesheet" href="./app.css?v=20261115-1">
 </head>
 <body>
-<div class="loading"><h1>申し送り</h1><p id="loadMsg">申し送り画面を読み込んでいます…</p></div>
-<script>
-(async()=>{
- const sources=[
-  'https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/91b47bf1827139706f49f970a1ec6c5126d46134/handoff/index.html',
-  'https://cdn.jsdelivr.net/gh/hideyuki062222-cyber/ai-kiroku-app@91b47bf1827139706f49f970a1ec6c5126d46134/handoff/index.html'
- ];
- let h='',lastError=null;
- for(const url of sources){
-   try{
-     const r=await fetch(url,{cache:'no-store'});
-     if(!r.ok)throw new Error('HTTP '+r.status);
-     h=await r.text();
-     if(h.includes('デジタル申し送り'))break;
-   }catch(e){lastError=e}
- }
- if(!h){
-   document.getElementById('loadMsg').textContent='画面を読み込めませんでした。再読み込みしてください。 '+(lastError?.message||'');
-   return;
- }
- h=h.replace('password.length<6','password.length<12');
- h=h.replace('メールアドレスと6文字以上のパスワードを入力してください。','メールアドレスと12文字以上のパスワードを入力してください。');
- const addon='<script src="../client-room-ui.js?v=20261014-1"><\/script><script src="./safety-addon.js?v=20261014-4"><\/script><script src="../common-nav.js?v=20261028-ui&nexia=20261112-name-1"><\/script>';
- const bodyClose=h.lastIndexOf('</body>');
- if(bodyClose>=0) h=h.slice(0,bodyClose)+addon+h.slice(bodyClose);
- else h+=addon;
- document.open();document.write(h);document.close();
-})();
-</script>
-</body>
-</html>
+<div id="auth" class="auth hidden">
+  <div class="authbox">
+    <h2>NEXIA 申し送り</h2><div class="sub">AI記録作成と同じアカウントを使えます</div>
+    <input id="email" type="email" placeholder="メールアドレス">
+    <input id="password" type="password" placeholder="パスワード（12文字以上）">
+    <div class="row"><button class="btn primary" onclick="login()">ログイン</button><button class="btn" onclick="signup()">新規登録</button></div>
+    <div id="authmsg" class="authmsg"></div>
+  </div>
+</div>
+
+<div id="setup" class="setup hidden">
+  <div class="setupbox">
+    <h2>事業所へ参加</h2>
+    <p class="small">AI記録作成ですでに事業所へ参加済みなら、そのまま利用できます。未参加の場合だけ参加コードを入力してください。</p>
+    <input id="joinCode" placeholder="参加コード">
+    <div class="row"><button class="btn primary" onclick="joinOrg()">参加する</button><button class="btn" onclick="logout()">ログアウト</button></div>
+    <div id="setupmsg" class="authmsg"></div>
+  </div>
+</div>
+
+<header class="top">
+  <div class="topline">
+    <div class="top-brand"><div class="brand">申し送り</div><select id="orgSwitch" class="org-switch" onchange="switchOrganization(this.value)"></select><div id="orgLabel" class="sub">読み込み中…</div></div>
+    <div class="header-right">
+      <nav class="app-nav" aria-label="アプリ切替">
+        <a class="app-tab active" href="./">申し送り</a>
+        <a class="app-tab" href="../?app=record">AI記録</a>
+        <a class="app-tab" href="../cashbook/">出納帳</a>
+      </nav>
+      <div class="utility-actions">
+        <a class="btn" href="../manage/" style="text-decoration:none">事業所</a>
+        <button id="adminTopBtn" class="btn amber hidden" onclick="openAdminSettings()">入力設定</button>
+        <button class="btn" onclick="printPdf()">印刷</button>
+        <button class="btn" onclick="logout()">退出</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="view-switch">
+      <button id="viewDayBtn" class="view-btn active" onclick="setViewMode('day')">📅 日付ごと</button>
+      <button id="viewManageBtn" class="view-btn hidden" onclick="setViewMode('manage')">管理者の確認</button>
+      <button id="viewClientBtn" class="view-btn" onclick="setViewMode('client')">👤 利用者ごと</button>
+    </div>
+    <div class="metric-grid" aria-label="申し送りの件数">
+      <button id="metricUnread" onclick="setFilter('unread')"><strong id="countUnread">—</strong><span id="unreadLabel">自分の未確認</span></button>
+      <button id="metricImportant" onclick="setFilter('important')"><strong id="countImportant">—</strong><span>重要</span></button>
+      <button id="metricCarry" onclick="setFilter('carry')"><strong id="countCarry">—</strong><span>継続中</span></button>
+      <button id="metricOverdue" onclick="setFilter('overdue')"><strong id="countOverdue">—</strong><span>期限超過</span></button>
+    </div>
+    <p class="rule-help">「重要」は注意の目印。「次の勤務にも残す」は未完了の引き継ぎです。重要だけでは翌日へ残りません。</p>
+    <div id="manageFilters" class="hidden">
+      <div class="manage-filters"><label>開始日<input id="reviewFrom" type="date" onchange="loadEntries()"></label><label>終了日<input id="reviewTo" type="date" onchange="loadEntries()"></label><label>職員（投稿・確認・対応）<select id="reviewStaff" onchange="render()"></select></label><label>利用者<select id="reviewClient" onchange="render()"></select></label></div>
+      <label class="checkrow"><input id="includeArchived" type="checkbox" onchange="loadEntries()">保管済みも表示する</label>
+      <p class="small">確認対象は、現在所属するログイン職員（投稿者を除く）です。各申し送りで全員の確認状況を開けます。</p>
+    </div>
+    <div class="datebar">
+      <button class="btn" onclick="moveDate(-1)">‹</button>
+      <input id="dateInput" type="date" onchange="changeDate(this.value)">
+      <button class="btn" onclick="moveDate(1)">›</button>
+      <button class="btn" onclick="goToday()">今日</button>
+    </div>
+    <div class="segment">
+      <button id="shiftAll" class="seg active" onclick="setShift('all')">すべて</button>
+      <button id="shiftDay" class="seg" onclick="setShift('day')">☀ 日勤</button>
+      <button id="shiftNight" class="seg night" onclick="setShift('night')">☾ 夜勤</button>
+    </div>
+    <div class="row between no-print"><div class="filters">
+      <button id="fAll" class="chip active" onclick="setFilter('all')">すべて</button>
+      <button id="fUnread" class="chip" onclick="setFilter('unread')">未確認</button>
+      <button id="fImportant" class="chip" onclick="setFilter('important')">重要</button>
+      <button id="fCarry" class="chip" onclick="setFilter('carry')">継続中</button>
+    </div>
+    <button id="reloadEntries" class="btn" onclick="loadEntries()">最新の情報に更新</button></div>
+    <div id="summary" class="status" role="status" aria-live="polite"></div>
+  </section>
+
+  <div id="operationStatus" class="operation-status" role="status" hidden></div>
+  <div id="dayModeArea">
+  <section class="generalbox">
+    <div class="general-title"><div><strong>📌 全体申し送り・備考</strong><div class="small">利用者に紐づかない共通連絡</div></div><button class="btn amber no-print" onclick="openEntry('__general__')">＋ 追加</button></div>
+    <div id="generalList"></div>
+  </section>
+
+  <section class="card">
+    <div class="row between"><strong>利用者の申し送り</strong><select id="listClient" aria-label="利用者で絞り込む" onchange="render()"></select></div>
+    <div id="clientList"></div>
+  </section>
+
+  </div>
+
+  <section id="clientModeArea" class="card hidden">
+    <div class="client-history-head">
+      <div style="flex:1"><strong>利用者別の経過</strong><div class="small">選択した日を基準に、数日間の申し送りを日付別に表示します。</div></div>
+      <select id="historyClient" onchange="changeHistoryClient(this.value)"></select>
+    </div>
+    <div class="range-switch">
+      <button id="range3" class="range-btn" onclick="setHistoryRange(3)">3日</button>
+      <button id="range7" class="range-btn active" onclick="setHistoryRange(7)">7日</button>
+      <button id="range14" class="range-btn" onclick="setHistoryRange(14)">14日</button>
+    </div>
+    <div id="clientTimeline" style="margin-top:12px"></div>
+  </section>
+
+  <section id="adminCard" class="card hidden">
+    <div class="row between"><div><strong style="font-size:18px">⚙ 管理者設定</strong><div class="small">管理者だけに表示されます</div></div><button class="btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">上へ戻る</button></div>
+    <div class="admin-divider"></div>
+    <p>利用者の入退居・表示名は共通の事業所管理で行います。</p><a class="btn" href="../manage/">事業所・権限管理へ</a><div class="admin-divider"></div>
+    <strong>かんたん入力の管理</strong>
+    <div class="small">ここで追加・削除したボタンが、全スタッフの「かんたん入力」に反映されます。</div>
+    <div class="quick-add-row" style="flex-wrap:wrap">
+  <select id="newQuickCategory" style="border:1px solid #ccd4df;border-radius:10px;padding:10px;background:#fff;min-width:130px">
+    <option value="食事">🍚 食事</option>
+    <option value="入浴">🛁 入浴</option>
+    <option value="排泄">🚻 排泄</option>
+    <option value="服薬">💊 服薬</option>
+    <option value="体調">❤️ 体調</option>
+    <option value="睡眠">🌙 睡眠</option>
+    <option value="受診">🏥 受診</option>
+    <option value="予定">📅 予定・外出</option>
+    <option value="コール">🔔 コール</option>
+    <option value="物品">📦 物品・生活</option>
+    <option value="家族連絡">☎ 家族連絡</option>
+    <option value="その他">その他</option>
+  </select>
+  <input id="newQuickInput" maxlength="80" placeholder="例：昼食半量、入浴拒否、外泊予定">
+  <button class="btn primary" onclick="addQuickInput()">追加</button>
+</div>
+    <div id="quickManageStatus" class="status"></div>
+    <div id="quickManageList" class="quick-manage-list"></div>
+  </section>
+</main>
+
+<button class="fab" onclick="openEntry()">＋ 申し送り</button>
+
+<div id="entryOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="申し送り入力">
+ <div class="sheet">
+  <div class="row between"><h2>申し送り入力</h2><button class="close" aria-label="申し送り入力を閉じる" onclick="closeEntry()">×</button></div>
+  <div class="field"><label class="client-select-label">👤 利用者を選択</label><select id="entryClient" aria-label="利用者を選択"></select><button id="entryClientButton" type="button" class="client-picker-button" onclick="openClientPicker()"><span id="entryClientButtonText">利用者を選ぶ</span><span class="client-picker-arrow">›</span></button><div class="client-select-help">この大きなボタンをタップして選択してください</div><div class="quicknote">「全体申し送り・備考」を選ぶと、事業所全体への連絡になります。</div></div>
+  <div class="field"><label>勤務区分</label><div class="segment"><button id="entryDay" class="seg active" onclick="setEntryShift('day')">☀ 日勤</button><button id="entryNight" class="seg night" onclick="setEntryShift('night')">☾ 夜勤</button><span></span></div></div>
+  <details id="dueOptions" class="field"><summary>対応日・時刻（任意）</summary><div class="duebox"><input id="dueDate" type="date" aria-label="対応日"><input id="dueTime" type="time" aria-label="対応時刻"></div><div class="quicknote">対応日を設定すると、未完了の間は次の日・次の勤務にも残ります。</div></details>
+  <div class="field"><label for="entryBody">申し送り内容</label><textarea id="entryBody" maxlength="500" placeholder="次の勤務者に伝える内容を入力" oninput="bodyCount()"></textarea><div id="bodyCounter" class="counter">0/500</div></div>
+  <label class="checkrow important"><input id="important" type="checkbox">重要な申し送り</label><p class="small">注意の目印です。これだけでは翌日へ残りません。</p>
+  <label class="checkrow carry"><input id="carry" type="checkbox">📌 次の勤務にも残す</label>
+  <div class="carry-help">未完了の間、次の日・次の勤務にも表示します。「対応完了」で終了。対応日を設定すると自動で残ります。</div>
+  <div class="row"><button class="btn" onclick="closeEntry()">キャンセル</button><button id="saveBtn" class="btn primary" onclick="saveEntry()">保存する</button></div>
+  <div id="entryStatus" class="status" role="status"></div>
+  <details class="quick-section">
+    <summary class="quick-section-title">⚡ かんたん入力</summary>
+    <div id="quickCategoryTabs" class="quick-cat-tabs"></div>
+    <div id="templates"></div>
+    <div class="quicknote">カテゴリーを選んで、使いたい項目を押してください。</div>
+  </details>
+
+  <details class="quick-section">
+    <summary class="quick-section-title">⚖️ 体重</summary>
+    <div class="row"><div class="number-item" style="flex:1"><label>体重（kg）</label><input id="weightInput" type="number" inputmode="decimal" step="0.1" min="0" placeholder="例 62.8"></div><button class="btn" style="align-self:end" onclick="addWeight()">追加</button></div>
+  </details>
+
+  <details class="quick-section">
+    <summary class="quick-section-title">❤️ バイタル</summary>
+    <div class="vital-help">測った項目だけ入力すればOKです。</div>
+    <div class="vital-stack">
+      <div class="vital-line">
+        <label for="tempInput">🌡 体温</label>
+        <div><input class="vital-input" id="tempInput" type="number" inputmode="decimal" step="0.1" placeholder="36.5"><div class="vital-unit">℃</div></div>
+      </div>
+      <div class="vital-line">
+        <label>🩺 血圧</label>
+        <div><div class="bp-inputs"><input class="vital-input" id="bpSysInput" type="number" inputmode="numeric" step="1" placeholder="上 120"><span class="bp-slash">/</span><input class="vital-input" id="bpDiaInput" type="number" inputmode="numeric" step="1" placeholder="下 80"></div><div class="vital-unit">mmHg</div></div>
+      </div>
+      <div class="vital-line">
+        <label for="pulseInput">💓 脈拍</label>
+        <div><input class="vital-input" id="pulseInput" type="number" inputmode="numeric" step="1" placeholder="80"><div class="vital-unit">回/分</div></div>
+      </div>
+      <div class="vital-line">
+        <label for="spo2Input">🫁 SpO₂</label>
+        <div><input class="vital-input" id="spo2Input" type="number" inputmode="numeric" step="1" placeholder="98"><div class="vital-unit">%</div></div>
+      </div>
+    </div>
+    <button class="quick-add" onclick="addVitals()">＋ バイタルを申し送りに追加</button>
+  </details>
+ </div>
+</div>
+
+<div id="clientPickerOverlay" class="overlay picker-overlay hidden">
+ <div class="sheet picker-sheet">
+  <div class="row between"><h2>利用者を選択</h2><button class="close" onclick="closeClientPicker()">×</button></div>
+  <input id="clientSearch" class="client-search" type="search" inputmode="search" placeholder="番号・名前で検索" oninput="renderClientPicker()">
+  <div id="clientPickerList" class="client-picker-list"></div>
+ </div>
+</div>
+
+<div id="detailOverlay" class="overlay hidden">
+ <div class="sheet">
+  <div class="row between"><div><h2 id="detailTitle">利用者詳細</h2><div id="detailSub" class="small"></div></div><button class="close" onclick="closeDetail()">×</button></div>
+  <div class="row no-print"><button class="btn primary" onclick="openEntryForSelected()">＋ この利用者へ追加</button><button class="btn" onclick="loadHistory()">過去30日</button></div>
+  <div id="detailList"></div>
+ </div>
+</div>
+
+<dialog id="actionDialog" aria-labelledby="actionTitle"><form id="actionForm"><h2 id="actionTitle">対応完了</h2><p id="actionDescription"></p><label for="actionNote">対応内容（任意・300文字まで）</label><textarea id="actionNote" maxlength="300" rows="3"></textarea><div class="row"><button type="button" onclick="closeAction()">キャンセル</button><button id="actionSave" type="submit" class="btn primary">保存する</button></div><p id="actionStatus" role="status"></p></form></dialog>
+<script src="./core.js?v=20261115-1"></script><script src="./app.js?v=20261115-1"></script><script src="../common-nav.js?v=20261028-ui&nexia=20261112-name-1"></script>
+</body></html>
