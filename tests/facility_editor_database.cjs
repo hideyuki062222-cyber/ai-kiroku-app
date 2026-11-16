@@ -69,7 +69,12 @@ try{
  await denied(()=>db.query('update public.meal_profiles set client_id=$1 where client_id=$2',[inserted[0].id,CA]),/immutable/);
  eq((await rows('update public.meal_prices set morning=999 where organization_id=$1 returning organization_id',[A])).length,0);
  await denied(()=>db.query('insert into public.meal_prices(organization_id,effective_date,morning,lunch,evening) values($1,current_date+1,1,1,1)',[A]),/row.level security|facility_edit_required/);
- // D: atomic time replacement, non-destructive deactivation, exact ID and preset preservation.
+ // D: minute-granularity validation and immutable time identities apply to direct APIs too.
+ await denied(()=>db.query("select public.save_facility_service_times($1,$2,array['24:00']::time[],array['09:00']::time[])",[A,CA]),/invalid_service_times/);
+ await denied(()=>db.query("select public.save_facility_service_times($1,$2,array['09:00:01']::time[],array['09:00']::time[])",[A,CA]),/invalid_service_times/);
+ await denied(()=>db.query("insert into public.client_service_slots(organization_id,client_id,service_time) values($1,$2,'10:00:01')",[A,CA]),/invalid_service_settings/);
+ await denied(()=>db.query("update public.client_service_slots set service_time='10:00' where id=$1",[SLOT]),/immutable_facility_fields/);
+ // Atomic time replacement, non-destructive deactivation, exact ID and preset preservation.
  await db.query("select public.save_facility_service_times($1,$2,array['08:00','20:00']::time[],array['09:00']::time[])",[A,CA]);
  eq((await rows('select is_active from public.client_service_slots where id=$1',[SLOT]))[0].is_active,false);
  eq((await rows('select service_time from public.client_service_slots where organization_id=$1 and client_id=$2 and is_active order by sort_order',[A,CA])).map(r=>r.service_time),['20:00:00','08:00:00'],'night-to-next-morning ordering remains the existing orderMinute convention');

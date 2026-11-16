@@ -117,7 +117,8 @@ begin
   v_allowed:=array['label','category','sort_order'];
   if new.category not in ('体調','食事','服薬','入浴','排泄','睡眠','受診','物品','家族連絡','予定','コール','その他') then raise exception 'invalid_quick_category';end if;
  elsif TG_TABLE_NAME='client_service_slots' then
-  v_allowed:=array['service_time','label','note','days_of_week','sort_order','is_active','service_contents','updated_at'];
+  v_allowed:=array['label','note','days_of_week','sort_order','is_active','service_contents','updated_at'];
+  if TG_OP='INSERT' and (new.service_time>=time '24:00' or extract(second from new.service_time)<>0) then raise exception 'invalid_service_settings';end if;
   if not new.days_of_week <@ array[0,1,2,3,4,5,6]::smallint[] or length(new.label)>200 or length(new.note)>1000 then raise exception 'invalid_service_settings';end if;
  elsif TG_TABLE_NAME='meal_profiles' then
   v_allowed:=array['start_date','end_date','food_form','rice_morning','rice_lunch','rice_evening','morning','lunch','evening','weekdays','note','revision','updated_at','updated_by'];
@@ -171,7 +172,7 @@ create function public.save_facility_service_times(p_org uuid,p_client uuid,p_ti
 declare actual time[];wanted time[];n integer;
 begin
  perform private.lock_facility_editor(p_org,'assignment_settings');
- if p_times is null or p_expected_times is null or array_position(p_times,null) is not null or cardinality(p_times)>48 then raise exception 'invalid_service_times';end if;
+ if p_times is null or p_expected_times is null or array_position(p_times,null) is not null or cardinality(p_times)>1440 or exists(select 1 from unnest(p_times) t where t>=time '24:00' or extract(second from t)<>0) then raise exception 'invalid_service_times';end if;
  if not exists(select 1 from public.clients c where c.id=p_client and c.organization_id=p_org and c.is_active) then raise exception 'active_client_required';end if;
  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(p_org::text||'/'||p_client::text,913));
  select coalesce(array_agg(service_time order by service_time),'{}') into actual from public.client_service_slots where organization_id=p_org and client_id=p_client and is_active;
