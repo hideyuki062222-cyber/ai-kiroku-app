@@ -192,7 +192,11 @@
         serviceChecks.forEach(cb=>{cb.checked=s.service_contents.includes(cb.value);});
       }else applyServiceLabel(ctx.label);
       serviceChecks.forEach(cb=>cb.dispatchEvent(new Event('change',{bubbles:true})));
-      history.replaceState(null,'',location.pathname+'?'+new URLSearchParams({from:'assignment',assignment:id}).toString());
+      // Keep the return token while the name-registration gate is resolving asynchronously.
+      // It only selects existing dashboard view state; record identity still comes from the database.
+      const cleanParams=new URLSearchParams({from:'assignment',assignment:id});
+      if(params.get('returnDashboard'))cleanParams.set('returnDashboard',params.get('returnDashboard'));
+      history.replaceState(null,'',location.pathname+'?'+cleanParams.toString());
     }catch(e){
       console.error('assignment context load failed',e);
       const card=q('assignmentContextCard'),text=q('assignmentContextText');if(card)card.classList.remove('hidden');if(text)text.textContent='担当割当の情報を安全に読み込めませんでした。担当割当画面から開き直してください。';

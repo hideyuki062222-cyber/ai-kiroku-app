@@ -9,7 +9,7 @@
   function clearCache(){try{CACHE.forEach(key=>localStorage.removeItem(key))}catch(_e){}}
   function notice(message,error=false){$('status').hidden=!message;$('status').textContent=message;$('status').classList.toggle('error',error)}
   function hideContent(){
-    $('portal').hidden=true;$('admin').hidden=true;$('unavailable').hidden=true;
+    $('portal').hidden=true;$('admin').hidden=true;$('facilityEditorTools').hidden=true;$('unavailable').hidden=true;
     $('nameRegistration').hidden=true;$('businessMenu').hidden=true;nameContext=null;
     $('organization').replaceChildren();$('identity').textContent='';$('role').textContent='';
     organizations=[];memberships=[];
@@ -22,9 +22,10 @@
     const org=organizations.find(o=>o.id===id),member=memberships.find(m=>m.organization_id===id);
     if(!org||!member||!['admin','staff'].includes(member.role))throw Error('この施設を利用する権限がありません。');
     saveOrg(org.id);$('organization').value=org.id;
-    $('role').textContent=member.role==='admin'?'管理者':'一般職員';
+    $('role').textContent=NexiaPermissions.label(member);
     $('identity').textContent=member.staff_name?member.staff_name+' さん':'業務を始めましょう。';
     const needsName=window.NexiaStaffName.missing(member.staff_name);
+    $('facilityEditorTools').hidden=needsName||member.role==='admin'||!NexiaPermissions.can(member,'resident_info',org);
     $('businessMenu').hidden=needsName;$('nameRegistration').hidden=!needsName;$('admin').hidden=needsName||member.role!=='admin';$('portal').hidden=false;
     if(needsName){
       nameContext={userId:user.id,orgId:org.id,prior:member.staff_name??'',version:generation};
@@ -57,6 +58,7 @@
         if(version!==generation)return;if(o.error)throw o.error;
         orgs=(o.data||[]).filter(o=>o.is_active&&members.some(m=>m.organization_id===o.id));
       }
+      await Promise.all(members.map(member=>NexiaPermissions.load(db,member,orgs.find(o=>o.id===member.organization_id),user.id)));if(version!==generation)return;
       memberships=members;organizations=orgs;
       if(!orgs.length){clearCache();$('unavailable').hidden=false;notice('');return}
       $('organization').replaceChildren(...orgs.map(o=>new Option(o.name,o.id)));

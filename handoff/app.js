@@ -143,12 +143,13 @@ function renderQuickManage(){
    const items=quickInputs.filter(x=>(x.category||"その他")===cat);
    if(!items.length)continue;
    html+='<div style="width:100%;font-size:12px;font-weight:900;color:#667489;margin-top:7px">'+esc(QUICK_CATEGORY_LABELS[cat]||cat)+'</div>';
-   html+=items.map(x=>'<span class="quick-manage-item">'+esc(x.label)+'<button class="quick-delete" title="削除" onclick="deleteQuickInput(\''+x.id+'\')">×</button></span>').join("");
+   html+=items.map(x=>'<span class="quick-manage-item">'+esc(x.label)+'<button type="button" class="mini" onclick="editQuickInput(\''+x.id+'\')">編集</button><button class="quick-delete" title="削除" onclick="deleteQuickInput(\''+x.id+'\')">×</button></span>').join("");
  }
  el.innerHTML=html;
 }
 
 async function addQuickInput(){
+ try{await NexiaPermissions.requireEdit(db,membership,organization,session.user.id,'handoff_settings');}catch(e){document.getElementById('quickManageStatus').textContent=e.message;return;}
  const input=document.getElementById("newQuickInput"),label=input.value.trim(),category=document.getElementById("newQuickCategory").value||"その他",status=document.getElementById("quickManageStatus");
  if(!label){status.textContent="追加する言葉を入力してください。";return}
  status.textContent="追加中…";
@@ -160,7 +161,19 @@ async function addQuickInput(){
  input.value="";status.textContent="追加しました。";await loadQuickInputs();
 }
 
+async function editQuickInput(id){
+ try{await NexiaPermissions.requireEdit(db,membership,organization,session.user.id,'handoff_settings');}catch(e){$('quickManageStatus').textContent=e.message;return;}
+ const item=quickInputs.find(q=>q.id===id);if(!item)return;
+ $('quickEditDialog')?.remove();const dialog=document.createElement('dialog');dialog.id='quickEditDialog';
+ dialog.innerHTML='<form><h2>かんたん入力を編集</h2><label>項目名<input name="label" maxlength="80" required></label><label>カテゴリー<select name="category"></select></label><p role="status"></p><button type="button">閉じる</button><button class="btn primary" type="submit">変更を保存</button></form>';
+ const form=dialog.querySelector('form');form.elements.label.value=item.label;form.elements.category.innerHTML=$('newQuickCategory').innerHTML;form.elements.category.value=item.category;form.querySelector('[type=button]').onclick=()=>dialog.close();
+ form.onsubmit=async event=>{event.preventDefault();const button=form.querySelector('[type=submit]');button.disabled=true;
+  try{await NexiaPermissions.requireEdit(db,membership,organization,session.user.id,'handoff_settings');const {data,error}=await db.from('handoff_quick_inputs').update({label:form.elements.label.value.trim(),category:form.elements.category.value}).eq('id',item.id).eq('organization_id',organization.id).eq('label',item.label).eq('category',item.category).select('id');if(error)throw error;if(data?.length!==1)throw Error('別の職員が変更しました。最新の項目を確認してください。');await loadQuickInputs();dialog.close();}
+  catch(error){form.querySelector('[role=status]').textContent=error.message;}finally{button.disabled=false;}
+ };document.body.append(dialog);dialog.showModal();
+}
 async function deleteQuickInput(id){
+ try{await NexiaPermissions.requireEdit(db,membership,organization,session.user.id,'handoff_settings');}catch(e){document.getElementById('quickManageStatus').textContent=e.message;return;}
  const item=quickInputs.find(x=>x.id===id); const label=item?.label||"この項目";
  if(!confirm("「"+label+"」を削除しますか？"))return;
  const status=document.getElementById("quickManageStatus");status.textContent="削除中…";
@@ -211,8 +224,9 @@ async function loadMembership(){
  const saved=localStorage.getItem('activeOrganizationId');organization=organizations.find(o=>o.id===saved)||organizations[0];membership=ms.find(m=>m.organization_id===organization.id);
  localStorage.setItem('activeOrganizationId',organization.id);hide('setup');
  $('orgSwitch').innerHTML=organizations.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');$('orgSwitch').value=organization.id;
- $('orgLabel').textContent=(membership.staff_name||'職員')+' / '+(membership.role==='admin'?'管理者':'一般職員');
- $('viewManageBtn').classList.toggle('hidden',membership.role!=='admin');$('adminTopBtn').classList.toggle('hidden',membership.role!=='admin');hide('adminCard');
+ await NexiaPermissions.load(db,membership,organization,session.user.id);
+ $('orgLabel').textContent=(membership.staff_name||'職員')+' / '+NexiaPermissions.label(membership);
+ $('viewManageBtn').classList.toggle('hidden',membership.role!=='admin');$('adminTopBtn').classList.toggle('hidden',!NexiaPermissions.can(membership,'handoff_settings',organization));hide('adminCard');
  $('dateInput').value=selectedDate;$('reviewFrom').value=selectedDate;$('reviewTo').value=selectedDate;
  await Promise.all([loadClients(),loadStaff(),loadQuickInputs()]);await loadEntries();
 }
@@ -428,9 +442,9 @@ async function transition(id,action,note='',draft=null){
 }
 function savedFeedback(message,entry){lastSavedEntry=entry;const box=$('operationStatus');box.replaceChildren(document.createTextNode(message));if(entry&&!entry.archived){const button=document.createElement('button');button.className='btn';button.textContent='この申し送りの履歴';button.onclick=()=>{if(lastSavedEntry?.organization_id!==organization.id)return;selectedDate=lastSavedEntry.service_date;$('dateInput').value=selectedDate;filterMode='all';shiftFilter='all';if(lastSavedEntry.client_id){historyClientId=lastSavedEntry.client_id;$('historyClient').value=historyClientId;setViewMode('client');}else setViewMode('day');};box.append(button);}box.hidden=false;}
 function archiveEntry(id){if(confirm('履歴を残したまま、この申し送りを通常の一覧から保管しますか？ 管理者の確認画面から戻せます。'))transition(id,'archived');}
-function openAdminSettings(){if(membership?.role!=='admin')return;show('adminCard');$('adminCard').scrollIntoView({behavior:'smooth',block:'start'});}
+function openAdminSettings(){if(!NexiaPermissions.can(membership,'handoff_settings',organization))return;show('adminCard');$('adminCard').scrollIntoView({behavior:'smooth',block:'start'});}
 function clearHandoffData(){++loadVersion;entries=[];receiptRows=[];activityRows=[];actionDraft=null;lastEntryPayload=null;lastSavedEntry=null;$('operationStatus').hidden=true;entrySaving=false;pendingRequests.clear();busyEntries.clear();expandedEntries.clear();expandedRooms.clear();for(const id of ['entryBody','actionNote'])$(id).value='';hide('entryOverlay');$('actionDialog').close();for(const id of ['clientList','generalList','clientTimeline'])$(id).replaceChildren();}
-function refresh(){if(membership&&!document.hidden&&!hasDraft()&&!busyEntries.size){loadStaff().then(()=>loadEntries()).catch(error=>{$('summary').textContent=errorText(error);});}}
+function refresh(){if(membership&&!document.hidden&&!hasDraft()&&!busyEntries.size){NexiaPermissions.load(db,membership,organization,session.user.id).then(()=>{ $('adminTopBtn').classList.toggle('hidden',!NexiaPermissions.can(membership,'handoff_settings',organization));if(!NexiaPermissions.can(membership,'handoff_settings',organization))hide('adminCard');return loadStaff();}).then(()=>loadEntries()).catch(error=>{$('summary').textContent=errorText(error);});}}
 window.addEventListener('pageshow',e=>{if(e.persisted)refresh();});
 document.addEventListener('visibilitychange',refresh);
 window.addEventListener('beforeunload',e=>{if(hasDraft()||entrySaving||busyEntries.size){e.preventDefault();e.returnValue='';}});

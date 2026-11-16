@@ -1,7 +1,7 @@
 (()=>{
  const choices=['起床介助','就寝介助','トイレ介助','食事介助','入浴準備','入浴介助','更衣介助','服薬介助・確認','口腔ケア','清容・保清','移動介助','買い物・外出支援','通院等介助','家事援助','その他'];
  function decorate(){
-  if(membership?.role!=='admin')return;
+  if(!NexiaPermissions.can(membership,'assignment_settings',organization))return;
   document.querySelectorAll('[data-times]').forEach(input=>{
    const box=input.closest('.settings-client');if(!box||box.querySelector('.service-presets'))return;
    const panel=document.createElement('div');panel.className='service-presets';
@@ -13,7 +13,7 @@
   });
  }
  function edit(slot){
-  if(membership?.role!=='admin')return;
+  if(!NexiaPermissions.can(membership,'assignment_settings',organization))return;
   document.getElementById('servicePresetDialog')?.remove();
   const dialog=document.createElement('dialog');dialog.id='servicePresetDialog';dialog.style.cssText='width:min(520px,90vw);max-height:85vh;overflow:auto;border:0;border-radius:16px;padding:20px';
   const title=document.createElement('h2');title.textContent=clientLabel(clients.find(c=>c.id===slot.client_id))+' '+fmtTime(slot.service_time);dialog.append(title);
@@ -25,6 +25,7 @@
   save.onclick=async()=>{
    save.disabled=true;status.textContent='保存中…';
    try{
+    await NexiaPermissions.requireEdit(sb,membership,organization,session.user.id,'assignment_settings');
     const values=[...fields.querySelectorAll('input:checked')].map(x=>x.value);
     let query=sb.from('client_service_slots').update({service_contents:values}).eq('id',slot.id).eq('organization_id',organization.id);
     query=slot.service_contents==null?query.is('service_contents',null):query.eq('service_contents',JSON.stringify(slot.service_contents));
