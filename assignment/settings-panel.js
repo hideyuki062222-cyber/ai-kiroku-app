@@ -38,12 +38,14 @@
       try{
         if(typeof membership==='undefined'||!membership)return false;
         const admin=membership.role==='admin';
-        button.style.display=admin?'inline-flex':'none';
+        const editor=NexiaPermissions.can(membership,'assignment_settings',organization);
+        button.style.display=editor?'inline-flex':'none';
         staffLink.style.display=admin?'inline-flex':'none';
-        if(!admin)close();
+        if(!editor)close();
         return true;
       }catch(e){return false;}
     }
+    window.addEventListener('nexia-permissions-changed',applyRole);
     if(!applyRole()){
       let tries=0;
       const timer=setInterval(()=>{tries++;if(applyRole()||tries>50)clearInterval(timer);},200);

@@ -1,0 +1,94 @@
+// Browser/UI contract tests. All Supabase calls are intercepted; no production accounts or data.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
+const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
+const root=path.resolve(__dirname,'..'),assets=process.env.NEXIA_BROWSER_ASSETS||'/workspace/work/handoff-room-assets',out=process.env.EDITOR_BROWSER_OUTPUT||path.join(assets,'editor-results');fs.mkdirSync(out,{recursive:true});
+const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,[A,B,ADMIN,EDITOR,CA,CB,SLOT,AS,REC,Q,H]=[1,2,11,12,21,22,31,41,51,61,71].map(id);
+const today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),at=today+'T00:00:00Z';
+function fixture(){return {
+ organizations:[{id:A,name:'検証施設A',is_active:true,join_code:'SYNTHETIC-A'},{id:B,name:'検証施設B',is_active:true,join_code:'SYNTHETIC-B'}],
+ organization_members:[{organization_id:A,user_id:ADMIN,role:'admin',staff_name:'検証管理者'},{organization_id:A,user_id:EDITOR,role:'staff',staff_name:'検証職員'},{organization_id:B,user_id:EDITOR,role:'staff',staff_name:'検証職員B'}],organization_facility_editors:[],
+ clients:[{id:CA,organization_id:A,code:'101',room_number:'101',display_name:'検証利用者A',is_active:true,sort_order:1},{id:CB,organization_id:B,code:'201',room_number:'201',display_name:'検証利用者B',is_active:true,sort_order:1}],
+ organization_staff:[],client_service_slots:[{id:SLOT,organization_id:A,client_id:CA,service_time:'09:00:00',is_active:true,days_of_week:[0,1,2,3,4,5,6],label:'食事介助',note:'既存設定',service_contents:['食事介助']}],
+ staff_assignments:[{id:AS,organization_id:A,client_id:CA,service_date:today,service_time:'09:00:00',assigned_user_id:EDITOR,assigned_staff_id:null,assigned_staff_name:'検証職員',memo:'既存メモ',created_by:ADMIN,updated_by:ADMIN}],care_records:[{id:REC,organization_id:A,client_id:CA,assignment_id:AS,created_by:ADMIN,record_text:'保持するAI記録',created_at:at}],
+ handoff_quick_inputs:[{id:Q,organization_id:A,label:'食事を全量摂取',category:'食事',sort_order:1,created_at:at}],handoff_entries:[{id:H,organization_id:A,client_id:CA,service_date:today,shift:'day',body:'保持する申し送り',is_important:true,carry_over:false,resolved:false,archived:false,created_by:ADMIN,created_at:at,workflow_revision:0,scope:'client'}],handoff_confirmations:[],handoff_activity:[],
+ meal_profiles:[{organization_id:A,client_id:CA,start_date:today.slice(0,7)+'-01',end_date:null,morning:true,lunch:true,evening:true,weekdays:[0,1,2,3,4,5,6],food_form:'常食',rice_morning:150,rice_lunch:150,rice_evening:150,note:'',revision:1}],meal_prices:[],meal_entries:[{id:id(81),organization_id:A,client_id:CA,meal_date:today,meal:'morning',status:'served',served_once:true,unit_price:330,food_form:'常食',rice_grams:150,revision:1,updated_by:ADMIN,updated_by_name:'検証管理者',updated_at:at}]
+};}
+const server=http.createServer((req,res)=>{let file=path.join(root,decodeURIComponent(new URL(req.url,'http://local').pathname).replace(/^\/ai-kiroku-app\/?/,''));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}try{if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');res.writeHead(200,{'content-type':file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.css')?'text/css':'text/javascript'}).end(fs.readFileSync(file));}catch{res.writeHead(404).end();}});
+const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,PATCH,DELETE,OPTIONS','content-type':'application/json'};
+function matches(value,f){const dot=f.indexOf('.'),op=f.slice(0,dot),v=f.slice(dot+1);if(op==='eq')return String(value)===v||typeof value==='object'&&JSON.stringify(value)===v;if(op==='in')return v.slice(1,-1).split(',').includes(String(value));if(op==='is')return v==='null'?value==null:String(value)===v;if(op==='not')return !matches(value,v);if(op==='gte')return String(value)>=v;if(op==='lte')return String(value)<=v;if(op==='lt')return String(value)<v;throw Error('Unhandled filter '+f);}
+async function scenario(browser,width){
+ const tables=fixture(),errors=[],blocked=[],requests=[],contexts=[];let seq=100;
+ const baseline=JSON.stringify(Object.fromEntries(['care_records','handoff_entries','staff_assignments','meal_entries'].map(t=>[t,tables[t]])));
+ const member=(org,uid)=>tables.organization_members.find(m=>m.organization_id===org&&m.user_id===uid),admin=(org,uid)=>member(org,uid)?.role==='admin',can=(org,uid)=>admin(org,uid)||tables.organization_facility_editors.some(p=>p.organization_id===org&&p.user_id===uid&&p.enabled);
+ async function create(uid){
+  const context=await browser.newContext({viewport:{width,height:1000},isMobile:width<600,hasTouch:width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo'});contexts.push(context);
+  const user={id:uid,email:'synthetic@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email'},user_metadata:{},created_at:at},exp=Math.floor(Date.now()/1000)+3600,token='e30.'+Buffer.from(JSON.stringify({sub:uid,role:'authenticated',aud:'authenticated',exp})).toString('base64url')+'.synthetic';
+  await context.addInitScript(({user,token,exp,A})=>{localStorage.setItem('sb-pagamoaxhqszojxrpxyu-auth-token',JSON.stringify({access_token:token,token_type:'bearer',expires_at:exp,refresh_token:'synthetic',user}));if(!localStorage.getItem('activeOrganizationId'))localStorage.setItem('activeOrganizationId',A);},{user,token,exp,A});
+  await context.route('**/*',async route=>{
+   const req=route.request(),url=new URL(req.url()),method=req.method();if(url.hostname==='127.0.0.1')return route.continue();
+   if(url.hostname==='cdn.jsdelivr.net'&&url.pathname.includes('@supabase/supabase-js@'))return route.fulfill({status:200,contentType:'text/javascript',body:fs.readFileSync(path.join(assets,url.pathname.includes('@2.57.4/')?'supabase-2.57.4.js':'supabase-v2.js'))});
+   if(['raw.githubusercontent.com','cdn.jsdelivr.net'].includes(url.hostname)){
+    const m=JSON.parse(fs.readFileSync(path.join(assets,'manifest.json'))).sort((a,b)=>b.path.length-a.path.length).find(m=>url.pathname.endsWith('/'+m.path));if(m)return route.fulfill({status:200,body:fs.readFileSync(m.pinned),contentType:'text/plain'});
+   }
+   if(url.hostname!=='pagamoaxhqszojxrpxyu.supabase.co'){blocked.push(url.origin+url.pathname);return route.abort();}
+   if(method==='OPTIONS')return route.fulfill({status:204,headers});requests.push({uid,method,path:url.pathname});
+   const respond=(data,status=200)=>route.fulfill({status,headers,body:JSON.stringify(data)}),deny=()=>respond({message:'permission denied',code:'42501'},403);
+   if(url.pathname.endsWith('/user'))return respond(user);if(url.pathname.endsWith('/logout'))return route.fulfill({status:204,headers});
+   if(url.pathname.startsWith('/rest/v1/rpc/')){
+    const name=url.pathname.split('/').pop(),p=JSON.parse(req.postData());
+    if(name==='list_organization_staff')return admin(p.p_org,uid)?respond(tables.organization_members.filter(m=>m.organization_id===p.p_org).map(m=>({...m,email:'synthetic@example.invalid'}))):deny();
+    if(name==='set_facility_editor'){
+     if(!admin(p.p_org,uid)||p.p_user===uid||member(p.p_org,p.p_user)?.role!=='staff')return deny();
+     let row=tables.organization_facility_editors.find(x=>x.organization_id===p.p_org&&x.user_id===p.p_user);if((row?.enabled||false)!==p.p_expected_enabled)return respond({message:'editor_permission_conflict'},409);
+     if(!row){row={organization_id:p.p_org,user_id:p.p_user};tables.organization_facility_editors.push(row);}row.enabled=p.p_enabled;return respond(row.enabled);
+    }
+    if(name==='save_facility_service_times'){
+     if(!can(p.p_org,uid))return deny();const rows=tables.client_service_slots.filter(s=>s.organization_id===p.p_org&&s.client_id===p.p_client);assert.deepEqual(rows.filter(s=>s.is_active).map(s=>s.service_time).sort(),p.p_expected_times);
+     rows.forEach(s=>s.is_active=p.p_times.includes(s.service_time));for(const time of p.p_times)if(!rows.some(s=>s.service_time===time))tables.client_service_slots.push({id:id(seq++),organization_id:p.p_org,client_id:p.p_client,service_time:time,days_of_week:[0,1,2,3,4,5,6],is_active:true,service_contents:null,label:'',note:''});return respond(p.p_times.length);
+    }
+    blocked.push('RPC '+name);return deny();
+   }
+   const table=url.pathname.split('/').pop();let data=table==='organization_staff_directory'?tables.organization_members.map((m,i)=>({...m,id:id(500+i),linked_user_id:m.user_id,is_active:true,sort_order:i})):tables[table];
+   if(!data){blocked.push('TABLE '+table);return deny();}
+   const orgIds=tables.organization_members.filter(m=>m.user_id===uid).map(m=>m.organization_id);
+   let rows=data.filter(r=>table==='organizations'?orgIds.includes(r.id):table==='organization_facility_editors'?orgIds.includes(r.organization_id)&&(r.user_id===uid||admin(r.organization_id,uid)):orgIds.includes(r.organization_id));
+   rows=rows.filter(r=>[...url.searchParams].every(([k,v])=>['select','order','limit','offset'].includes(k)||matches(r[k],v)));
+   if(method==='GET')return respond(req.headers().accept?.includes('application/vnd.pgrst.object+json')?rows[0]||null:rows);
+   const payload=JSON.parse(req.postData()||'{}'),changes=Array.isArray(payload)?payload:[payload],org=rows[0]?.organization_id||changes[0]?.organization_id;
+   if(!member(org,uid)||table==='organization_facility_editors'||!['clients','handoff_quick_inputs','meal_profiles','client_service_slots'].includes(table)||!can(org,uid))return deny();
+   if(method==='DELETE'){if(table!=='handoff_quick_inputs'&&!admin(org,uid))return deny();for(const row of rows)data.splice(data.indexOf(row),1);return respond(rows);}
+   if(method==='PATCH'){for(const row of rows)Object.assign(row,payload,{revision:(row.revision||0)+1});return respond(rows);}
+   if(method==='POST'){const added=changes.map(p=>({id:id(seq++),created_at:at,is_active:true,revision:1,...p}));data.push(...added);return respond(added,201);}
+   blocked.push(method+' '+table);return deny();
+  });
+  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));const answers=[];page.on('dialog',d=>d.type()==='prompt'?d.accept(answers.shift()||d.defaultValue()):d.type()==='confirm'?d.accept():d.dismiss());page.answerPrompts=values=>answers.push(...values);return page;
+ }
+ const base=`http://127.0.0.1:${server.address().port}/ai-kiroku-app/`,visit=async(page,area)=>{await page.goto(base+area+'/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>!document.getElementById('nexiaStaffNameCheck'));};
+ const shot=async(page,name)=>{assert((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,name+' horizontal overflow');await page.screenshot({path:path.join(out,width+'-'+name+'.png'),fullPage:false});};
+ try{
+  const manager=await create(ADMIN),editor=await create(EDITOR);
+  await visit(editor,'home');await editor.locator('#portal').waitFor({state:'visible'});assert.equal(await editor.locator('#role').textContent(),'一般職員');assert(!await editor.locator('#facilityEditorTools').isVisible());
+  await visit(manager,'manage');const userRow=manager.locator('[data-user-id="'+EDITOR+'"]');await userRow.getByRole('button',{name:'施設編集者を付与',exact:true}).click();await userRow.getByRole('button',{name:'施設編集者を解除',exact:true}).waitFor();assert.equal(member(A,EDITOR).role,'staff');await shot(manager,'permission-admin');console.log(width+': grant passed');
+  await editor.reload();await editor.locator('#facilityEditorTools').waitFor({state:'visible'});assert.equal(await editor.locator('#role').textContent(),'施設編集者');assert(!await editor.locator('#admin').isVisible());assert.equal(await editor.locator('#facilityEditorTools a').count(),4);
+  await visit(editor,'manage');await editor.locator('#clientsCard').waitFor({state:'visible'});assert(!await editor.locator('#staffCard').isVisible());assert(!await editor.locator('#orgSettings').isVisible());assert.equal(await editor.getByRole('button',{name:'退去',exact:true}).count(),0);
+  await editor.locator('#newRoomNumber').fill('103');await editor.locator('#newResidentName').fill('検証利用者追加');await editor.locator('#addResidentBtn').click();await editor.locator('#activeClientList').getByText('検証利用者追加',{exact:false}).waitFor();
+  editor.answerPrompts(['105','検証利用者A変更']);await editor.locator('#activeClientList .manage-row').filter({hasText:'検証利用者A'}).getByRole('button',{name:'編集',exact:true}).click();await editor.locator('#activeClientList').getByText('検証利用者A変更',{exact:false}).waitFor();assert.equal(tables.clients.find(c=>c.id===CA).room_number,'105');console.log(width+': residents passed');
+  await visit(editor,'handoff');await editor.locator('#adminTopBtn').waitFor({state:'visible'});assert(!await editor.locator('#viewManageBtn').isVisible());await editor.locator('#adminTopBtn').click();await editor.locator('#newQuickInput').fill('検証追加項目');await editor.locator('#newQuickCategory').selectOption('体調');await editor.getByRole('button',{name:'追加',exact:true}).click();
+  let quick=editor.locator('.quick-manage-item').filter({hasText:'検証追加項目'});await quick.getByRole('button',{name:'編集',exact:true}).click();await editor.locator('#quickEditDialog [name=label]').fill('検証変更項目');assert((await editor.locator('#quickEditDialog').evaluate(e=>e.scrollWidth-e.clientWidth))<=1,'quick edit dialog fits');await shot(editor,'quick-edit-dialog');await editor.locator('#quickEditDialog [name=category]').selectOption('服薬');await editor.locator('#quickEditDialog [type=submit]').click();await editor.locator('#quickEditDialog').waitFor({state:'hidden'});await shot(editor,'handoff-settings');
+  quick=editor.locator('.quick-manage-item').filter({hasText:'検証変更項目'});await quick.getByTitle('削除').click();await quick.waitFor({state:'hidden'});assert(tables.handoff_quick_inputs.some(q=>q.id===Q));console.log(width+': handoff settings passed');
+  await visit(editor,'meals');await editor.locator('#app').waitFor({state:'visible'});await editor.locator('[data-tab=settings]').click();assert.equal(await editor.locator('#priceForm').count(),0);assert(await editor.locator('#residentForm').isVisible());assert(!await editor.locator('#profileForm [name=food_form]').isDisabled());await editor.locator('#profileForm [name=rice_morning]').fill('200');await editor.locator('#profileForm [type=submit]').click();await editor.waitForFunction(()=>document.getElementById('notice').textContent.includes('食事設定を保存'));assert.equal(tables.meal_profiles[0].rice_morning,200);assert.equal(tables.meal_entries[0].unit_price,330);await shot(editor,'meal-settings');console.log(width+': meal settings passed');
+  await visit(editor,'assignment');await editor.locator('#scheduleSettingsToggle').waitFor({state:'visible'});assert(!await editor.locator('#offlineStaffManageLink').isVisible());await editor.locator('#scheduleSettingsToggle').click();assert((await editor.locator('#clientSettings').innerText()).includes('105'),'updated room number is shared without changing resident ID');await editor.locator('.service-presets button').first().click();await editor.locator('#servicePresetDialog input[value="口腔ケア"]').check();await editor.locator('#servicePresetDialog .primary').click();await editor.locator('#servicePresetDialog').waitFor({state:'hidden'});assert(tables.client_service_slots[0].service_contents.includes('口腔ケア'));
+  await editor.locator('[data-times="'+CA+'"]').fill('8:00 / 20:00');await editor.locator('[data-save-times="'+CA+'"]').click();await editor.locator('.service-presets button').filter({hasText:'20:00'}).waitFor({state:'visible'});assert.equal(tables.client_service_slots.find(s=>s.id===SLOT).is_active,false);assert.equal(requests.filter(r=>r.method==='DELETE'&&r.path.endsWith('client_service_slots')).length,0);await shot(editor,'assignment-settings');console.log(width+': assignment settings passed');
+  assert.equal(JSON.stringify(Object.fromEntries(['care_records','handoff_entries','staff_assignments','meal_entries'].map(t=>[t,tables[t]]))),baseline,'all existing records and served bill snapshot unchanged');
+  await userRow.getByRole('button',{name:'施設編集者を解除',exact:true}).click();await userRow.getByRole('button',{name:'施設編集者を付与',exact:true}).waitFor();assert.equal(member(A,EDITOR).role,'staff');
+  // Same editor session: recheck before saving, then hide revoked controls after reload.
+  const count=requests.filter(r=>r.path.endsWith('save_facility_service_times')).length;await editor.locator('[data-times="'+CA+'"]').fill('10:00');const deniedDialog=editor.waitForEvent('dialog');await editor.locator('[data-save-times="'+CA+'"]').click();assert((await deniedDialog).message().includes('編集権限'));assert.equal(requests.filter(r=>r.path.endsWith('save_facility_service_times')).length,count);
+  await editor.reload();await editor.locator('#reloadBtn').waitFor();assert(!await editor.locator('#scheduleSettingsToggle').isVisible());
+  await visit(editor,'handoff');await editor.waitForFunction(()=>typeof loaded!=='undefined'&&loaded);assert(!await editor.locator('#adminTopBtn').isVisible());
+  await visit(editor,'meals');await editor.locator('#app').waitFor({state:'visible'});await editor.locator('[data-tab=settings]').click();assert(await editor.locator('#profileForm [name=food_form]').isDisabled());assert.equal(await editor.locator('#priceForm').count(),0);
+  await visit(editor,'manage');await editor.locator('#app').waitFor({state:'visible'});assert(!await editor.locator('#clientsCard').isVisible());
+  await userRow.getByRole('button',{name:'施設編集者を付与',exact:true}).click();await userRow.getByRole('button',{name:'施設編集者を解除',exact:true}).waitFor();await editor.reload();await editor.locator('#clientsCard').waitFor({state:'visible'});await editor.locator('#orgSwitch').selectOption(B);await editor.waitForFunction(()=>document.getElementById('currentRole').textContent.includes('検証施設B'));assert(!await editor.locator('#clientsCard').isVisible());assert(!await editor.locator('#staffCard').isVisible());
+  assert.deepEqual(errors,[]);assert.deepEqual(blocked,[]);const report={width,grantRevoke:true,allFourFeatures:true,adminFeaturesHidden:true,facilityIsolation:true,recordsAndBillingPreserved:true,errors,blocked};fs.writeFileSync(path.join(out,width+'.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+ }catch(e){console.error(JSON.stringify({width,errors,blocked}));throw e;}finally{await Promise.all(contexts.map(c=>c.close()));}
+}
+(async()=>{await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({headless:true,executablePath:process.env.NEXIA_CHROMIUM||'/usr/bin/chromium'});try{for(const width of [1440,390])await scenario(browser,width);}finally{await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;server.close();});

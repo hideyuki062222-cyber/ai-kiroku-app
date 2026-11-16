@@ -24,7 +24,7 @@ function fixture(options={}){
   const w=dom.window,$=id=>w.document.getElementById(id);
   w.supabase={createClient:(url,key,config)=>{state.client={url,key,config};return db}};
   if(options.saved)w.localStorage.setItem('activeOrganizationId',options.saved);
-  w.eval(fs.readFileSync('staff-name.js','utf8'));w.eval(script);
+  w.eval(fs.readFileSync('staff-name.js','utf8'));w.eval(fs.readFileSync('facility-permissions.js','utf8'));w.eval(script);
   return {dom,w,$,state,db,close:()=>w.close()};
 }
 const submit=f=>{f.$('email').value='synthetic@example.invalid';f.$('password').value='synthetic-password';f.$('loginForm').dispatchEvent(new f.w.Event('submit',{cancelable:true}))};

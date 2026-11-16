@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#16345b">
 <title>申し送り | NEXIA</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
-<link rel="stylesheet" href="../common-theme.css?v=20261028-1"><link rel="stylesheet" href="./app.css?v=20261115-rooms-1">
+<link rel="stylesheet" href="../common-theme.css?v=20261028-1"><link rel="stylesheet" href="./app.css?v=20261116-editor-1">
 </head>
 <body>
 <div id="auth" class="auth hidden">
@@ -116,7 +116,7 @@
   </section>
 
   <section id="adminCard" class="card hidden">
-    <div class="row between"><div><strong style="font-size:18px">⚙ 管理者設定</strong><div class="small">管理者だけに表示されます</div></div><button class="btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">上へ戻る</button></div>
+    <div class="row between"><div><strong style="font-size:18px">⚙ 管理者設定</strong><div class="small">管理者・施設編集者が入力項目を設定できます</div></div><button class="btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">上へ戻る</button></div>
     <div class="admin-divider"></div>
     <p>利用者の入退居・表示名は共通の事業所管理で行います。</p><a class="btn" href="../manage/">事業所・権限管理へ</a><div class="admin-divider"></div>
     <strong>かんたん入力の管理</strong>
@@ -213,5 +213,5 @@
 </div>
 
 <dialog id="actionDialog" aria-labelledby="actionTitle"><form id="actionForm"><h2 id="actionTitle">対応完了</h2><p id="actionDescription"></p><label for="actionNote">対応内容（任意・300文字まで）</label><textarea id="actionNote" maxlength="300" rows="3"></textarea><div class="row"><button type="button" onclick="closeAction()">キャンセル</button><button id="actionSave" type="submit" class="btn primary">保存する</button></div><p id="actionStatus" role="status"></p></form></dialog>
-<script src="./core.js?v=20261115-1"></script><script src="./rooms.js?v=20261115-rooms-1"></script><script src="./app.js?v=20261115-rooms-1"></script><script src="../common-nav.js?v=20261028-ui&nexia=20261112-name-1"></script>
+<script src="../facility-permissions.js?v=20261116-editor-1"></script><script src="./core.js?v=20261115-1"></script><script src="./rooms.js?v=20261116-editor-1"></script><script src="./app.js?v=20261116-editor-1"></script><script src="../common-nav.js?v=20261028-ui&nexia=20261112-name-1"></script>
 </body></html>

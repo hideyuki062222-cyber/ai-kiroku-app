@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),{JSDOM}=require(process.env.JSDOM_PATH||'jsdom');
 const html=fs.readFileSync('meals/index.html','utf8').replace(/<script[^>]*>[\s\S]*?<\/script>/g,'');
 const dom=new JSDOM(html,{url:'https://example.invalid/ai-kiroku-app/meals/',runScripts:'dangerously',pretendToBeVisual:true,beforeParse(w){w.confirm=()=>true;w.print=()=>{};w.structuredClone=structuredClone;}}),w=dom.window;
-for(const p of ['tests/meals_fixture.js','meals/core.js','meals/app.js']){const s=w.document.createElement('script');s.textContent=fs.readFileSync(p,'utf8');w.document.body.append(s);}
+for(const p of ['tests/meals_fixture.js','facility-permissions.js','meals/core.js','meals/app.js']){const s=w.document.createElement('script');s.textContent=fs.readFileSync(p,'utf8');w.document.body.append(s);}
 const el=id=>w.document.getElementById(id),tick=()=>new Promise(r=>setTimeout(r,10));
 (async()=>{for(let i=0;i<100&&!w.eval('S.ready');i++)await tick();assert.equal(el('app').hidden,false);assert.match(el('view').textContent,/サンプル利用者A/);
 let selector=w.document.querySelector('[data-status]');selector.value='served';selector.dispatchEvent(new w.Event('change'));await tick();assert.equal(w.mealTest.data.meal_entries.length,1);assert.equal(w.mealTest.data.meal_entries[0].status,'served');assert.match(el('notice').textContent,/保存しました/);
