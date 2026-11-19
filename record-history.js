@@ -62,6 +62,12 @@
      if(!current()||seq!==dayRequest)return;if(legacy.error)throw legacy.error;
      if(legacy.data&&!rows.some(r=>r.id===legacy.data.id))rows.push(legacy.data);
     }
+    // Read corrections by immutable record ID and facility, before rendering or copying.
+    for(let i=0;i<rows.length;i+=100){
+     const changes=await db.from('care_record_amendments').select('record_id,revision,visit_note,care_note,actor,occurred_at').eq('organization_id',member.organization_id).in('record_id',rows.slice(i,i+100).map(r=>r.id)).order('revision');
+     if(!current()||seq!==dayRequest)return;if(changes.error)throw changes.error;
+     for(const correction of changes.data||[]){const row=rows.find(r=>r.id===correction.record_id);if(row&&(!row.correction||row.correction.revision<correction.revision)){row.visit_note=correction.visit_note;row.care_note=correction.care_note;row.correction=correction;}}
+    }
     rows.sort((a,b)=>String(a.service_time).localeCompare(String(b.service_time))||String(a.id).localeCompare(String(b.id)));
     const authors=new Map(),authorIds=[...new Set(rows.map(r=>r.created_by).filter(Boolean))];
     for(let i=0;i<authorIds.length;i+=100){
@@ -79,6 +85,7 @@
       article.append(el('p','記録者：'+(authors.get(row.created_by)||'確認できません（退職・氏名未登録など）')));
       for(const [title,value]of [['訪問時の状態・様子・体調',row.visit_note],['支援中・介護者が実施したこと',row.care_note]]){article.append(el('h3',title));const p=el('p',value||'記載なし');p.style.cssText='white-space:pre-wrap;line-height:1.8';article.append(p);if(value)article.append(copyControl(title+'をコピー',value));}
       article.append(copyControl('この記録をまとめてコピー','【訪問時】\n'+(row.visit_note||'')+'\n\n【支援中】\n'+(row.care_note||'')));
+      if(row.correction)article.append(el('p','訂正 第'+row.correction.revision+'版 ／ 修正者ID：'+row.correction.actor+' ／ '+new Date(row.correction.occurred_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})));
       const saved=el('small','保存日時：'+new Date(row.created_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}));article.append(saved);details.append(article);
       if(row.id===targetId){
        details.open=true;article.classList.add('record-target');article.tabIndex=-1;article.style.cssText+=';border:3px solid #2563eb;border-radius:12px;background:#eff6ff;padding:14px;scroll-margin-top:24px';

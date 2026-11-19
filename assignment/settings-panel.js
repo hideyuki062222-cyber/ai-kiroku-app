@@ -40,7 +40,7 @@
         const admin=membership.role==='admin';
         const editor=NexiaPermissions.can(membership,'assignment_settings',organization);
         button.style.display=editor?'inline-flex':'none';
-        staffLink.style.display=admin?'inline-flex':'none';
+        staffLink.style.display=admin||NexiaPermissions.canFull(membership,'staff_info',organization)?'inline-flex':'none';
         if(!editor)close();
         return true;
       }catch(e){return false;}

@@ -15,7 +15,7 @@
   if(!org||org!==localStorage.getItem('activeOrganizationId'))throw Error('施設の選択を確認して再読み込みしてください。');
   const [m,o]=await Promise.all([x.from('organization_members').select('role').eq('organization_id',org).eq('user_id',auth.data.user.id).maybeSingle(),x.from('organizations').select('is_active').eq('id',org).maybeSingle()]);
   const member=check(m),facility=check(o);if(!member||!facility?.is_active)throw Error('この施設を利用できません。');
-  return {db:x,org,actor:auth.data.user.id,role:member.role};
+  member.organization_id=org;facility.id=org;await NexiaPermissions.load(x,member,facility,auth.data.user.id);return {db:x,org,actor:auth.data.user.id,role:member.role,canProfile:NexiaPermissions.canFull(member,'resident_info',facility)};
  }
  function candidateServices(){return [...document.querySelectorAll('input[name=serviceContent]:checked')].map(e=>e.value);}
  function actionRows(){
@@ -35,7 +35,7 @@
  function setProfileRole(admin){
   q('structuredProfile').querySelectorAll('input,textarea').forEach(e=>e.disabled=!admin);
   Object.values(legacyFields).forEach(id=>q(id).disabled=!admin);
-  q('factProfileSave').disabled=!admin;q('factProfileRole').textContent=admin?'管理者として編集できます。全項目任意です。':'閲覧のみです。機微なプロフィールの編集は管理者が行います。';
+  q('factProfileSave').classList.remove('hidden');q('factProfileSave').hidden=false;q('factProfileSave').disabled=!admin;q('factProfileRole').textContent=admin?'プロフィール編集権限があります。全項目任意です。':'閲覧のみです。編集には利用者情報・プロフィールの全範囲の権限が必要です。';
  }
  async function loadStructured(code){
   if(profileDirty&&editor?.code===code)return;
@@ -49,7 +49,7 @@
    const ps=check(await c.db.from('client_record_profiles').select('*').eq('organization_id',c.org).eq('client_id',client.id));
    if(ticket!==profileVersion||q('profileUser').value!==code||c.org!==localStorage.getItem('activeOrganizationId'))return;
    const row=ps[0]||null,legacy=Object.fromEntries(Object.keys(legacyFields).map(k=>[k,client[k]||'']));editor={...c,code,client,row,legacy};
-   for(const [k,id]of Object.entries(legacyFields))q(id).value=legacy[k];profileForm(row?.data);setProfileRole(c.role==='admin');
+   for(const [k,id]of Object.entries(legacyFields))q(id).value=legacy[k];profileForm(row?.data);setProfileRole(c.canProfile);
    q('factProfileStatus').textContent=ps.length?'登録済みのプロフィールを読み込みました。':'新しい選択項目は未登録です。以前の登録内容は下に保持しています。';
    q('factOldIntro').textContent=client.care_intro_text||C.INTRO;
    if(code===q('user').value){const refs=Object.entries(row?.data||{}).filter(([,v])=>v.choices?.length||v.note).map(([k,v])=>`${C.profileFields[k]?.[0]||k}：${[...(v.choices||[]),v.note].filter(Boolean).join('、')}`);const old=Object.entries(legacy).filter(([,v])=>v).map(([k,v])=>`${legacyLabels[k]}：${v}`);q('factReference').textContent=[...refs,...old].join('\n')||'登録済みプロフィールはありません。当日の事実だけで記録を作成できます。';}
@@ -103,11 +103,11 @@
   const data=Object.fromEntries(Object.keys(C.profileFields).map(k=>[k,{choices:[...document.querySelectorAll('[data-profile="'+k+'"]:checked')].map(e=>e.value),note:document.querySelector('[data-profile-note="'+k+'"]').value.trim()}]));
   const legacy=Object.fromEntries(Object.entries(legacyFields).map(([k,id])=>[k,q(id).value]));
   try{
-   const c=await context();if(c.role!=='admin'||c.org!==savedContext.org||c.actor!==savedContext.actor)throw Error('管理者権限・施設を確認してください。');
+   const c=await context();if(!c.canProfile||c.org!==savedContext.org||c.actor!==savedContext.actor)throw Error('プロフィール編集権限・施設を確認してください。');
    if(editor!==savedContext||q('profileUser').value!==savedContext.code)throw Error('選択が変わりました。利用者を確認して保存し直してください。');
    check(await c.db.rpc('save_record_profile',{p_org:c.org,p_client:savedContext.client.id,p_revision:savedContext.row?.revision||0,p_data:data,p_expected_legacy:savedContext.legacy,p_legacy:legacy}));
    if(editor!==savedContext)return;profileDirty=false;await loadStructured(savedContext.code);q('factProfileStatus').textContent='プロフィールを保存しました。以前の値と変更履歴も保持しています。';
-  }catch(e){q('factProfileStatus').textContent='保存できませんでした：'+e.message;}finally{controls.forEach(([e,disabled])=>{if(e.isConnected)e.disabled=disabled;});setProfileRole(editor?.role==='admin');}
+  }catch(e){q('factProfileStatus').textContent='保存できませんでした：'+e.message;}finally{controls.forEach(([e,disabled])=>{if(e.isConnected)e.disabled=disabled;});setProfileRole(editor?.canProfile);}
  }
  async function generate(){
   const f=collect(),result=C.compose(f);q('factErrors').textContent=result.errors.join('\n');if(result.errors.length){q('factErrors').focus();return;}

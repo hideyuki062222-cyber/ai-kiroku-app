@@ -44,6 +44,9 @@ jobs:
           node --check home/app.js
           node --check staff-name.js
           node --check facility-permissions.js
+          node --check facility-tools/app.js
+          node --check manage/feature-permissions.js
+          node --check cashbook/feature-addon.js
           node --check assignment/facility-editor-addon.js
           node --check tests/facility_editor_browser.cjs
           node --check tests/nexia_browser.cjs
@@ -69,6 +72,7 @@ jobs:
           node tests/facility_editor_database.cjs
           node tests/meal_extras_database.cjs
           node tests/record_facts_database.cjs
+          node tests/scoped_permissions_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
           JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
@@ -77,6 +81,8 @@ jobs:
           node tests/nexia_admin_nav.cjs
           node tests/dashboard_return.cjs
           node tests/record_link.cjs
+          node tests/record_history.cjs
+          node tests/scoped_permissions_core.cjs
           node tests/service_presets.cjs
           node tests/meals_dom.cjs
           node tests/meals_core.cjs
@@ -115,3 +121,4 @@ jobs:
           node tests/facility_editor_browser.cjs
           node tests/meal_extras_browser.cjs
           node tests/record_facts_browser.cjs
+          node tests/scoped_permissions_browser.cjs

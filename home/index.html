@@ -9,8 +9,8 @@
 <link rel="stylesheet" href="./style.css?v=20261112-1">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <script defer src="../staff-name.js?v=20261112-1"></script>
-<script defer src="../facility-permissions.js?v=20261116-editor-1"></script>
-<script defer src="./app.js?v=20261116-editor-1"></script>
+<script defer src="../facility-permissions.js?v=20261119-scoped-1"></script>
+<script defer src="./app.js?v=20261120-scoped-1"></script>
 </head>
 <body>
 <a class="skip" href="#main">本文へ移動</a>
@@ -56,8 +56,8 @@
           <a class="tool" href="../cashbook/"><span class="icon" aria-hidden="true">07</span><h3>金銭出納帳</h3><p>利用者ごとの入出金・残高を確認</p><span class="open" aria-hidden="true">開く →</span></a>
         </div>
       </section>
-      <section id="facilityEditorTools" class="panel admin" hidden><div><h2>施設の編集</h2><p class="muted">選択中の施設内の入力・利用者・食事・担当時間を設定できます。</p></div><div class="admin-links"><a class="button secondary" href="../handoff/">申し送りの入力設定</a><a class="button secondary" href="../manage/">利用者情報</a><a class="button secondary" href="../meals/">食事設定</a><a class="button secondary" href="../assignment/">担当時間・サービス設定</a></div></section>
-      <section id="admin" class="panel admin" hidden aria-labelledby="adminTitle"><div><h2 id="adminTitle">管理者メニュー</h2><p class="muted">選択中の施設を管理します。</p></div><div class="admin-links"><a class="button secondary" href="../admin/">管理画面</a><a class="button secondary" href="../staff/">職員管理</a><a class="button secondary" href="../manage/">施設・利用者管理</a></div></section>
+      <section id="facilityEditorTools" class="panel admin" hidden><div><h2>施設の編集</h2><p class="muted">選択中の施設で許可された機能を編集できます。</p></div><div class="admin-links"><a class="button secondary" data-editor-feature="handoff_settings" href="../handoff/">申し送りの入力設定</a><a class="button secondary" data-editor-feature="resident_info" href="../manage/">利用者情報</a><a class="button secondary" data-editor-feature="meal_settings" href="../meals/">食事設定</a><a class="button secondary" data-editor-feature="assignment_settings" href="../assignment/">担当時間・サービス設定</a><a class="button secondary" href="../facility-tools/">許可された業務管理・出力</a></div></section>
+      <section id="admin" class="panel admin" hidden aria-labelledby="adminTitle"><div><h2 id="adminTitle">管理者メニュー</h2><p class="muted">選択中の施設を管理します。</p></div><div class="admin-links"><a class="button secondary" href="../admin/">管理画面</a><a class="button secondary" href="../facility-tools/">記録管理・管理用出力</a><a class="button secondary" href="../staff/">職員管理</a><a class="button secondary" href="../manage/">施設・利用者管理</a></div></section>
     </div>
     <button id="retry" class="button secondary" hidden>もう一度確認する</button>
     <noscript><p class="notice">NEXIAを利用するにはJavaScriptを有効にしてください。</p></noscript>
