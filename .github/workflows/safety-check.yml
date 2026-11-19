@@ -64,6 +64,7 @@ jobs:
           node tests/handoff_rooms.cjs
           node tests/handoff_database.cjs
           node tests/facility_editor_database.cjs
+          node tests/meal_extras_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
           JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
@@ -75,6 +76,7 @@ jobs:
           node tests/service_presets.cjs
           node tests/meals_dom.cjs
           node tests/meals_core.cjs
+          node tests/meal_extras_core.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
@@ -92,7 +94,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install browser test runner
-        run: npm install --prefix "$RUNNER_TEMP/nexia-browser" --no-audit --no-fund --ignore-scripts playwright@1.62.1
+        run: npm install --prefix "$RUNNER_TEMP/nexia-browser" --no-audit --no-fund --ignore-scripts playwright@1.62.1 @electric-sql/pglite@0.5.16
       - name: Install Chromium
         run: node "$RUNNER_TEMP/nexia-browser/node_modules/playwright/cli.js" install --with-deps chromium
       - name: Prepare public application assets
@@ -100,8 +102,10 @@ jobs:
       - name: Check desktop, mobile, authorization UI and exports
         env:
           PLAYWRIGHT_PATH: ${{ runner.temp }}/nexia-browser/node_modules/playwright
+          PGLITE_PATH: ${{ runner.temp }}/nexia-browser/node_modules/@electric-sql/pglite
           NEXIA_BROWSER_ASSETS: ${{ runner.temp }}/nexia-browser-assets
         run: |
           node tests/nexia_browser.cjs
           node tests/handoff_browser.cjs
           node tests/facility_editor_browser.cjs
+          node tests/meal_extras_browser.cjs
