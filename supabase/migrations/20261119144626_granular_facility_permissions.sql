@@ -374,6 +374,7 @@ create table public.facility_operation_history(
  table_name text not null,record_id text not null,operation text not null,actor uuid not null,
  previous jsonb,next_record jsonb,occurred_at timestamptz not null default clock_timestamp()
 );
+create index facility_operation_history_facility_feature_time on public.facility_operation_history(organization_id,feature,occurred_at desc);
 alter table public.facility_operation_history enable row level security;
 revoke all on public.facility_operation_history from public,anon,authenticated;
 grant select on public.facility_operation_history to authenticated;
@@ -432,6 +433,7 @@ create table public.care_record_amendments(
  visit_note text not null,care_note text not null,previous_visit text not null,previous_care text not null,
  reason text not null check(length(btrim(reason)) between 1 and 500),actor uuid not null,occurred_at timestamptz not null default clock_timestamp(),unique(record_id,revision)
 );
+create index care_record_amendments_facility_record_revision on public.care_record_amendments(organization_id,record_id,revision desc);
 alter table public.care_record_amendments enable row level security;
 revoke all on public.care_record_amendments from public,anon,authenticated;
 grant select on public.care_record_amendments to authenticated;
@@ -481,9 +483,9 @@ begin
  if p_feature='record_management' then
   select coalesce(jsonb_agg(to_jsonb(q) order by q.service_date,q.id),'[]') into result from (
    select r.id,r.client_id,r.service_date,r.service_time,r.created_by,r.created_at,coalesce(a.visit_note,r.visit_note) visit_note,coalesce(a.care_note,r.care_note) care_note,coalesce(a.revision,0) revision,a.actor modified_by,a.occurred_at modified_at
-   from public.care_records r left join lateral(select * from public.care_record_amendments x where x.record_id=r.id and x.organization_id=p_org order by revision desc limit 1) a on true where r.organization_id=p_org and r.service_date between p_since and p_until) q;
- elsif p_feature='cashbook_management' then select coalesce(jsonb_agg(to_jsonb(e) order by tx_date,id),'[]') into result from public.cashbook_entries e where organization_id=p_org and tx_date between p_since and p_until;
- elsif p_feature='staff_info' then select coalesce(jsonb_agg(jsonb_build_object('id',d.id,'staff_name',d.staff_name,'office_label',d.office_label,'employment_type',d.employment_type) order by d.staff_name,d.id),'[]') into result from public.organization_staff_directory d where organization_id=p_org;
+   from public.care_records r left join lateral(select * from public.care_record_amendments x where x.record_id=r.id and x.organization_id=p_org order by revision desc limit 1) a on true where r.organization_id=p_org and r.service_date between p_since and p_until order by r.service_date,r.id limit 10001) q;
+ elsif p_feature='cashbook_management' then select coalesce(jsonb_agg(to_jsonb(e) order by tx_date,id),'[]') into result from (select * from public.cashbook_entries where organization_id=p_org and tx_date between p_since and p_until order by tx_date,id limit 10001) e;
+ elsif p_feature='staff_info' then select coalesce(jsonb_agg(jsonb_build_object('id',d.id,'staff_name',d.staff_name,'office_label',d.office_label,'employment_type',d.employment_type) order by d.staff_name,d.id),'[]') into result from (select * from public.organization_staff_directory where organization_id=p_org order by staff_name,id limit 10001) d;
  else raise exception 'unsupported_management_export';end if;
  if jsonb_array_length(result)>10000 then raise exception 'export_too_large_reduce_period';end if;
  return result;

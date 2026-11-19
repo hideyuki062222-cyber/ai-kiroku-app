@@ -64,6 +64,7 @@ const old=['resident_info','handoff_settings','meal_settings','assignment_settin
   await staffEdit();await deny(staffEdit,/staff_name_changed/);
   eq((await q('select staff_name,role from public.organization_members where organization_id=$1 and user_id=$2',[A,STAFF]))[0],{staff_name:'職員氏名変更（架空）',role:'staff'});eq((await q('select staff_name from public.organization_members where organization_id=$1 and user_id=$2',[A,TARGET]))[0].staff_name,'同姓同名（架空）','no name-based identity');
   eq((await q("update public.organization_staff set linked_user_id=$1 where id=$2 returning id",[TARGET,STAFFID])).length,0);await deny(()=>q('select public.list_organization_staff($1)',[A]),/admin_required/);await deny(()=>q("select public.set_organization_member_role($1,$2,'admin')",[A,TARGET]),/admin_required/);
+  eq((await exportCall('staff_info'))[0].x[0].staff_name,'職員氏名変更（架空）');eq((await exportCall('cashbook_management'))[0].x[0].amount,120);
   await deny(()=>q('select public.amend_care_record($1,$2,0,\'x\',$3,\'r\')',[B,RECORD,prefix]));await deny(()=>q("select public.save_meal_extra_price($1,null,current_date,false,200,'[]',0,0)",[uuid(99)]));
   await as(ADMIN);await deny(()=>q('select public.set_facility_editor($1,$2,false,true)',[A,TARGET]),/ui_upgrade/);
   await q('select public.set_facility_editor($1,$2,false,true)',[A,LEGACY]);await q('select public.set_facility_editor($1,$2,true,false)',[A,LEGACY]);await as(LEGACY);for(const f of features)eq(await can(A,f,false),old.includes(f),'old RPC only legacy');
