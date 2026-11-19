@@ -19,7 +19,7 @@ function database(){
   care_records:[],handoff_entries:[],handoff_quick_inputs:[],handoff_confirmations:[],attendance_months:[],
   cashbook_accounts:[{organization_id:A,client_id:CA,opening_balance:1000}],
   cashbook_entries:[{id:'entry-a',organization_id:A,client_id:CA,tx_date:date,kind:'expense',amount:100,item:'確認用消耗品',store:'確認用店舗',memo:'テストデータ',created_by:U,created_by_name:'確認用管理者',created_at:now,updated_by:U}],
-  cashbook_choices:[],meal_entries:[],meal_prices:[],meal_profiles:[]
+  cashbook_choices:[],meal_entries:[],meal_prices:[],meal_extra_prices:[],meal_entry_extras:[],meal_bill_versions:[],meal_profiles:[]
  };
  for(const [org,id] of [[A,'40000000-0000-4000-8000-000000000003'],[B,'40000000-0000-4000-8000-000000000004']])tables.organization_staff.push({id,organization_id:org,staff_name:'確認用代理入力職員',linked_user_id:null,is_active:true,office_label:'確認用施設',employment_type:'非常勤',sort_order:2,created_at:now});
  for(const c of tables.clients)tables.meal_profiles.push({organization_id:c.organization_id,client_id:c.id,start_date:date.slice(0,7)+'-01',end_date:null,morning:true,lunch:true,evening:true,weekdays:[0,1,2,3,4,5,6],rice_morning:150,rice_lunch:150,rice_evening:150,food_form:'常食',revision:1,note:''});

@@ -37,3 +37,15 @@
 }
 
 .kitchen{border-top:1px solid var(--line);padding-top:10px}.kitchen h3{margin:0 0 8px}.kitchen h3 small{font-size:.8em;color:var(--green)}.kitchen-qty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.kitchen-qty>div{background:var(--mint);border-radius:8px;padding:8px;font-size:13px}.kitchen-qty strong,.kitchen-qty small{display:block;overflow-wrap:anywhere}.kitchen-qty strong{font-size:clamp(15px,3vw,21px)}.kitchen details{font-size:13px;margin:4px 0}
+/* Extra serving controls retain readable labels and large touch targets. */
+.extra-control{margin-top:10px;max-width:410px}.extra-control summary{min-height:44px;cursor:pointer;padding:10px;background:#edf5f2;border-radius:8px;font-weight:700}.extra-control form{padding:12px;border:1px solid #c9ddd4;border-radius:8px;white-space:normal}.extra-control label{display:block;margin:12px 0}.extra-control input{min-height:44px;width:100%;font-size:16px}.extra-control button{min-height:44px;font-size:16px}.refill-stepper{display:flex;align-items:center;gap:8px}.refill-stepper button{min-width:48px}.refill-stepper input{min-width:60px;max-width:100px;text-align:center}.band-table input{width:100%;min-width:70px;min-height:44px;font-size:16px}.band-table td{padding:6px}#extraPriceForm button{min-height:44px}#extraPriceForm input[type=checkbox]{width:22px;height:22px}.today-table td{vertical-align:top}
+@media(max-width:600px){.extra-control{max-width:100%}.extra-control form{padding:8px}.band-table th,.band-table td{font-size:14px}.band-table input{min-width:60px}}
+@media print{#billAction,#extraPriceForm{display:none!important}#print table{font-size:10px}}
+@media(max-width:700px){
+ .formgrid.two{grid-template-columns:minmax(0,1fr)}.formgrid>label{min-width:0}.formgrid input{min-width:0;width:100%}
+ .today-table td:first-child{grid-column:1;grid-row:1}.today-table td:nth-child(2){grid-column:1;grid-row:2}
+ .today-table td:nth-child(3){display:contents;text-align:left}
+ .today-table td:nth-child(3)>.status-select{grid-column:2;grid-row:1 / span 2}
+ .today-table .extra-control{grid-column:1/-1;grid-row:3;margin:8px 0 0;text-align:left;width:100%}
+ .today-table td:nth-child(4){grid-row:4}.extra-control form{text-align:left}.refill-stepper input{flex:1;min-width:0;max-width:none}
+}
