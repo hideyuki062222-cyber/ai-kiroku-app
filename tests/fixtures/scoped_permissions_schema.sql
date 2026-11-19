@@ -11,7 +11,7 @@ create table public.cashbook_accounts(
  constraint cashbook_accounts_pkey PRIMARY KEY (organization_id, client_id),
  constraint cashbook_accounts_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES auth.users(id));
 alter table public.cashbook_accounts enable row level security;
-grant select,insert,update,delete on public.cashbook_accounts to authenticated;
+grant select,insert,update on public.cashbook_accounts to authenticated;
 create policy cashbook_accounts_insert_admin on public.cashbook_accounts for INSERT to authenticated with check(private.is_org_admin(organization_id));
 create policy cashbook_accounts_select_member on public.cashbook_accounts for SELECT to authenticated using(private.is_org_member(organization_id));
 create policy cashbook_accounts_update_admin on public.cashbook_accounts for UPDATE to authenticated using(private.is_org_admin(organization_id)) with check(private.is_org_admin(organization_id));
@@ -68,7 +68,7 @@ create table public.cashbook_choices(
  constraint cashbook_choices_pkey PRIMARY KEY (id),
  constraint cashbook_choices_unique UNIQUE (organization_id, kind, label));
 alter table public.cashbook_choices enable row level security;
-grant select,insert,update,delete on public.cashbook_choices to authenticated;
+grant select,insert,delete on public.cashbook_choices to authenticated;
 create policy cashbook_choices_delete_admin on public.cashbook_choices for DELETE to authenticated using(private.is_org_admin(organization_id));
 create policy cashbook_choices_insert_member on public.cashbook_choices for INSERT to authenticated with check((private.is_org_member(organization_id) AND (created_by = ( SELECT auth.uid() AS uid))));
 create policy cashbook_choices_select_member on public.cashbook_choices for SELECT to authenticated using(private.is_org_member(organization_id));
