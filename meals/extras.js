@@ -27,8 +27,12 @@ function bindExtras(){
   f.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const input=f.elements[b.dataset.step];input.value=Math.max(0,Math.min(100,Number(input.value)+Number(b.dataset.delta)));f.oninput();});
   f.onsubmit=e=>{e.preventDefault();const g=f.elements.grams.value===''?null:Number(f.elements.grams.value),rice=Number(f.elements.rice.value),soup=Number(f.elements.soup.value);run(async()=>{
    let reason='';if(f.dataset.date<today()){reason=prompt('過去分を訂正する理由（必須）');if(!reason)return;}
-   const r=entry(f.dataset.extra,f.dataset.date,f.dataset.meal);check(await db.rpc('save_meal_extra',{p_org:S.org.id,p_client:r.client_id,p_date:r.meal_date,p_meal:r.meal,p_revision:x.revision,p_entry_revision:r.revision,p_grams:g,p_rice:rice,p_soup:soup,p_reason:reason}));
-   S.dirty=false;await load();msg('実提供量・おかわりを保存しました。');
+   const r=entry(f.dataset.extra,f.dataset.date,f.dataset.meal);const saved=check(await db.rpc('save_meal_extra',{p_org:S.org.id,p_client:r.client_id,p_date:r.meal_date,p_meal:r.meal,p_revision:x.revision,p_entry_revision:r.revision,p_grams:g,p_rice:rice,p_soup:soup,p_reason:reason}));
+   Object.assign(x,saved);f.dataset.dirty='false';S.dirty=!!document.querySelector('[data-extra][data-dirty=true]');
+   const amounts=MealExtras.amounts(r),total=amounts.rice+amounts.riceRefill+amounts.soupRefill;
+   f.closest('details').querySelector('summary').textContent=(x.state==='needs_review'?'追加料金：要確認':`追加料金 ${total.toLocaleString()}円`)+' ／ おかわり入力';
+   f.querySelector('small').textContent='最終入力：'+x.updated_by_name+' ／ '+new Date(x.updated_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
+   msg('実提供量・おかわりを保存しました。'+(S.dirty?' ほかの利用者の入力は未保存です。':''));
   });};preview();
  });
  const f=document.getElementById('extraPriceForm');if(f){
