@@ -59,11 +59,12 @@
   function services(){return [...document.querySelectorAll('input[name="serviceContent"]:checked')].map(x=>x.value).sort()}
   function formSignature(){
     return JSON.stringify({
-      user:q('user')?.value||'',service:q('service')?.value||'',scene:q('scene')?.value||'',condition:q('condition')?.value||'',health:q('health')?.value||'',length:q('length')?.value||'',intervention:q('interventionLevel')?.value||'',services:services(),input:q('input')?.value||''
+      user:q('user')?.value||'',service:q('service')?.value||'',scene:q('scene')?.value||'',condition:q('condition')?.value||'',health:q('health')?.value||'',length:q('length')?.value||'',intervention:q('interventionLevel')?.value||'',services:services(),input:q('input')?.value||'',facts:window.NexiaFactUI?.signature()||''
     });
   }
   function currentResultIsValid(){
     const v=(q('visitResult')?.textContent||'').trim(),c=(q('careResult')?.textContent||'').trim();
+    if(window.__nexiaFactsMode)return !!v&&!!c&&c.startsWith(window.NexiaFactCore.INTRO);
     return !!v&&!v.includes('ここに')&&!v.includes('選択してください')&&!!c&&!c.includes('ここに')&&!c.includes('入力してください');
   }
   function syncPendingText(){
@@ -185,13 +186,14 @@
       const userSel=q('user'),profileSel=q('profileUser');
       if(userSel&&[...userSel.options].some(o=>o.value===ctx.client))userSel.value=ctx.client;
       if(profileSel&&[...profileSel.options].some(o=>o.value===ctx.client)){profileSel.value=ctx.client;try{window.loadProfile?.()}catch(_e){}}
-      const input=q('input');if(input&&ctx.memo&&!input.value.trim()){input.value=ctx.memo;const cnt=q('inputCount');if(cnt)cnt.textContent=input.value.length+'文字'}
+      const input=q('input');if(!window.__nexiaFactsMode&&input&&ctx.memo&&!input.value.trim()){input.value=ctx.memo;const cnt=q('inputCount');if(cnt)cnt.textContent=input.value.length+'文字'}
       const serviceChecks=[...document.querySelectorAll('input[name="serviceContent"]')];
       serviceChecks.forEach(cb=>{cb.checked=false;});
       if(Array.isArray(s?.service_contents)){
         serviceChecks.forEach(cb=>{cb.checked=s.service_contents.includes(cb.value);});
       }else applyServiceLabel(ctx.label);
       serviceChecks.forEach(cb=>cb.dispatchEvent(new Event('change',{bubbles:true})));
+      window.dispatchEvent(new CustomEvent('nexia-assignment-loaded'));
       // Keep the return token while the name-registration gate is resolving asynchronously.
       // It only selects existing dashboard view state; record identity still comes from the database.
       const cleanParams=new URLSearchParams({from:'assignment',assignment:id});
@@ -240,6 +242,7 @@
     if(window.assignmentContext?.client&&pendingRecord.userCode!==window.assignmentContext.client){
       setStatus('担当割当の利用者と現在の利用者が一致しません。担当割当から開き直してください。','error');return;
     }
+    if(window.__nexiaFactsMode&&!(q('careResult')?.textContent||'').startsWith(window.NexiaFactCore.INTRO))return setStatus('②の必須冒頭文を先頭に戻してから保存してください。','error');
     syncPendingText();
     if(!currentResultIsValid())return setStatus('保存する記録文を確認できません。もう一度作成してください。','error');
     saveBusy=true;const btn=ensureSaveUi();if(btn)btn.disabled=true;setGenerateDisabled(true);
@@ -253,6 +256,7 @@
       if(typeof originalAddHistory==='function'&&pendingHistoryArgs)originalAddHistory(...pendingHistoryArgs);
       pendingRecord=null;pendingHistoryArgs=null;pendingSignature='';
       setStatus('✓ 正式にクラウド保存しました。','success');
+      window.dispatchEvent(new CustomEvent('nexia-record-saved'));
     }catch(e){console.error(e);setStatus('保存できていません。通信状態を確認して、もう一度お試しください。','error')}
     finally{saveBusy=false;setGenerateDisabled(false);if(btn)btn.disabled=!pendingRecord}
   }
