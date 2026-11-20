@@ -1,6 +1,7 @@
 // Confidential rows stay in process memory and the in-memory local Postgres only.
 // This script never connects to production and never prints row contents or IDs.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),cp=require('node:child_process');
+const {parseBackup}=require('./scoped-backup-data.cjs');
 const packagePath=process.env.PGLITE_PATH||'@electric-sql/pglite';
 const {PGlite}=require(packagePath);
 const {pgcrypto}=require(path.isAbsolute(packagePath)?path.join(packagePath,'dist/contrib/pgcrypto.cjs'):'@electric-sql/pglite/contrib/pgcrypto');
@@ -31,7 +32,7 @@ async function acl(target,aclText,kind,column=null){
  if(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'app-backup.gpg'))).digest('hex')!==process.env.NEXIA_BACKUP_SHA256)throw Error('Encrypted backup hash mismatch');
  const decrypt=cp.spawnSync('gpg',['--homedir',path.join(root,'keyring'),'--batch','--pinentry-mode','loopback','--passphrase-file',path.join(root,'restore-passphrase'),'--decrypt',path.join(root,'app-backup.gpg')],{maxBuffer:64*1024*1024});
  if(decrypt.status!==0)throw Error('Encrypted backup integrity or decryption failure');
- const payload=JSON.parse(decrypt.stdout.toString());decrypt.stdout.fill(0);
+ const payload=parseBackup(decrypt.stdout);
  if(payload.format!=='nexia-encrypted-logical-backup-v1'||payload.project!=='pagamoaxhqszojxrpxyu')throw Error('Unexpected backup format or project');
  const m=payload.schema_catalog,tables=m.relations.filter(t=>['r','p'].includes(t.kind));
  const before={};for(const [key,rows]of Object.entries(payload.tables))before[key]={rows:rows.length,hash:hashRows(rows)};

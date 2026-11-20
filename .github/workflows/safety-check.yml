@@ -87,6 +87,7 @@ jobs:
           node tests/record_link.cjs
           node tests/record_history.cjs
           node tests/scoped_permissions_core.cjs
+          node tests/scoped_backup_core.cjs
           node tests/service_presets.cjs
           node tests/meals_dom.cjs
           node tests/meals_core.cjs
