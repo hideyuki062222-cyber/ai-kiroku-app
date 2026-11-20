@@ -18,7 +18,7 @@ def test_record_requires_explicit_formal_save():
 
 def test_record_entrypoint_loads_current_safety_bundle():
     html = text("index.html")
-    assert "common-nav.js?v=20261020-services" in html
+    assert "common-nav.js?v=20261120-quality-1" in html
     assert "担当情報をクラウドから安全に確認しています" in html
     assert 'q.get("client")' not in html
     assert 'q.get("memo")' not in html
@@ -27,7 +27,7 @@ def test_record_entrypoint_loads_current_safety_bundle():
 def test_assignment_context_fails_closed_until_trusted():
     common = text("common-nav.js")
     guard = text("assignment-context-guard.js")
-    assert "assignment-context-guard.js?v=20261014-1" in common
+    assert "assignment-context-guard.js?v=20261120-quality-1" in common
     assert "lockAssignmentFlowButtons" in common
     assert "__assignmentContextGuardReady" in guard
     assert "ctx.assignmentId===assignmentId" in guard

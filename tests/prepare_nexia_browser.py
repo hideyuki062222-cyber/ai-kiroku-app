@@ -34,6 +34,12 @@ def main():
         url = "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/d834ee9211abd6e5289d183e2faf2df1a1ddee5e/handoff/" + name
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(target)], check=True)
         manifest.append({"path": "handoff-rooms-before/" + name, "pinned": str(target)})
+    # Frozen production facts UI before the November quality/usability revision.
+    quality_before = assets / "record-quality-before"
+    quality_before.mkdir(exist_ok=True)
+    for name in ["index.html", "record-facts-core.js", "record-facts-ui.js", "record-facts.css"]:
+        url = "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/8d162e6483d9ce2cb2c8ebe17636bc4defd6ca04/" + name
+        subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(quality_before / name)], check=True)
     for version, name in [("2.57.4/dist/umd/supabase.min.js", "supabase-2.57.4.js"), ("2", "supabase-v2.js")]:
         url = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@" + version
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(assets / name)], check=True)
