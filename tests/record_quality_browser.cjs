@@ -10,7 +10,8 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  const atomic=fn=>{const p=chain.then(fn);chain=p.catch(()=>{});return p;};
  try{
  await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/facility_editor_schema.sql'),'utf8'));
- await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261115235721_facility_editor_permissions.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/scoped_permissions_schema.sql'),'utf8'));
+ for(const f of fs.readdirSync(path.join(root,'supabase/migrations')).filter(f=>f>='20261115235721'&&f<'20261119144626'))await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations',f),'utf8'));
  await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[ADMIN]);
  for(const uid of [ADMIN,STAFF,EDITOR])await pg.query('insert into auth.users values($1,$2)',[uid,uid+'@example.invalid']);
  await pg.query('insert into public.organizations(id,name,join_code,created_by) values($1,\'架空検証施設\',\'SYNTHETIC\',$2)',[ORG,ADMIN]);
@@ -19,8 +20,8 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await pg.query("insert into public.staff_assignments(id,organization_id,client_id,service_date,service_time,assigned_user_id,assigned_staff_name,memo,created_by,updated_by) values($1,$2,$3,$4,'09:00',$5,'架空職員','予定：洗身を介助する',$6,$6)",[ASSIGN,ORG,CLIENT,date,STAFF,ADMIN]);
  await pg.query("insert into public.client_service_slots(id,organization_id,client_id,service_time,service_contents) values($1,$2,$3,'09:00','[\"服薬介助・確認\"]')",[SLOT,ORG,CLIENT]);
  await pg.query("insert into public.care_records(id,organization_id,client_id,created_by,visit_note,care_note) values($1,$2,$3,$4,'保持する過去の観察','保持する過去の支援')",[OLD,ORG,CLIENT,ADMIN]);
- await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261119134048_record_facts_profiles.sql'),'utf8'));
  await pg.query('select public.set_facility_editor($1,$2,true,false)',[ORG,EDITOR]);
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261119144626_granular_facility_permissions.sql'),'utf8'));
  async function pageFor(uid,baseline=false,assignment=true){
   const ctx=await browser.newContext({viewport:{width,height:950},isMobile:width<600,hasTouch:width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo',acceptDownloads:true});contexts.push(ctx);
   const user={id:uid,email:'synthetic@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email'},user_metadata:{}},exp=Math.floor(Date.now()/1000)+3600,token='e30.'+Buffer.from(JSON.stringify({sub:uid,role:'authenticated',aud:'authenticated',exp})).toString('base64url')+'.synthetic';
@@ -41,7 +42,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
     try{
      if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});return {data:0};}if(!['save_record_profile','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
       const names=Object.keys(p);const {rows}=await pg.query('select public.'+fn+'('+names.map((k,i)=>k+'=> $'+(i+1)).join(',')+') result',Object.values(p).map(v=>v&&typeof v==='object'?JSON.stringify(v):v));return {data:rows[0].result};}
-     const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','clients','client_record_profiles','staff_assignments','client_service_slots','care_records'].includes(table))throw Error('Unexpected table '+table);
+     const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','organization_feature_permissions','organization_permission_sets','care_record_amendments','clients','client_record_profiles','staff_assignments','client_service_slots','care_records'].includes(table))throw Error('Unexpected table '+table);
      const params=[],where=[];for(const [k,v]of u.searchParams){if(['select','order','limit','offset'].includes(k))continue;if(!/^\w+$/.test(k))throw Error('bad column');const dot=v.indexOf('.'),op=v.slice(0,dot),value=v.slice(dot+1);
       if(op==='not'&&value==='is.null'){where.push(k+' is not null');continue;}if(op==='in'){const ps=value.slice(1,-1).split(',');where.push(k+' in ('+ps.map(p=>{params.push(p);return '$'+params.length;}).join(',')+')');}else{const cmp={eq:'=',gte:'>=',lte:'<=',lt:'<',is:'is'}[op];if(!cmp)throw Error('Unexpected filter '+op);params.push(value);where.push(k+cmp+'$'+params.length);}}
      let sql='select * from public.'+table;

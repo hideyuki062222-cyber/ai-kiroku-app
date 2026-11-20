@@ -1,0 +1,85 @@
+// Live-schema-derived definitions, synthetic data; never connects to production.
+const {PGlite}=require(process.env.PGLITE_PATH||'@electric-sql/pglite'),fs=require('node:fs'),assert=require('node:assert/strict');
+const {setup,ids,uuid,migration}=require('./scoped_fixture.cjs');
+const features=['resident_info','record_management','handoff_settings','assignment_settings','meal_settings','cashbook_management','staff_info','exports'];
+const old=['resident_info','handoff_settings','meal_settings','assignment_settings'];
+(async()=>{const db=new PGlite();let n=0;const {A,B,ADMIN,LEGACY,STAFF,OTHER,TARGET,SECOND,CA,CB,RECORD,STAFFID,HANDOFF,CASH,CHOICE}=ids;
+ const q=async(s,p=[])=>(await db.query(s,p)).rows,eq=(a,b,m)=>{assert.deepEqual(a,b,m);n++;},deny=async(fn,re=/denied|permission|conflict|invalid|forbidden|required|immutable|legacy_scope|row.level|not_found/)=>{await assert.rejects(fn,re);n++;};
+ const as=async u=>{await db.exec('reset role;set role authenticated');await q("select set_config('request.jwt.claim.sub',$1,false)",[u]);};
+ const owner=async()=>{await db.exec('reset role');await q("select set_config('request.jwt.claim.sub','',false)");};
+ const can=async(o,f,full=true)=>(await q('select private.has_facility_permission($1,$2,$3) yes',[o,f,full]))[0].yes;
+ const set=async(u,p,org=A,revision=null)=>{if(revision===null)revision=(await q('select revision from public.organization_permission_sets where organization_id=$1 and user_id=$2',[org,u]))[0]?.revision||0;return (await q('select public.set_facility_permissions($1,$2,$3,$4) x',[org,u,revision,JSON.stringify(p)]))[0].x;};
+ const snapshot=async()=>{await owner();const data={};for(const t of ['organization_facility_editors','organizations','organization_members','organization_staff','clients','care_records','handoff_entries','handoff_confirmations','handoff_activity','meal_entries','meal_prices','meal_entry_extras','meal_bill_versions','cashbook_entries','cashbook_accounts','cashbook_choices'])data[t]=await q('select to_jsonb(t) row from public.'+t+' t order by to_jsonb(t)::text');return data;};
+ try{
+  await setup(db,{migrate:false});const before=await snapshot();await db.exec(fs.readFileSync(migration,'utf8'));eq(await snapshot(),before,'all existing business rows and balances unchanged');
+  await as(LEGACY);for(const f of features){eq(await can(A,f,false),old.includes(f),'legacy scope '+f);eq(await can(A,f),false,'no implicit full upgrade '+f);eq(await can(B,f,false),false,'facility isolation '+f);}
+  await as(STAFF);for(const f of features)eq(await can(A,f),false);await deny(()=>set(STAFF,{staff_info:'full'},A,0),/admin_required/);
+  await deny(()=>q("insert into public.organization_feature_permissions values($1,$2,'staff_info','full')",[A,STAFF]));await deny(()=>q("update public.organization_members set role='admin' where organization_id=$1 and user_id=$2",[A,STAFF]));
+  const permissionSnapshot=(o,u)=>q('select public.get_facility_permission_set($1,$2) x',[o,u]);
+  eq((await permissionSnapshot(A,STAFF))[0].x.permissions,{});eq((await permissionSnapshot(A,LEGACY))[0].x,null,'staff cannot inspect others grants');eq((await permissionSnapshot(B,STAFF))[0].x,null,'no other facility permission reads');
+  await as(LEGACY);await q("update public.clients set room_number='102' where id=$1",[CA]);await q("insert into public.handoff_quick_inputs(organization_id,label,category) values($1,'追加する架空項目','体調')",[A]);await q('update public.meal_profiles set rice_morning=200 where client_id=$1',[CA]);await q("select public.save_facility_service_times($1,$2,array['20:00','08:00']::time[],array[]::time[])",[A,CA]);eq((await q('select service_time from public.client_service_slots where client_id=$1 and is_active order by sort_order',[CA])).map(x=>x.service_time),['20:00:00','08:00:00'],'legacy feature operations and overnight ordering');
+  await as(ADMIN);for(const f of features)eq(await can(A,f),true,'admin '+f);await deny(()=>set(ADMIN,{exports:'full'},A,0),/self_permission/);await deny(()=>set(TARGET,{exports:'full'},B,0),/admin_required/);
+  await deny(()=>set(TARGET,{unknown:'full'},A,0));await deny(()=>set(TARGET,{resident_info:'legacy'},A,0),/legacy_scope/);await deny(()=>set(TARGET,{exports:null},A,0));
+  for(const f of features){await set(TARGET,{[f]:'full'});await as(TARGET);for(const test of features)eq(await can(A,test),test===f,'independent '+f+'/'+test);await as(ADMIN);}
+  await set(SECOND,{staff_info:'full'});await set(TARGET,{record_management:'full',exports:'full'});await as(SECOND);eq(await can(A,'record_management'),false);eq(await can(A,'staff_info'),true);
+  await as(OTHER);await set(TARGET,{meal_settings:'full'},B);await as(TARGET);eq(await can(A,'meal_settings'),false);eq(await can(B,'meal_settings'),true);eq(await can(B,'record_management'),false);
+  await deny(()=>set(SECOND,{exports:'full'},A,0),/admin_required/);await deny(()=>q('select public.set_facility_editor($1,$2,true,false)',[A,SECOND]),/admin_required/);
+  // Corrections append versions, never UPDATE the signed original or assignment links.
+  const prefix='指示内容確認しました。前回のサービス記録確認しました。';
+  const amend=rev=>q('select public.amend_care_record($1,$2,$3,$4,$5,$6) x',[A,RECORD,rev,'当日の観察訂正',prefix+'実際の支援を訂正','架空テストの訂正理由']);
+  await amend(0);await deny(()=>amend(0),/revision_conflict/);await amend(1);await deny(()=>q('update public.care_records set visit_note=\'破壊\' where id=$1',[RECORD]));await deny(()=>q('delete from public.care_record_amendments where record_id=$1',[RECORD]));
+  eq((await q('select previous_visit,revision,actor from public.care_record_amendments order by revision'))[0],{previous_visit:'元の観察',revision:1,actor:TARGET});
+  const exportCall=f=>q('select public.facility_management_export($1,$2,current_date-1,current_date+1) x',[A,f]);
+  eq((await exportCall('record_management'))[0].x[0].visit_note,'当日の観察訂正');await deny(()=>exportCall('staff_info'));
+  await as(ADMIN);let saved=await set(TARGET,{exports:'full'});await deny(()=>set(TARGET,{staff_info:'full'},A,saved.revision-1),/permission_conflict/);await as(TARGET);await deny(()=>amend(2));await deny(()=>exportCall('record_management'));
+  // Normal staff create/read/confirm/serve remain available without any new capability.
+  await as(STAFF);await q('insert into public.care_records(organization_id,client_id,created_by) values($1,$2,$3)',[A,CA,STAFF]);eq((await q('select * from public.care_records')).length,2);
+  await q('select public.handoff_set_confirmation($1,$2,false,0,$3)',[A,HANDOFF,uuid(901)]);await deny(()=>q('insert into public.handoff_confirmations(entry_id,user_id) values($1,$2)',[HANDOFF,TARGET]));
+  await q("update public.meal_entries set status='absent' where organization_id=$1 and client_id=$2",[A,CA]);await q("update public.meal_entries set status='served' where organization_id=$1 and client_id=$2",[A,CA]);
+  const legacyExpected={usual:'',trait:'',caution:'',communication:'',support_method:''};
+  const profile=()=>q('select public.save_record_profile($1,$2,0,$3,$4,$5)',[A,CA,'{}',JSON.stringify(legacyExpected),JSON.stringify({...legacyExpected,caution:'具体的な注意'})]);
+  const tariff=()=>q("select public.save_meal_extra_price($1,null,current_date,false,200,'[]',0,0)",[A]);
+  await as(LEGACY);await profile().then(()=>{throw Error('unexpected profile grant')},e=>eq(/required/.test(e.message),true));await deny(tariff);await deny(()=>q('select public.handoff_transition($1,$2,\'archived\',0,$3,\'\')',[A,HANDOFF,uuid(902)]));
+  await as(ADMIN);await set(TARGET,Object.fromEntries(features.map(f=>[f,'full'])));await as(TARGET);await profile();await tariff();
+  await q('insert into public.meal_prices(organization_id,effective_date,morning,lunch,evening) values($1,current_date+1,350,450,550)',[A]);
+  eq((await q('select unit_price from public.meal_entries where organization_id=$1',[A]))[0].unit_price,330,'saved unit price unaffected');
+  await deny(()=>q('select public.meal_bill_action($1,current_date,0,true,\'test\')',[A]),/meal_permission/);
+  await as(ADMIN);const past=(await q("select (date_trunc('month',current_date)-interval '1 month')::date::text d"))[0].d;
+  await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,$3,'evening','served')",[A,CA,past]);
+  await q('select public.meal_fill_month($1,$2,$3)',[A,past,CA]);await q("update public.meal_entries set status='absent' where organization_id=$1 and date_trunc('month',meal_date)::date=$2 and status='planned'",[A,past]);
+  await q("select public.meal_bill_action($1,$2,0,true,'過去請求の架空テスト')",[A,past]);
+  const frozen=(await q('select to_jsonb(b) row from public.meal_bill_versions b where organization_id=$1',[A]));
+  await as(TARGET);await q('insert into public.meal_prices(organization_id,effective_date,morning,lunch,evening) values($1,current_date+2,360,460,560)',[A]);
+  eq(await q('select to_jsonb(b) row from public.meal_bill_versions b where organization_id=$1',[A]),frozen,'new rate grant preserves finalized amounts');
+  await deny(()=>q("select public.meal_bill_action($1,$2,1,false,'委任者の解除は禁止')",[A,past]),/meal_permission/);
+  await deny(()=>q("update public.meal_entries set status='absent' where organization_id=$1 and meal_date=$2",[A,past]),/finalized/);
+  await q('select public.handoff_transition($1,$2,\'archived\',0,$3,\'\')',[A,HANDOFF,uuid(903)]);await q('select public.handoff_transition($1,$2,\'restored\',1,$3,\'\')',[A,HANDOFF,uuid(904)]);
+  await deny(()=>q('delete from public.handoff_activity where entry_id=$1',[HANDOFF]));
+  await q("update public.cashbook_entries set amount=120,updated_by=$1 where id=$2",[TARGET,CASH]);eq((await q('delete from public.cashbook_entries where id=$1 returning id',[CASH])).length,0,'delegates cannot delete others entries');
+  await deny(()=>q('update public.cashbook_entries set id=$1 where id=$2',[uuid(1001),CASH]),/immutable_cashbook/);
+  await q("update public.cashbook_choices set label='変更した検証店' where id=$1",[CHOICE]);
+  await deny(()=>q('update public.cashbook_choices set organization_id=$1 where id=$2',[B,CHOICE]));
+  const person=(await q('select * from public.organization_staff_directory where id=$1',[STAFFID]))[0];
+  const staffEdit=()=>q('select public.edit_facility_staff_profile($1,$2,$3,$4,$5,$6) x',[A,STAFFID,JSON.stringify({staff_name:person.staff_name,linked_user_id:person.linked_user_id,office_label:person.office_label,employment_type:person.employment_type}),'職員氏名変更（架空）','所属表示','常勤']);
+  await staffEdit();await deny(staffEdit,/staff_name_changed/);
+  eq((await q('select staff_name,role from public.organization_members where organization_id=$1 and user_id=$2',[A,STAFF]))[0],{staff_name:'職員氏名変更（架空）',role:'staff'});eq((await q('select staff_name from public.organization_members where organization_id=$1 and user_id=$2',[A,TARGET]))[0].staff_name,'同姓同名（架空）','no name-based identity');
+  eq((await q("update public.organization_staff set linked_user_id=$1 where id=$2 returning id",[TARGET,STAFFID])).length,0);await deny(()=>q('select public.list_organization_staff($1)',[A]),/admin_required/);await deny(()=>q("select public.set_organization_member_role($1,$2,'admin')",[A,TARGET]),/admin_required/);
+  eq((await exportCall('staff_info'))[0].x[0].staff_name,'職員氏名変更（架空）');eq((await exportCall('cashbook_management'))[0].x[0].amount,120);
+  await deny(()=>q('select public.amend_care_record($1,$2,0,\'x\',$3,\'r\')',[B,RECORD,prefix]));await deny(()=>q("select public.save_meal_extra_price($1,null,current_date,false,200,'[]',0,0)",[uuid(99)]));
+  await as(ADMIN);await deny(()=>q('select public.set_facility_editor($1,$2,false,true)',[A,TARGET]),/ui_upgrade/);
+  await q('select public.set_facility_editor($1,$2,false,true)',[A,LEGACY]);await q('select public.set_facility_editor($1,$2,true,false)',[A,LEGACY]);await as(LEGACY);for(const f of features)eq(await can(A,f,false),old.includes(f),'old RPC only legacy');
+  await as(ADMIN);await set(TARGET,{});await as(TARGET);for(const f of features)eq(await can(A,f),false);await deny(tariff);await deny(()=>amend(2));
+  await as(ADMIN);await set(TARGET,{staff_info:'full'});await q("select public.set_organization_member_role($1,$2,'admin')",[A,TARGET]);await q("select public.set_organization_member_role($1,$2,'staff')",[A,TARGET]);await as(TARGET);eq(await can(A,'staff_info'),false,'role cycle never resurrects grants');
+  await owner();eq((await q('select count(*)::int n from private.feature_permission_history'))[0].n>15,true);eq((await q('select count(*)::int n from public.facility_operation_history'))[0].n>=5,true);
+  eq((await q('select visit_note from public.care_records where id=$1',[RECORD]))[0].visit_note,'元の観察');
+  const grantRows=await q('select to_jsonb(p) row from public.organization_feature_permissions p order by organization_id,user_id,feature');
+  await db.exec(fs.readFileSync('supabase/rollbacks/20261119144626_permission_compatibility.sql','utf8'));
+  eq(await q('select to_jsonb(p) row from public.organization_feature_permissions p order by organization_id,user_id,feature'),grantRows,'containment never deletes grants');
+  await as(LEGACY);for(const f of old)eq(await can(A,f,false),true);for(const f of features)eq(await can(A,f),false);
+  await as(ADMIN);for(const f of features)eq(await can(A,f),true);await deny(()=>set(TARGET,{exports:'full'}),/maintenance/);
+  await owner();await db.exec(fs.readFileSync('supabase/rollbacks/20261119144626_restore_permission_functions.sql','utf8'));
+  await as(SECOND);eq(await can(A,'staff_info'),true,'restored saved grant without rebuilding data');
+  await db.exec('set role anon');await deny(()=>q('select * from public.organization_feature_permissions'));await deny(()=>q('select public.set_facility_permissions($1,$2,0,\'{}\')',[A,TARGET]));
+  console.log('PASS scoped permissions DB:',n,'assertions');
+ }finally{await db.close();}
+})().catch(e=>{console.error(e.message,e.where,e.stack);process.exitCode=1});
