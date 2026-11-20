@@ -46,6 +46,7 @@ jobs:
           node --check staff-name.js
           node --check facility-permissions.js
           node --check tests/scoped_permissions_safety.cjs
+          node --check tests/scoped_staff_management_database.cjs
           node --check tools/scoped-backup-restore.cjs
           node --check facility-tools/app.js
           node --check manage/feature-permissions.js
@@ -77,6 +78,7 @@ jobs:
           node tests/record_facts_database.cjs
           node tests/scoped_permissions_database.cjs
           node tests/scoped_permissions_safety.cjs
+          node tests/scoped_staff_management_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
           JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom

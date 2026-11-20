@@ -400,8 +400,17 @@ begin
     select m.staff_name into v_name from public.organization_members m
      where m.organization_id = new.organization_id and m.user_id = new.linked_user_id;
     if not found then raise exception 'linked_member_missing'; end if;
-    if v_actor is not null and v_actor <> new.linked_user_id and not (private.has_facility_permission(new.organization_id,'staff_info',true) and tg_op='UPDATE' and new.linked_user_id is not distinct from old.linked_user_id and new.organization_id=old.organization_id) then
-      raise exception 'admin_required';
+    -- Keep existing facility-admin INSERT/link/relink operations. The staff_info
+    -- delegation only edits display fields of an unchanged identity. RLS still
+    -- checks the source and destination facilities for every direct write.
+    if v_actor is not null and v_actor <> new.linked_user_id
+       and not private.is_org_admin(new.organization_id) then
+      if tg_op <> 'UPDATE' then raise exception 'admin_required'; end if;
+      if new.linked_user_id is distinct from old.linked_user_id
+         or new.organization_id is distinct from old.organization_id
+         or not private.has_facility_permission(new.organization_id,'staff_info',true) then
+        raise exception 'admin_required';
+      end if;
     end if;
     if tg_op = 'UPDATE' and old.linked_user_id is not distinct from new.linked_user_id
        and new.staff_name is distinct from old.staff_name and new.staff_name is distinct from v_name then

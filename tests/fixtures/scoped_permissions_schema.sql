@@ -83,3 +83,13 @@ left join public.organization_members m
   on m.organization_id = s.organization_id and m.user_id = s.linked_user_id;
 revoke all on public.organization_staff_directory from public, anon, authenticated;
 grant select on public.organization_staff_directory to authenticated;
+-- Existing public forwarding RPC omitted from the earlier metadata fixture.
+-- Match the staff-name migration so browser tests use the real API entrypoint.
+create function public.rename_organization_staff(
+ p_org uuid,p_staff uuid,p_name text,p_expected_user uuid,p_expected_name text
+) returns table(id uuid,organization_id uuid,linked_user_id uuid,staff_name text)
+language sql security invoker set search_path='' as $$
+ select * from private.rename_staff_canonical(p_org,p_staff,p_name,p_expected_user,p_expected_name);
+$$;
+revoke all on function public.rename_organization_staff(uuid,uuid,text,uuid,text) from public,anon;
+grant execute on function public.rename_organization_staff(uuid,uuid,text,uuid,text) to authenticated;
