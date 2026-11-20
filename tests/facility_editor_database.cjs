@@ -11,6 +11,7 @@ const denied=async(fn,re=/permission denied|row.level security|admin_required|fa
 const snapshot=async names=>{await owner();const out={};for(const n of names)out[n]=await rows('select to_jsonb(t) row from public.'+n+' t order by to_jsonb(t)::text');return out};
 const grant=(org,user,enabled,expected)=>db.query('select public.set_facility_editor($1,$2,$3,$4)',[org,user,enabled,expected]);
 try{
+ await db.exec("set time zone 'Asia/Tokyo'");
  await db.exec(fs.readFileSync('tests/fixtures/facility_editor_schema.sql','utf8'));
  await db.query('insert into auth.users(id,email) select u,u::text||\'@example.invalid\' from unnest($1::uuid[]) u',[[ADMIN,EDITOR,STAFF,OTHER]]);
  await db.query("select set_config('request.jwt.claim.sub',$1,false)",[ADMIN]);

@@ -200,6 +200,7 @@ let staffMembers=[],receiptRows=[],activityRows=[],loadVersion=0,loaded=false;
 let actionDraft=null,entryDraftId=null,entrySaving=false,lastEntryPayload=null,lastSavedEntry=null;
 const pendingRequests=new Map(),busyEntries=new Set(),expandedEntries=new Set(),expandedRooms=new Set();
 const actionLabels={confirmed:'確認',confirmation_cancelled:'確認取消',completed:'対応完了',reopened:'対応再開',carry:'継続表示を開始',archived:'保管',restored:'保管から戻す',legacy_completed:'既存の対応完了（旧データ）'};
+const canManage=()=>NexiaPermissions.canFull(membership,'handoff_settings',organization);
 const apiErrors={workflow_conflict:'別の職員が対応状態を変更しました。最新の状態を確認して、もう一度操作してください。',confirmation_conflict:'別画面で確認状態が変わりました。最新の状態を確認してください。',organization_membership_required:'この事業所を利用する権限を確認できません。',organization_inactive:'この事業所は利用停止中です。',entry_archived:'この申し送りは保管済みです。',author_or_admin_required:'保管・復元は投稿者か管理者だけが行えます。',not_authenticated:'ログイン状態を確認してください。',request_conflict:'保存結果を確認できません。最新の状態を確認してください。'};
 function errorText(error){return apiErrors[error?.message]||('通信・保存に失敗しました：'+(error?.message||'再試行してください。'));}
 function staffName(uid){return staffMap[uid]||('氏名を確認できない職員（'+String(uid||'').slice(0,8)+'）');}
@@ -226,7 +227,7 @@ async function loadMembership(){
  $('orgSwitch').innerHTML=organizations.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');$('orgSwitch').value=organization.id;
  await NexiaPermissions.load(db,membership,organization,session.user.id);
  $('orgLabel').textContent=(membership.staff_name||'職員')+' / '+NexiaPermissions.label(membership);
- $('viewManageBtn').classList.toggle('hidden',membership.role!=='admin');$('adminTopBtn').classList.toggle('hidden',!NexiaPermissions.can(membership,'handoff_settings',organization));hide('adminCard');
+ $('viewManageBtn').classList.toggle('hidden',!canManage());$('adminTopBtn').classList.toggle('hidden',!NexiaPermissions.can(membership,'handoff_settings',organization));hide('adminCard');
  $('dateInput').value=selectedDate;$('reviewFrom').value=selectedDate;$('reviewTo').value=selectedDate;
  await Promise.all([loadClients(),loadStaff(),loadQuickInputs()]);await loadEntries();
 }
@@ -293,7 +294,7 @@ function dueBadge(e){return !e.due_date?'':`<span class="badge ${Rules.overdue(e
 function receiptHtml(e){
  const active=receiptRows.filter(c=>c.entry_id===e.id&&Rules.active(c));
  let html=`<section class="receipt-section"><h4>確認状況</h4><div class="receipt-summary">確認済み ${active.length}名${active.length?'：'+active.map(c=>esc(displayStaff(c.user_id,c.staff_name))+'（'+esc(timestamp(c.confirmed_at))+'）').join('、'):''}</div></section>`;
- if(membership.role==='admin')html+=`<section class="review-matrix"><h4>全職員の確認状況</h4><p class="small">現在所属するログイン職員。確認・取消の操作は本人だけが行えます。</p><ul>${staffMembers.map(m=>{
+ if(canManage())html+=`<section class="review-matrix"><h4>全職員の確認状況</h4><p class="small">現在所属するログイン職員。確認・取消の操作は本人だけが行えます。</p><ul>${staffMembers.map(m=>{
   const c=receiptFor(e.id,m.user_id),confirmed=Rules.active(c);return `<li data-reader="${esc(m.user_id)}"><span>${esc(displayStaff(m.user_id))}</span><span>${confirmed?'確認済み '+esc(timestamp(c.confirmed_at)):m.user_id===e.created_by?'投稿者':'未確認'}</span></li>`;
  }).join('')}</ul></section>`;
  return html;
@@ -309,7 +310,7 @@ function eventHtml(e){
  return `<p class="completion-summary">${status}</p><section class="confirmation-history"><h4>確認履歴（${confirmations.length}件）</h4>${activityList(confirmations)}</section><section class="activity-history"><h4>操作履歴（${operations.length}件）</h4>${activityList(operations)}${!list.length?'<p class="small">過去の対応者・対応日時は推測して補っていません。</p>':''}</section>`;
 }
 function entryCard(e){
- const client=allClients.find(c=>c.id===e.client_id),own=receiptFor(e.id),mine=Rules.active(own),busy=busyEntries.has(e.id),canArchive=e.created_by===session.user.id||membership.role==='admin';
+ const client=allClients.find(c=>c.id===e.client_id),own=receiptFor(e.id),mine=Rules.active(own),busy=busyEntries.has(e.id),canArchive=e.created_by===session.user.id||canManage();
  const primary=e.archived?'':`<div class="note-actions primary-actions no-print" aria-label="主な操作"><button class="mini ${mine?'done':''}" data-primary-action="confirm" ${mine?'disabled aria-label="確認済み"':`onclick="toggleConfirm('${e.id}',false)" ${busy?'disabled':''}`}>${mine?'✓ 確認済み':'確認しました'}</button><button class="mini ${e.resolved?'done':'primary'}" data-primary-action="complete" ${e.resolved?'disabled aria-label="対応済み"':`onclick="openAction('${e.id}','completed')" ${busy?'disabled':''}`}>${e.resolved?'✓ 対応済み':'対応しました'}</button></div>`;
  const secondary=e.archived?(canArchive?`<button class="mini" onclick="transition('${e.id}','restored')" ${busy?'disabled':''}>保管から戻す</button>`:''):`${mine?`<button class="mini" onclick="toggleConfirm('${e.id}',true)" ${busy?'disabled':''}>確認を取り消す</button>`:''}${e.resolved?`<button class="mini" onclick="openAction('${e.id}','reopened')" ${busy?'disabled':''}>対応を再開する</button>`:''}${!e.resolved&&!Rules.carry(e)?`<button class="mini" onclick="transition('${e.id}','carry')" ${busy?'disabled':''}>次の勤務にも残す</button>`:''}${canArchive?`<button class="mini archive-button" onclick="archiveEntry('${e.id}')" ${busy?'disabled':''}>保管する</button>`:''}`;
  return `<article class="note handoff-note ${e.is_important?'important-note ':''}${isUnread(e)?'unread-note ':''}${Rules.carry(e)?'carry ':''}${e.shift==='night'?'night':''}" data-entry-id="${esc(e.id)}"><div class="note-head"><strong>${e.scope==='general'?'全体申し送り':esc(client?clientLabel(client):'退去済み・名称不明の利用者')}</strong><span>${e.shift==='night'?'夜勤':'日勤'} · ${esc(e.service_date)}</span></div><div class="client-meta">${e.is_important?'<span class="badge red">重要</span>':''}${Rules.carry(e)?'<span class="badge amber">継続中</span>':''}${e.archived?'<span class="badge">保管済み</span>':''}${dueBadge(e)}</div><div class="entry-statuses" aria-label="確認と対応の状態"><span class="state-chip ${mine?'complete':'pending'}">${mine?'✓ 自分は確認済み':e.created_by===session.user.id?'自分の投稿':'自分は未確認'}</span><span class="state-chip ${e.resolved?'complete':'pending'}">${e.resolved?'✓ 対応済み':'未対応'}</span></div><div class="note-body">${esc(e.body)}</div><p class="small">投稿：${esc(staffName(e.created_by))} · ${esc(timestamp(e.created_at))}${e.source_label?' · 出典 '+esc(e.source_label):''}</p>${primary}<details class="entry-details" data-entry-details="${esc(e.id)}" ${expandedEntries.has(e.id)?'open':''}><summary>詳細を見る</summary><div class="entry-details-content">${secondary?`<div class="note-actions secondary-actions no-print">${secondary}</div>`:''}${receiptHtml(e)}${eventHtml(e)}</div></details></article>`;
@@ -349,7 +350,7 @@ function render(){
  }else $('clientTimeline').innerHTML=list.map(entryCard).join('')||'<p class="empty">該当する申し送りはありません。</p>';
 }
 function setViewMode(mode){
- if(mode==='manage'&&membership?.role!=='admin')return;
+ if(mode==='manage'&&!canManage())return;
  viewMode=mode;for(const [id,value]of [['viewDayBtn','day'],['viewClientBtn','client'],['viewManageBtn','manage']])$(id).classList.toggle('active',mode===value);
  $('dayModeArea').classList.toggle('hidden',mode!=='day');$('clientModeArea').classList.toggle('hidden',mode==='day');$('manageFilters').classList.toggle('hidden',mode!=='manage');
  document.querySelector('.datebar').hidden=mode==='manage';document.querySelector('.client-history-head').hidden=mode==='manage';document.querySelector('.range-switch').hidden=mode==='manage';
@@ -444,7 +445,7 @@ function savedFeedback(message,entry){lastSavedEntry=entry;const box=$('operatio
 function archiveEntry(id){if(confirm('履歴を残したまま、この申し送りを通常の一覧から保管しますか？ 管理者の確認画面から戻せます。'))transition(id,'archived');}
 function openAdminSettings(){if(!NexiaPermissions.can(membership,'handoff_settings',organization))return;show('adminCard');$('adminCard').scrollIntoView({behavior:'smooth',block:'start'});}
 function clearHandoffData(){++loadVersion;entries=[];receiptRows=[];activityRows=[];actionDraft=null;lastEntryPayload=null;lastSavedEntry=null;$('operationStatus').hidden=true;entrySaving=false;pendingRequests.clear();busyEntries.clear();expandedEntries.clear();expandedRooms.clear();for(const id of ['entryBody','actionNote'])$(id).value='';hide('entryOverlay');$('actionDialog').close();for(const id of ['clientList','generalList','clientTimeline'])$(id).replaceChildren();}
-function refresh(){if(membership&&!document.hidden&&!hasDraft()&&!busyEntries.size){NexiaPermissions.load(db,membership,organization,session.user.id).then(()=>{ $('adminTopBtn').classList.toggle('hidden',!NexiaPermissions.can(membership,'handoff_settings',organization));if(!NexiaPermissions.can(membership,'handoff_settings',organization))hide('adminCard');return loadStaff();}).then(()=>loadEntries()).catch(error=>{$('summary').textContent=errorText(error);});}}
+function refresh(){if(membership&&!document.hidden&&!hasDraft()&&!busyEntries.size){NexiaPermissions.load(db,membership,organization,session.user.id).then(()=>{ $('viewManageBtn').classList.toggle('hidden',!canManage());if(viewMode==='manage'&&!canManage())setViewMode('day');$('adminTopBtn').classList.toggle('hidden',!NexiaPermissions.can(membership,'handoff_settings',organization));if(!NexiaPermissions.can(membership,'handoff_settings',organization))hide('adminCard');return loadStaff();}).then(()=>loadEntries()).catch(error=>{$('summary').textContent=errorText(error);});}}
 window.addEventListener('pageshow',e=>{if(e.persisted)refresh();});
 document.addEventListener('visibilitychange',refresh);
 window.addEventListener('beforeunload',e=>{if(hasDraft()||entrySaving||busyEntries.size){e.preventDefault();e.returnValue='';}});

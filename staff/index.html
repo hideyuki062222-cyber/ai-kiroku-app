@@ -17,6 +17,7 @@
 <section class="card"><div class="title">メールアドレス無しのスタッフを追加</div><div class="small">管理者が担当割当・出勤簿を入力できます。本人による操作はできません。</div><div class="row"><input id="newName" maxlength="80" placeholder="例：山田 太郎"><button class="btn primary" id="addBtn">追加</button></div><div id="addStatus" class="status"></div></section>
 <section class="card"><div class="title">全スタッフ</div><div class="small">停止すると新しい担当割当には表示されません。過去の担当記録の名前は残ります。</div><div id="list" style="margin-top:8px"></div><div id="listStatus" class="status"></div></section>
 </main>
+<script src="../facility-permissions.js?v=20261119-scoped-1"></script>
 <script>
 const CFG={url:'https://pagamoaxhqszojxrpxyu.supabase.co',key:'sb_publishable_GQFRQYCo2oACYAh9lj9ZyA_JqfIPJGT'};
 const db=supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -24,7 +25,7 @@ const $=s=>document.querySelector(s); const esc=s=>String(s??'').replace(/[&<>"'
 let session=null,org=null,membership=null,rows=[],accounts=[],loadVersion=0;
 async function login(){const {error}=await db.auth.signInWithPassword({email:$('#email').value.trim(),password:$('#password').value});$('#authStatus').textContent=error?error.message:'';if(!error)location.reload()}
 $('#loginBtn').onclick=login;
-async function init(){const {data:{session:s}}=await db.auth.getSession();session=s;if(!session){$('#auth').classList.remove('hidden');return}const {data:ms,error}=await db.from('organization_members').select('organization_id,role,staff_name,created_at').eq('user_id',session.user.id).order('created_at');if(error||!ms?.length){alert('事業所情報を確認できません。');return}const saved=localStorage.getItem('activeOrganizationId');membership=ms.find(x=>x.organization_id===saved)||ms.find(x=>x.role==='admin')||ms[0];if(membership.role!=='admin'){alert('職員管理は管理者のみ利用できます。');location.href='../assignment/';return}const {data:o,error:oe}=await db.from('organizations').select('id,name,is_active').eq('id',membership.organization_id).single();if(oe||!o){alert('事業所を確認できません。');return}org=o;localStorage.setItem('activeOrganizationId',org.id);$('#orgName').textContent=org.name;$('#app').classList.remove('hidden');await load();}
+async function init(){const {data:{session:s}}=await db.auth.getSession();session=s;if(!session){$('#auth').classList.remove('hidden');return}const {data:ms,error}=await db.from('organization_members').select('organization_id,role,staff_name,created_at').eq('user_id',session.user.id).order('created_at');if(error||!ms?.length){alert('事業所情報を確認できません。');return}const saved=localStorage.getItem('activeOrganizationId');membership=ms.find(x=>x.organization_id===saved)||ms.find(x=>x.role==='admin')||ms[0];if(membership.role!=='admin'){location.replace('../facility-tools/?tab=staff_info');return}const {data:o,error:oe}=await db.from('organizations').select('id,name,is_active').eq('id',membership.organization_id).single();if(oe||!o){alert('事業所を確認できません。');return}org=o;localStorage.setItem('activeOrganizationId',org.id);$('#orgName').textContent=org.name;$('#app').classList.remove('hidden');await load();}
 async function load(){
   const version=++loadVersion,orgId=org.id,st=$('#listStatus');st.textContent='読み込み中…';
   // The directory joins the canonical name by BOTH organization_id and auth user ID.

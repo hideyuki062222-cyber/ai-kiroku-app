@@ -1,6 +1,10 @@
 -- Metadata-only snapshot of the relevant production schema, constraints, grants and RLS.
 -- Synthetic test database only; captured before facility-editor development. No production rows.
-create role anon nologin; create role authenticated nologin; create schema auth; create schema private; create schema meal_history;
+create role anon nologin; create role authenticated nologin;
+-- Supabase maintenance/PostgREST role identities, without credentials or a real API.
+create role service_role nologin bypassrls; create role supabase_admin nologin;
+create role authenticator nologin noinherit; grant anon,authenticated,service_role to authenticator;
+create schema auth; create schema private; create schema meal_history;
 create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
 -- PGlite-only stub for unused pgcrypto join-code default; fixtures supply explicit codes.
 create function public.gen_random_bytes(n integer) returns bytea language sql as $$select decode(repeat('00',n),'hex')$$;
