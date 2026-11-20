@@ -17,10 +17,7 @@
   if(!org||org!==localStorage.getItem('activeOrganizationId'))throw Error('施設の選択を確認して再読み込みしてください。');
   const [m,o]=await Promise.all([x.from('organization_members').select('role').eq('organization_id',org).eq('user_id',auth.data.user.id).maybeSingle(),x.from('organizations').select('is_active').eq('id',org).maybeSingle()]);
   const member=check(m),facility=check(o);if(!member||!facility?.is_active)throw Error('この施設を利用できません。');
-  // Compatible with both deployed admin-only profiles and PR #26 full-scope grants.
-  let canProfile=member.role==='admin';
-  if(window.NexiaPermissions?.canFull){member.organization_id=org;facility.id=org;await NexiaPermissions.load(x,member,facility,auth.data.user.id);canProfile=NexiaPermissions.canFull(member,'resident_info',facility);}
-  return {db:x,org,actor:auth.data.user.id,role:member.role,canProfile};
+  member.organization_id=org;facility.id=org;await NexiaPermissions.load(x,member,facility,auth.data.user.id);return {db:x,org,actor:auth.data.user.id,role:member.role,canProfile:NexiaPermissions.canFull(member,'resident_info',facility)};
  }
  function candidateServices(){return [...document.querySelectorAll('input[name=serviceContent]:checked')].map(e=>e.value);}
  function readCard(e){return {service:e.dataset.factService,actions:[...e.querySelectorAll('[data-action]:checked')].map(i=>i.value),reactions:[...e.querySelectorAll('[data-reaction]:checked')].map(i=>i.value),methods:[...e.querySelectorAll('[data-method]:checked')].map(i=>i.value),unconfirmed:e.querySelector('[data-unconfirmed]').value==='true',note:e.querySelector('[data-action-note]').value,self:e.querySelector('[data-self]').value,after:e.querySelector('[data-after]').value,open:e.querySelector('[data-service-details]').open};}
@@ -58,7 +55,7 @@
  function setProfileRole(admin){
   q('structuredProfile').querySelectorAll('input,textarea').forEach(e=>e.disabled=!admin);
   Object.values(legacyFields).forEach(id=>q(id).disabled=!admin);
-  q('factProfileSave').classList.remove('hidden');q('factProfileSave').disabled=!admin;q('factProfileRole').textContent=admin?'プロフィール編集権限があります。全項目任意です。':'閲覧のみです。編集には利用者プロフィールの編集権限が必要です。';
+  q('factProfileSave').classList.remove('hidden');q('factProfileSave').hidden=false;q('factProfileSave').disabled=!admin;q('factProfileRole').textContent=admin?'プロフィール編集権限があります。全項目任意です。':'閲覧のみです。編集には利用者情報・プロフィールの全範囲の権限が必要です。';
  }
  async function loadStructured(code){
   if(profileDirty&&editor?.code===code)return;

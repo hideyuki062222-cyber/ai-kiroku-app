@@ -45,6 +45,12 @@ jobs:
           node --check home/app.js
           node --check staff-name.js
           node --check facility-permissions.js
+          node --check tests/scoped_permissions_safety.cjs
+          node --check tests/scoped_staff_management_database.cjs
+          node --check tools/scoped-backup-restore.cjs
+          node --check facility-tools/app.js
+          node --check manage/feature-permissions.js
+          node --check cashbook/feature-addon.js
           node --check assignment/facility-editor-addon.js
           node --check tests/facility_editor_browser.cjs
           node --check tests/nexia_browser.cjs
@@ -70,6 +76,9 @@ jobs:
           node tests/facility_editor_database.cjs
           node tests/meal_extras_database.cjs
           node tests/record_facts_database.cjs
+          node tests/scoped_permissions_database.cjs
+          node tests/scoped_permissions_safety.cjs
+          node tests/scoped_staff_management_database.cjs
       - name: Check NEXIA authentication and navigation
         env:
           JSDOM_PATH: ${{ runner.temp }}/nexia-tests/node_modules/jsdom
@@ -78,6 +87,9 @@ jobs:
           node tests/nexia_admin_nav.cjs
           node tests/dashboard_return.cjs
           node tests/record_link.cjs
+          node tests/record_history.cjs
+          node tests/scoped_permissions_core.cjs
+          node tests/scoped_backup_core.cjs
           node tests/service_presets.cjs
           node tests/meals_dom.cjs
           node tests/meals_core.cjs
@@ -86,9 +98,9 @@ jobs:
           node tests/record_quality_core.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner
-        run: python -m pip install --disable-pip-version-check pytest
+        run: python -m pip install --disable-pip-version-check pytest pglast==8.9
       - name: Run safety contract tests
-        run: python -m pytest -q tests/test_system_safety.py tests/test_care_intro.py
+        run: python -m pytest -q tests/test_system_safety.py tests/test_care_intro.py tests/test_scoped_migration_safety.py
 
   browser:
     runs-on: ubuntu-latest
@@ -117,4 +129,5 @@ jobs:
           node tests/facility_editor_browser.cjs
           node tests/meal_extras_browser.cjs
           node tests/record_facts_browser.cjs
+          node tests/scoped_permissions_browser.cjs
           node tests/record_quality_browser.cjs

@@ -25,7 +25,8 @@
     $('role').textContent=NexiaPermissions.label(member);
     $('identity').textContent=member.staff_name?member.staff_name+' さん':'業務を始めましょう。';
     const needsName=window.NexiaStaffName.missing(member.staff_name);
-    $('facilityEditorTools').hidden=needsName||member.role==='admin'||!NexiaPermissions.can(member,'resident_info',org);
+    $('facilityEditorTools').hidden=needsName||member.role==='admin'||!NexiaPermissions.features.some(f=>NexiaPermissions.can(member,f,org));
+    document.querySelectorAll('[data-editor-feature]').forEach(a=>a.hidden=!NexiaPermissions.can(member,a.dataset.editorFeature,org));
     $('businessMenu').hidden=needsName;$('nameRegistration').hidden=!needsName;$('admin').hidden=needsName||member.role!=='admin';$('portal').hidden=false;
     if(needsName){
       nameContext={userId:user.id,orgId:org.id,prior:member.staff_name??'',version:generation};

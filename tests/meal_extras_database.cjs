@@ -9,6 +9,7 @@ const get=async(c=CA,m='morning',d=today)=>(await q('select * from public.meal_e
 let today,past;
 const save=async(g,r=0,s=0,c=CA,m='morning',d=today,reason='')=>{const x=await get(c,m,d);const e=(await q('select revision from public.meal_entries where client_id=$1 and meal=$2 and meal_date=$3',[c,m,d]))[0];return q('select public.save_meal_extra($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) x',[c===CB?B:A,c,d,m,x.revision,e.revision,g,r,s,reason]);};
 try{
+ await db.exec("set time zone 'Asia/Tokyo'");
  await db.exec(fs.readFileSync('tests/fixtures/facility_editor_schema.sql','utf8'));await db.exec(fs.readFileSync('supabase/migrations/20261115235721_facility_editor_permissions.sql','utf8'));
  for(const u of [AD,ST,ED,OB])await q('insert into auth.users values($1,$2)',[u,u+'@example.invalid']);
  await q("select set_config('request.jwt.claim.sub',$1,false)",[AD]);
