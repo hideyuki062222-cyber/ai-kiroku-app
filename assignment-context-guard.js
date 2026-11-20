@@ -26,7 +26,7 @@
   function setGenerateButtons(disabled){
     document.querySelectorAll('button').forEach(btn=>{
       const text=(btn.textContent||'').trim();
-      if(text==='AIで記録作成'||text==='別の文章を作る')btn.disabled=disabled;
+      if(text==='AIで記録作成'||text==='別の文章を作る'||text==='入力内容で作り直す')btn.disabled=disabled;
     });
   }
   function lock(){

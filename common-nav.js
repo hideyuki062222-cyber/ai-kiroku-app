@@ -86,9 +86,9 @@
     if(key==='record'){
       lockAssignmentFlowButtons();
       loadScript('staffCompactScript',BASE+'staff-compact.js?v=20261014-2');
-      loadScript('recordSafetyScript',BASE+'record-safety.js?v=20261119-facts-1');
+      loadScript('recordSafetyScript',BASE+'record-safety.js?v=20261120-quality-1');
       if(!window.__nexiaFactsMode)loadScript('careIntroScript',BASE+'care-intro-addon.js?v=20261028-1');
-      if(assignmentFlowRequested()) loadScript('assignmentContextGuardScript',BASE+'assignment-context-guard.js?v=20261014-1');
+      if(assignmentFlowRequested()) loadScript('assignmentContextGuardScript',BASE+'assignment-context-guard.js?v=20261120-quality-1');
     }else if(key==='cashbook'){
       loadScript('cashbookSafetyScript',BASE+'cashbook/safety-addon.js?v=20261014-3');
     }

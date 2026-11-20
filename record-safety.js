@@ -53,7 +53,7 @@
   function setGenerateDisabled(disabled){
     document.querySelectorAll('button').forEach(b=>{
       const t=(b.textContent||'').trim();
-      if(t==='AIで記録作成'||t==='別の文章を作る')b.disabled=disabled;
+      if(t==='AIで記録作成'||t==='別の文章を作る'||t==='入力内容で作り直す')b.disabled=disabled;
     });
   }
   function services(){return [...document.querySelectorAll('input[name="serviceContent"]:checked')].map(x=>x.value).sort()}

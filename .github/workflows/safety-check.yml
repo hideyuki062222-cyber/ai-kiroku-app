@@ -31,6 +31,7 @@ jobs:
           node --check record-safety.js
           node --check record-facts-core.js
           node --check record-facts-ui.js
+          node --check tests/record_quality_browser.cjs
           node --check tests/record_facts_browser.cjs
           node --check care-intro-addon.js
           node --check assignment-context-guard.js
@@ -88,6 +89,7 @@ jobs:
           node tests/meals_core.cjs
           node tests/meal_extras_core.cjs
           node tests/record_facts_core.cjs
+          node tests/record_quality_core.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest
@@ -122,3 +124,4 @@ jobs:
           node tests/meal_extras_browser.cjs
           node tests/record_facts_browser.cjs
           node tests/scoped_permissions_browser.cjs
+          node tests/record_quality_browser.cjs
