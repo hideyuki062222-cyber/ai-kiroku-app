@@ -61,9 +61,18 @@
   '家事援助':[['掃除',[0]],['洗濯',[1]],['調理',[2]]], 'その他':[['見守り',[0]],['声かけ',[1]]]
  };
  const quickChoices=Object.fromEntries(Object.entries(presets).map(([s,ps])=>[s,ps.map(([label,indices],i)=>({id:s+'-'+i,label,actions:indices.map(n=>serviceActions[s][n]),unconfirmed:s==='服薬介助・確認'&&i>=2}))]));
+ // Optional shortcuts explicitly state the person's own action and the worker's help.
+ for(const [service,label,actions,self] of [
+  ['入浴介助','上半身は本人・背部の洗身を介助',['背部の洗身を介助した'],'上半身を洗った'],
+  ['トイレ介助','衣類は本人が下げた・職員は見守り',['排泄中の見守りを行った'],'衣類を下げた'],
+  ['食事介助','本人が口元へ運んだ・職員は見守り',['食事中の見守りを行った'],'食物を口元へ運んだ'],
+  ['口腔ケア','歯磨きは本人・職員は見守り',['口腔ケア中の見守りを行った'],'歯を磨いた'],
+  ['更衣介助','脱衣は本人・着衣を介助',['衣類を着る動作を介助した'],'衣類を脱いだ'],
+  ['移動介助','立ち上がりは本人・歩行に付き添い',['歩行に付き添った'],'立ち上がった']
+ ])quickChoices[service].push({id:service+'-self',label,actions,self});
  const reactions={
   '服薬介助・確認':['声かけにうなずいて応じた','本人が自分で服薬した','服薬を拒否した','服薬に時間を要した'],
-  '食事介助':['自分で食具を操作した','食事を希望する発言があった','食事を断る意思を示した','食事に時間を要した'],
+  '食事介助':['自分で食具を操作した','食事を希望する発言があった','食事を断る意思を示した','食事に時間を要した','声かけにうなずいて応じた'],
   'トイレ介助':['排泄の希望を伝えた','声かけにうなずいて応じた','排泄時に痛みを訴えた','排泄に時間を要した'],
   '入浴介助':['入浴を希望した','声かけにうなずいて応じた','入浴を断る意思を示した','入浴中に疲れを訴えた'],
   '入浴準備':['入浴を希望した','自分で衣類を選んだ','声かけにうなずいて応じた'],
@@ -198,6 +207,7 @@
  // Without that prompt, the response is retained independently; no action is inferred.
  const promptActions={
   '服薬介助・確認':['服薬の声かけを行った','服薬に向けて声をかけると'],
+  '食事介助':['食事の際に声をかけた','食事の際に声をかけると'],
   '口腔ケア':['歯磨きの声かけを行った','歯磨きの声をかけると'],
   '起床介助':['起床の声かけを行った','起床の声をかけると','起床の声かけに返事をした','本人は返事をされました'],
   '就寝介助':['就寝準備の声かけを行った','就寝準備の声をかけると']
@@ -221,11 +231,12 @@
   if(text(f.concern))visit+=sentence(f.concern);
   const sections=[];
   for(const a of f.actions||[]){if(!performed(a))continue;
-   const composed=supportClauses(a),acts=composed.acts,own=text(a.self)?sentence(selfSentence(a.self)):'';
+   const composed=supportClauses(a),deferUnconfirmed=a.service==='服薬介助・確認'&&a.unconfirmed&&composed.reactions.includes('服薬を拒否した');
+   const acts=deferUnconfirmed?composed.acts.filter(v=>v!=='服用済みかは確認していません'):composed.acts,own=text(a.self)?sentence(selfSentence(a.self)):'';
    const method=unique(a.methods||[]).map(polite);
    const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
-   let body=(own?own+'職員は':'')+(composed.lead||'')+joinClauses(acts.concat(method),mode)+joinClauses(rs,mode)+after+note;
+   let body=(own?own+'職員は':'')+(composed.lead||'')+joinClauses(acts.concat(method),mode)+joinClauses(rs,mode)+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
    if(mode==='long')body='【'+a.service+'】\n'+body;
    sections.push(body);
   }

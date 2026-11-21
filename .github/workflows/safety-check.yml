@@ -97,6 +97,8 @@ jobs:
           node tests/record_facts_core.cjs
           node tests/record_quality_core.cjs
           node tests/record_ui_restore_core.cjs
+          node tests/record_similarity.cjs
+          node tests/record_seven_days.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner
         run: python -m pip install --disable-pip-version-check pytest pglast==8.9

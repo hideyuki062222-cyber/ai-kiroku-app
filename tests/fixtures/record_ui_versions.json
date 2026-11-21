@@ -22,7 +22,9 @@
       "index.html": "578cf9835e77b071e822e6f73747870da950b9ad964dc3ea8de4c0f450f33f19",
       "record-facts-core.js": "78fb290e2b90887845053e28024cbc1ef8702ed0aa40117f00a28c99b9701bc8",
       "record-facts-ui.js": "9cbc1ac0b120a9253a195bbfdd3495002c34e2c23c08bf87460d833588ff9170",
-      "record-facts.css": "f70c2e96f54afa1e6ea993a8644c9656d63be99c96f9df892e6ac13ad58d65d4"
+      "record-facts.css": "f70c2e96f54afa1e6ea993a8644c9656d63be99c96f9df892e6ac13ad58d65d4",
+      "record-safety.js": "695013b20218030698d5ac578931bc0b597cf543f58f7caf0bbfff80e1bb40f3",
+      "common-nav.js": "2ff1557dffb427180dc6de6e7a649edb5f9ae5048700dc0eae32f4daebeb626a"
     }
   }
 }
