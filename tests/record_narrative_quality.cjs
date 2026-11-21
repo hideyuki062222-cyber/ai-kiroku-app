@@ -35,6 +35,12 @@ for(const mode of ['normal','long'])for(const reaction of ['服薬を拒否し�
  const f={...fixed,lengthMode:mode,actions:[{...fixed.actions[0],reactions:[reaction]}]},out=C.compose(f,profile,seed);
  assert.deepEqual(out.errors,[]);assert(out.care.includes('服用済みかは確認していません。'));assert(!/服用されたこと|本人は自分で服薬|副作用/.test(out.care));if(reaction==='服薬を拒否した')assert(/本人は服薬を拒否されました/.test(out.care));generations++;
 }
+// Legacy facts may have methods + self but no confirmed-service flag/action.
+// Do not leave a dangling worker subject attached to the resident's own action.
+for(const lengthMode of ['normal','long'])for(let seed=0;seed<128;seed++){
+ const out=C.compose({...empty,lengthMode,actions:[{service:'入浴介助',actions:[],self:'上半身を洗った',methods:['ゆっくり話した']}]},undefined,seed);
+ assert.deepEqual(out.errors,[]);assert(out.care.includes('上半身は本人が自分で洗われました。'));assert(out.care.includes('ゆっくり話しました。'));assert(!out.care.includes('職員は'));assert(!out.care.includes('洗身を介助'));generations++;
+}
 const stats=xs=>({unique:new Set(xs).size,repeatOccurrences:xs.length-new Set(xs).size,adjacentMatches:xs.slice(1).filter((v,i)=>v===xs[i]).length});
 const thirty=[];
 for(const mode of ['normal','long']){

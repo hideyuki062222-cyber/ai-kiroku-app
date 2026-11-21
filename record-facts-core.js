@@ -697,14 +697,14 @@
     const how=method.length?structure(['支援の際は、','支援方法として、',''])+joinClauses(method,'long'):'';
     const reaction=joinClauses(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v),'long');
     // Self-help order can change without implying an unobserved sequence or outcome.
-    const assistance=(own?'職員は':'')+help;
+    const assistance=help?(own?'職員は':'')+help:'';
     const work=own?structure([own+assistance,assistance+own]):assistance;
     const middle=structure([work+how+reaction,how+work+reaction,work+reaction+how]);
     body=middle+uncertainty+after+note;
    }else if(mode==='normal'){
     const help=lead+render(positive.map(variant.phrase));
     const how=method.length?structure(['','支援の際は、','支援方法として、'])+render(method):'';
-    body=(own?own+'職員は':'')+help+how+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+uncertainty+after+note;
+    body=own+(help?(own?'職員は':'')+help:'')+how+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+uncertainty+after+note;
    }else{
     body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
    }

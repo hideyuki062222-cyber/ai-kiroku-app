@@ -57,7 +57,7 @@
     ],
     "identicalResultsAcrossWidths": true,
     "sourceHashes": {
-      "record-facts-core.js": "7d17141e4e51e13ae9a828051839493451d7cce18e4b988943cfcd850faf310a",
+      "record-facts-core.js": "d5a81484a13220855d21469301f593af2fb1fe4b7b727a1c0d5e997766495a77",
       "record-similarity.js": "b8749c1cd307c46f47f93e5a0893a905f3806d30cc61694ffd2d2839e18cb557"
     },
     "actualPinnedHTML": true,
