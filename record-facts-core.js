@@ -1,6 +1,8 @@
 /* Deterministic composition of confirmed observations. No network or profile-to-event inference. */
 (function(root){
  'use strict';
+ const interventionLabels={active:'積極的支援（直接介助を多め）',partial:'必要な部分を介助',prompt:'声かけ・促し中心',watch:'見守り中心',minimal:'最小限の支援・確認中心'};
+ const interventionText={active:'今回は直接介助を中心に支援しました',partial:'今回は必要な部分に介助を行いました',prompt:'今回は声かけ・促しを中心に支援しました',watch:'今回は見守りを中心に支援しました',minimal:'今回は最小限の支援・確認を中心に対応しました'};
  const INTRO='指示内容確認しました。前回のサービス記録確認しました。';
  const serviceActions={
   '食事介助':['食事中の見守りを行った','食事の際に声をかけた','食物を口元へ運ぶ介助を行った'],
@@ -501,7 +503,7 @@
  // Scheduled candidates and saved facts without this flag keep their former meaning.
  function performed(a){return a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length;}
  function validate(f){
-  const errors=[];let validDate=false;
+  const errors=[];if(f.interventionLevel&&!Object.hasOwn(interventionLabels,f.interventionLevel))errors.push('今回の支援介入度を確認してください。');let validDate=false;
   try{validDate=/^\d{4}-\d{2}-\d{2}$/.test(f.date||'')&&f.date>='2000-01-01'&&f.date<='2100-12-31'&&new Date(f.date+'T00:00:00Z').toISOString().slice(0,10)===f.date;}catch{}
   if(!validDate)errors.push('記録日を確認してください。');
   if(![f.scene,f.condition,f.health,f.statement,f.difference,f.concern].some(text))errors.push('① 訪問時に確認した状態・表情・体調などを1つ選択、または入力してください。');
@@ -651,7 +653,9 @@
   if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
   if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
   if(text(f.concern))visit+=sentence(f.concern);
+  if(mode==='long'){const parts=[];if(obs.length)parts.push('【訪問時の状態】\n'+joinClauses(obs,'long'));if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))parts.push('【体調】\n'+sentence(observation(f.health)));if(text(f.statement))parts.push('【本人の発言・訴え】\n'+sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました'));if(text(f.difference))parts.push('【普段との違い】\n'+sentence(observations[f.difference]||text(f.difference)));if(text(f.concern))parts.push('【気になったこと】\n'+sentence(f.concern));visit=parts.join('\n');}
   const sections=[];
+  if(f.interventionLevel)sections.push(sentence(interventionText[f.interventionLevel]));
   for(const a of f.actions||[]){if(!performed(a))continue;
    const composed=supportClauses(a),deferUnconfirmed=a.service==='服薬介助・確認'&&a.unconfirmed&&composed.reactions.includes('服薬を拒否した');
    const acts=deferUnconfirmed?composed.acts.filter(v=>v!=='服用済みかは確認していません'):composed.acts,own=text(a.self)?sentence(selfSentence(a.self)):'';
@@ -660,15 +664,15 @@
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
    const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
    let body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
-   if(mode==='long')body='【'+a.service+'】\n'+body;
+   if(mode==='long'){const blocks=[];if(own)blocks.push('本人が行ったこと：'+own);const help=lead+joinClauses(acts.map(variant.phrase).concat(method),'long');if(help)blocks.push('職員の支援：'+(own?'職員は':'')+help);if(rs.length)blocks.push('本人の反応：'+joinClauses(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v),'long'));if(deferUnconfirmed)blocks.push('服用済みかは確認していません。');if(after)blocks.push('支援後の状態：'+after);if(note)blocks.push('補足：'+note);body='【'+a.service+'】\n'+blocks.join('\n');}
    sections.push(body);
   }
   if(text(f.supportNote))sections.push(sentence(f.supportNote));
   if(text(f.response))sections.push(sentence('支援中、'+(reactionSentences[f.response]||text(f.response))));
   if(text(f.after))sections.push(sentence(afterSentence(f.after)));
   const care=INTRO+(mode==='long'?'\n':'')+sections.join(mode==='short'?'':'\n');
-  const inputCount=[f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
+  const inputCount=[f.interventionLevel,f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount};
  }
- const api={INTRO,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);

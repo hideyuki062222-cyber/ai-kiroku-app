@@ -53,12 +53,12 @@
    try{
     let rows=[],offset=0;
     while(true){
-     const {data,error}=await db.from('care_records').select('id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).not('assignment_id','is',null).not('service_time','is',null).order('service_time',{ascending:true}).order('id',{ascending:true}).range(offset,offset+499);
+     const {data,error}=await db.from('care_records').select('id,assignment_id,service_date,service_time,service_type,intervention_level,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).not('assignment_id','is',null).not('service_time','is',null).order('service_time',{ascending:true}).order('id',{ascending:true}).range(offset,offset+499);
      if(!current()||seq!==dayRequest)return;if(error)throw error;rows.push(...(data||[]));if((data||[]).length<500)break;offset+=500;
     }
     // Older records without assignment_id are shown only when opened by their exact ID.
     if(targetRecord&&!targetRecord.assignment_id&&targetRecord.client_id===id&&targetRecord.service_date===chosen){
-     const legacy=await db.from('care_records').select('id,client_id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).eq('id',targetRecord.id).maybeSingle();
+     const legacy=await db.from('care_records').select('id,client_id,assignment_id,service_date,service_time,service_type,intervention_level,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('client_id',id).eq('service_date',chosen).eq('id',targetRecord.id).maybeSingle();
      if(!current()||seq!==dayRequest)return;if(legacy.error)throw legacy.error;
      if(legacy.data&&!rows.some(r=>r.id===legacy.data.id))rows.push(legacy.data);
     }
@@ -82,6 +82,7 @@
     for(const [time,records]of groups){
      const details=el('details');details.className='history-item';const summary=el('summary',time+' ／ '+records.length+'件');summary.style.cssText='padding:16px 4px;cursor:pointer;font-weight:700';details.append(summary);
      records.forEach((row,i)=>{const article=el('article');article.style.cssText='border-top:1px solid #ddd;padding:12px 0;overflow-wrap:anywhere';article.dataset.recordId=row.id;article.append(el('strong',chosen+' '+time+' ／ 記録'+(i+1)+(row.service_type?' ／ '+row.service_type:'')));
+      if(row.intervention_level)article.append(el('p','今回の支援介入度：'+(window.NexiaFactCore?.interventionLabels?.[row.intervention_level]||({active:'積極的支援（直接介助を多め）',partial:'必要な部分を介助',prompt:'声かけ・促し中心',watch:'見守り中心',minimal:'最小限の支援・確認中心'})[row.intervention_level]||row.intervention_level)));
       article.append(el('p','記録者：'+(authors.get(row.created_by)||'確認できません（退職・氏名未登録など）')));
       for(const [title,value]of [['訪問時の状態・様子・体調',row.visit_note],['支援中・介護者が実施したこと',row.care_note]]){article.append(el('h3',title));const p=el('p',value||'記載なし');p.style.cssText='white-space:pre-wrap;line-height:1.8';article.append(p);if(value)article.append(copyControl(title+'をコピー',value));}
       article.append(copyControl('この記録をまとめてコピー','【訪問時】\n'+(row.visit_note||'')+'\n\n【支援中】\n'+(row.care_note||'')));
@@ -121,7 +122,7 @@
    if(!current())return;if(error)throw error;select.append(new Option('利用者を選択',''));
    for(const c of data||[])select.append(new Option(c.code+(c.display_name?' '+c.display_name:'')+(c.is_active?'':'（利用終了）'),c.id));
    if(revealTarget){
-    const result=await db.from('care_records').select('id,client_id,assignment_id,service_date,service_time,service_type,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('id',targetId).maybeSingle();
+    const result=await db.from('care_records').select('id,client_id,assignment_id,service_date,service_time,service_type,intervention_level,visit_note,care_note,created_at,created_by').eq('organization_id',member.organization_id).eq('id',targetId).maybeSingle();
     if(!current())return;
     const row=result.data,person=data?.find(c=>c.id===row?.client_id);
     if(result.error||!row||!person||!row.service_date||!row.service_time||(link.get('assignment')&&row.assignment_id&&row.assignment_id!==link.get('assignment'))){

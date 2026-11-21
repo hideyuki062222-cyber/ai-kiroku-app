@@ -37,15 +37,18 @@
   return {rows,limit:LIMIT,atLimit:rows.length===LIMIT};
  }
  // A bounded search across fact-preserving renderings. High similarity may remain.
- function chooseExpression(core,f,scope,rows,seed){
+ function chooseExpression(core,f,scope,rows,seed,previous=null){
   const visible=rows.filter(r=>r.organization_id===scope.organizationId&&r.client_id===scope.clientId);
   const original=core.compose(f,undefined,seed);if(original.errors.length)return original;
-  let best=original,bestScore=Infinity,bestSeed=seed;
+  let best=original,bestRank=[Infinity,Infinity],bestSeed=seed;
   for(let i=0;i<32;i++){
-   const candidate=core.compose(f,undefined,seed+i);if(candidate.errors.length)continue;
+   const candidateSeed=i===0?seed:(seed+i*131071)%1048576;
+   const candidate=core.compose(f,undefined,candidateSeed);if(candidate.errors.length)continue;
    const score=visible.reduce((max,r)=>Math.max(max,normalize(candidate.visit)===normalize(r.visit_note)&&normalize(candidate.care)===normalize(r.care_note)?2:0.75*dice(candidate.care,r.care_note)+0.25*dice(candidate.visit,r.visit_note)),0);
-   if(score<bestScore){best=candidate;bestScore=score;bestSeed=seed+i;}
-   if(score===0)break;
+   const recent=previous&&previous.organization_id===scope.organizationId&&previous.client_id===scope.clientId?previous:null;
+   const repeat=recent?(normalize(candidate.care)===normalize(recent.care_note)?2:0)+(normalize(candidate.visit)===normalize(recent.visit_note)?1:0):0;
+   if(repeat<bestRank[0]||repeat===bestRank[0]&&score<bestRank[1]){best=candidate;bestRank=[repeat,score];bestSeed=candidateSeed;}
+   if(score===0&&repeat===0)break;
   }
   return {...best,expressionSeed:bestSeed};
  }
