@@ -50,7 +50,7 @@
  function showQuickDetail(f,services){
   const box=q('factQuickDetail');quickDetailSignature=JSON.stringify({user:q('user').value,org:localStorage.getItem('activeOrganizationId'),facts:f});
   box.hidden=!services.length;
-  box.innerHTML=services.length?'<p>具体的な介助方法が未入力です。実施した方法を1つ選ぶと、その事実で記録を作り直せます（任意）。反応・体調は自動追加しません。</p>'+services.map(service=>'<div><strong>'+esc(service)+'</strong><div class="fact-presets">'+C.quickChoices[service].map(p=>'<button type="button" data-quick-detail="'+esc(p.id)+'" data-quick-service="'+esc(service)+'">'+esc(p.label)+'</button>').join('')+'</div></div>').join(''):'';
+  box.innerHTML=services.length?'<p>具体的な介助方法が未入力です。確認した事実が少ない場合、記録文は短くなります。実施した方法を1つ選ぶと、その事実で記録を作り直せます（任意）。反応・体調は自動追加しません。</p>'+services.map(service=>'<div><strong>'+esc(service)+'</strong><div class="fact-presets">'+C.quickChoices[service].map(p=>'<button type="button" data-quick-detail="'+esc(p.id)+'" data-quick-service="'+esc(service)+'">'+esc(p.label)+'</button>').join('')+'</div></div>').join(''):'';
  }
  async function applyQuickDetail(e){
   const b=e.target.closest('[data-quick-detail]');if(!b||quickDetailBusy)return;
@@ -142,7 +142,7 @@
    if(result.errors.length)return;
    q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;
    for(const id of ['visitResult','careResult'])q(id+'Count').textContent=q(id).textContent.length+'文字';
-   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:2};
+   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:3};
    q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
    window.__nexiaPreviousExpression={actor:scope.actorId,org:scope.organizationId,client:scope.clientId,row:{organization_id:scope.organizationId,client_id:scope.clientId,visit_note:result.visit,care_note:result.care}};
   },signature:()=>JSON.stringify({org:localStorage.getItem('activeOrganizationId'),facts:collect()})};

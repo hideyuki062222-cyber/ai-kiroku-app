@@ -1,0 +1,9 @@
+{
+  "baseline": "0b5ebd022e0bd760058590aacfbe1e2074fd5121",
+  "productionChanged": false,
+  "sourceHashes": {
+    "record-similarity.js": "8662bc486d2cdf2d2566a1455f48b9ea4804cf471ecbbe4fc3c5ace0e5a6ae22",
+    "record-facts-core.js": "2237950e3bde709345be0969851c820b778d6b2362b7e6f9ff3402ad851630c5",
+    "record-facts-ui.js": "9ab53d29c0de6dc5b6260806d87744d94e028c00ef3e92f2af403311bd8d4664"
+  }
+}
