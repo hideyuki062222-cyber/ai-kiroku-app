@@ -36,27 +36,51 @@
   }
   return {rows,limit:LIMIT,atLimit:rows.length===LIMIT};
  }
- // A bounded search across fact-preserving renderings. High similarity may remain.
+ // Keep at most 32 distinct, fact-preserving pairs. Different seeds can render
+ // the same words; probes therefore have a separate hard limit (no network).
+ const MAX_CANDIDATES=32,MAX_PROBES=128;
+ const pairKey=(v,c)=>JSON.stringify([v,c]);
  function chooseExpression(core,f,scope,rows,seed,previous=null){
   const visible=rows.filter(r=>r.organization_id===scope.organizationId&&r.client_id===scope.clientId);
   const original=core.compose(f,undefined,seed);if(original.errors.length)return original;
-  let best=original,bestRank=[Infinity,Infinity],bestSeed=seed;
-  for(let i=0;i<32;i++){
+  const counts=()=>new Map(),pairs=counts(),visits=counts(),cares=counts();
+  const add=(m,k)=>m.set(k,(m.get(k)||0)+1);
+  const history=visible.map(r=>{
+   const v=normalize(r.visit_note),c=normalize(r.care_note),key=pairKey(v,c);
+   add(pairs,key);add(visits,v);add(cares,c);return {v,c};
+  });
+  const recent=previous&&previous.organization_id===scope.organizationId&&previous.client_id===scope.clientId?{v:normalize(previous.visit_note),c:normalize(previous.care_note)}:null;
+  const candidates=[],seen=new Set();let probes=0;
+  for(let i=0;i<MAX_PROBES;i++){
    const candidateSeed=i===0?seed:(seed+i*131071)%1048576;
-   const candidate=core.compose(f,undefined,candidateSeed);if(candidate.errors.length)continue;
-   const score=visible.reduce((max,r)=>{
-    if(normalize(candidate.visit)===normalize(r.visit_note)&&normalize(candidate.care)===normalize(r.care_note))return 2;
-    const care=dice(candidate.care,r.care_note),weighted=0.75*care+0.25*dice(candidate.visit,r.visit_note);
-    // Use the advisory check's real threshold. Weak character overlap with unrelated
-    // history must not funnel every generation into the same two phrasings.
+   const result=i===0?original:core.compose(f,undefined,candidateSeed);probes++;
+   if(result.errors.length)continue;
+   const v=normalize(result.visit),c=normalize(result.care),key=pairKey(v,c);
+   if(seen.has(key))continue;seen.add(key);
+   const candidate={result,seed:candidateSeed,v,c,key};
+   if(candidates.length<MAX_CANDIDATES)candidates.push(candidate);
+   else if(!pairs.has(key)){candidates[candidates.length-1]=candidate;break;}
+   // After a reload, the initial cohort can already be fully saved. Continue
+   // within the probe budget rather than declaring those first 32 exhausted.
+   if(candidates.length===MAX_CANDIDATES&&candidates.some(c=>!pairs.has(c.key)))break;
+  }
+  const compareRank=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return a[i]-b[i];return 0;};
+  let best=null,bestRank=null,bestSimilarity=Infinity;
+  for(const candidate of candidates){
+   const fullCount=pairs.get(candidate.key)||0;
+   // Saved full matches must never win merely because an unused rendering shares
+   // a visit/care section with the preceding draft. Section and recent-draft
+   // preferences only apply AFTER avoidance of a saved full match.
+   const rank=[Number(fullCount>0),Number(cares.has(candidate.c)),Number(visits.has(candidate.v)),recent?(candidate.c===recent.c?2:0)+(candidate.v===recent.v?1:0):0,fullCount];
+   const order=bestRank?compareRank(rank,bestRank):-1;if(order>0)continue;
+   const similarity=history.reduce((max,r)=>{
+    const care=dice(candidate.c,r.c),weighted=0.75*care+0.25*dice(candidate.v,r.v);
     return Math.max(max,care>=0.82&&weighted>=0.8?weighted:0);
    },0);
-   const recent=previous&&previous.organization_id===scope.organizationId&&previous.client_id===scope.clientId?previous:null;
-   const repeat=recent?(normalize(candidate.care)===normalize(recent.care_note)?2:0)+(normalize(candidate.visit)===normalize(recent.visit_note)?1:0):0;
-   if(repeat<bestRank[0]||repeat===bestRank[0]&&score<bestRank[1]){best=candidate;bestRank=[repeat,score];bestSeed=candidateSeed;}
-   if(score===0&&repeat===0)break;
+   if(order<0||similarity<bestSimilarity){best=candidate;bestRank=rank;bestSimilarity=similarity;}
   }
-  return {...best,expressionSeed:bestSeed};
+  return {...best.result,expressionSeed:best.seed,selection:{candidateCount:candidates.length,probeCount:probes,unseenPairCount:candidates.filter(c=>!pairs.has(c.key)).length,selectedExact:pairs.has(best.key)}};
  }
- const api={INTRO,LIMIT,normalize,dice,compare,load,chooseExpression};if(typeof module!=='undefined')module.exports=api;else root.NexiaRecordSimilarity=api;
+
+ const api={INTRO,LIMIT,MAX_CANDIDATES,MAX_PROBES,normalize,dice,compare,load,chooseExpression};if(typeof module!=='undefined')module.exports=api;else root.NexiaRecordSimilarity=api;
 })(globalThis);

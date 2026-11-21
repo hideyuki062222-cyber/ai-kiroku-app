@@ -15,7 +15,11 @@ module.exports=async function({pg,atomic,pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,C
  await atomic(async()=>{await pg.exec('reset role');await pg.query('insert into public.care_records(id,organization_id,client_id,created_by,visit_note,care_note) values($1,$2,$3,$4,$5,$6)',[id(551),ORG,CLIENT,ADMIN,visit,body]);});
  await generate();assert.equal(await page.locator('#recordSimilarityNotice').getAttribute('data-matches'),'0');
  await page.locator('#recordCommitButton').click();await page.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('正式にクラウド保存'));
- await generate();assert.equal(await page.locator('#recordSimilarityNotice').getAttribute('data-matches'),'1');assert.equal(await page.locator('#recordCommitButton').innerText(),'当日の事実として正式保存');
+ // This fixture now exhausts safe expressions deliberately. A single old row
+ // must no longer force an exact repeat while unused renderings are available.
+ const exhausted=await page.evaluate(()=>{const C=NexiaFactCore,S=NexiaRecordSimilarity,f=NexiaFactUI.collect(),seen=new Set(),rows=[];for(let n=0;n<256;n++){const r=C.compose(f,undefined,n),k=JSON.stringify([S.normalize(r.visit),S.normalize(r.care)]);if(!seen.has(k)){seen.add(k);rows.push(r);}}return rows;});
+ await atomic(async()=>{await pg.exec('reset role');for(let n=0;n<exhausted.length;n++)await pg.query('insert into public.care_records(id,organization_id,client_id,created_by,visit_note,care_note) values($1,$2,$3,$4,$5,$6)',[id(800000+n),ORG,CLIENT2,ADMIN,exhausted[n].visit,exhausted[n].care]);});
+ await generate();assert(Number(await page.locator('#recordSimilarityNotice').getAttribute('data-matches'))>0);assert.equal(await page.locator('#recordCommitButton').innerText(),'当日の事実として正式保存');
  await page.locator('#recordSimilarityNotice summary').click();assert((await page.locator('#recordSimilarityNotice').innerText()).includes('文章が一致'));
  assert((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1);await page.locator('#recordSimilarityNotice').screenshot({path:path.join(out,width+'-similarity.png')});
  // Identical real facts may be saved with the same single save action, with no extra modal.

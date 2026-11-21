@@ -743,7 +743,7 @@
    const after=sentence(afterSentence(a.after)),note=sentence(a.note);
    let body;
    if(a.scopeOnly&&!a.methods.length){
-    body=work;if(plan.intervention&&scopeOnlyRecord){const scope={active:'直接介助を中心に',partial:'必要な部分への介助として',prompt:'声かけ・促しを中心に',watch:'見守りを中心に',minimal:'最小限の支援・確認を中心に'}[plan.intervention];body=sentence(serviceStatements[a.service].replace(/を行いました$/,'は、'+scope+'行いました'));}body+=render(reactions)+uncertain+after+note;
+    body=work;if(plan.intervention&&scopeOnlyRecord){const scope={active:'直接介助を中心に',partial:'必要な部分への介助として',prompt:'声かけ・促しを中心に',watch:'見守りを中心に',minimal:'最小限の支援・確認を中心に'}[plan.intervention];const caption=serviceStatements[a.service].replace(/を行いました$/,'');body=sentence(structure([caption+'は、'+scope+'行いました',caption+'では、'+interventionText[plan.intervention].replace(/^今回は/,'').replace(/支援しました$/,'対応しました'),scope+'、'+serviceStatements[a.service]]));}body+=render(reactions)+uncertain+after+note;
    }else if(mode==='short'){
     // Only clauses with the same worker subject are compacted together.
     const how=a.methods.map(polite);
