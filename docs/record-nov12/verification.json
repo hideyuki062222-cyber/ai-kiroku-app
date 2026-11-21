@@ -1,0 +1,14 @@
+{
+  "fictionalOnly": true,
+  "productionTouched": false,
+  "baseline": "e050e93763418a7cf38cf3d9452cf668473238c1",
+  "sourceHashes": {
+    "index.html": "ba391808723919cdf564539b76a7f864209bd21acbd94970dd72fdb45d00d6c0",
+    "record-facts-core.js": "2c86177e8204d4e02fd1a27a97337e0b8df5a161a9c95ed4148e607eed1ee1ab",
+    "record-facts-ui.js": "91e8248f77ca484f518b24f8025d50676cdae2870fa9694369fb18ca7d9eed73",
+    "record-facts.css": "9fada44ca4502cfb8665af67cb1f321d946fc5b694bbfbc6d4c654cb4d5b0199"
+  },
+  "comparisonPassed": true,
+  "actualHardwareTested": false,
+  "liveProductionSaveTested": false
+}
