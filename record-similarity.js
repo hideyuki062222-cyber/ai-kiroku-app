@@ -36,5 +36,18 @@
   }
   return {rows,limit:LIMIT,atLimit:rows.length===LIMIT};
  }
- const api={INTRO,LIMIT,normalize,dice,compare,load};if(typeof module!=='undefined')module.exports=api;else root.NexiaRecordSimilarity=api;
+ // A bounded search across fact-preserving renderings. High similarity may remain.
+ function chooseExpression(core,f,scope,rows,seed){
+  const visible=rows.filter(r=>r.organization_id===scope.organizationId&&r.client_id===scope.clientId);
+  const original=core.compose(f,undefined,seed);if(original.errors.length)return original;
+  let best=original,bestScore=Infinity,bestSeed=seed;
+  for(let i=0;i<32;i++){
+   const candidate=core.compose(f,undefined,seed+i);if(candidate.errors.length)continue;
+   const score=visible.reduce((max,r)=>Math.max(max,normalize(candidate.visit)===normalize(r.visit_note)&&normalize(candidate.care)===normalize(r.care_note)?2:0.75*dice(candidate.care,r.care_note)+0.25*dice(candidate.visit,r.visit_note)),0);
+   if(score<bestScore){best=candidate;bestScore=score;bestSeed=seed+i;}
+   if(score===0)break;
+  }
+  return {...best,expressionSeed:bestSeed};
+ }
+ const api={INTRO,LIMIT,normalize,dice,compare,load,chooseExpression};if(typeof module!=='undefined')module.exports=api;else root.NexiaRecordSimilarity=api;
 })(globalThis);

@@ -1,0 +1,1595 @@
+{
+  "checks": 5089,
+  "rows": [
+    {
+      "service": "食事介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食器の位置を整える介助を行った"
+            ],
+            "reactions": [
+              "食べる量の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "食事支援後に飲み物を希望した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食器の位置を整える介助を行いました。本人から食べる量の希望が伝えられました。食事の支援後、本人から飲み物を希望する発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食器の位置を整える介助を実施しました。ご本人から食べる量の希望が伝えられました。食事の支援後、本人から飲み物を希望する発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援を行いました。食器の位置を整える介助を行った。食べる量の希望を伝えた。食事支援後に飲み物を希望した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "食事介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食物を食べやすい大きさにする介助を行った"
+            ],
+            "reactions": [
+              "食事中に休憩を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "食事支援後に満腹と伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を食べやすい大きさにする介助を行いました。本人から食事中に休憩したいとの希望がありました。食事の支援後、本人から満腹との発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を食べやすい大きさにする介助を実施しました。ご本人から食事中に休憩したいとの希望がありました。食事の支援後、本人から満腹との発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援を行いました。食物を食べやすい大きさにする介助を行った。食事中に休憩を希望した。食事支援後に満腹と伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "トイレ介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "トイレの扉の開閉を介助した"
+            ],
+            "reactions": [
+              "衣類の調整を依頼した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "排泄支援後に居室へ戻る希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。トイレの扉の開閉を介助しました。本人から衣類の調整の依頼がありました。排泄の支援後、本人から居室へ戻りたいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。トイレの扉の開閉の介助を行いました。ご本人から衣類の調整の依頼がありました。排泄の支援後、本人から居室へ戻りたいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄に関する支援を行いました。トイレの扉の開閉を介助した。衣類の調整を依頼した。排泄支援後に居室へ戻る希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "トイレ介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "排泄後の手洗いを介助した"
+            ],
+            "reactions": [
+              "排泄中に支えてほしいと伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "排泄支援後に休憩を希望した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄後の手洗いを介助しました。排泄中、本人から支えてほしいとの希望がありました。排泄の支援後、本人から休憩したいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄後の手洗いの介助を行いました。排泄中、本人から支えてほしいとの希望がありました。排泄の支援後、本人から休憩したいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 3
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄に関する支援を行いました。排泄後の手洗いを介助した。排泄中に支えてほしいと伝えた。排泄支援後に休憩を希望した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "入浴介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "洗身後の体を拭く介助を行った"
+            ],
+            "reactions": [
+              "湯の温度の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "入浴支援後に水分を希望した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。洗身後の体を拭く介助を行いました。本人から湯の温度の希望が伝えられました。入浴の支援後、本人から水分を希望する発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。洗身後の体を拭く介助を実施しました。ご本人から湯の温度の希望が伝えられました。入浴の支援後、本人から水分を希望する発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援を行いました。洗身後の体を拭く介助を行った。湯の温度の希望を伝えた。入浴支援後に水分を希望した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "入浴介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "シャワーを持つ動作を介助した"
+            ],
+            "reactions": [
+              "洗う場所を自分で伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "入浴支援後に休憩を希望した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。シャワーを持つ動作を介助しました。本人が洗う場所を自分で伝えられました。入浴の支援後、本人から休憩したいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。シャワーを持つ動作の介助を行いました。ご本人が洗う場所を自分で伝えられました。入浴の支援後、本人から休憩したいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援を行いました。シャワーを持つ動作を介助した。洗う場所を自分で伝えた。入浴支援後に休憩を希望した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "入浴準備",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "入浴準備",
+            "confirmedService": true,
+            "actions": [
+              "着替えを手元に置く支援を行った"
+            ],
+            "reactions": [
+              "使用するタオルを自分で選んだ"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "入浴準備後に浴室へ向かう希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。着替えを手元に置く支援を行いました。本人が使用するタオルを自分で選ばれました。入浴の準備後、本人から浴室へ向かいたいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。着替えを手元に置く支援を実施しました。ご本人が使用するタオルを自分で選ばれました。入浴の準備後、本人から浴室へ向かいたいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴準備を行いました。着替えを手元に置く支援を行った。使用するタオルを自分で選んだ。入浴準備後に浴室へ向かう希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "入浴準備",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "入浴準備",
+            "confirmedService": true,
+            "actions": [
+              "入浴用のタオルを準備した"
+            ],
+            "reactions": [
+              "準備する物品の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "入浴準備後に開始を待つと伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴用のタオルを準備しました。本人から準備する物品の希望が伝えられました。入浴の準備後、本人から開始を待つとの発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴用のタオルを準備いたしました。ご本人から準備する物品の希望が伝えられました。入浴の準備後、本人から開始を待つとの発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴準備を行いました。入浴用のタオルを準備した。準備する物品の希望を伝えた。入浴準備後に開始を待つと伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "更衣介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "更衣介助",
+            "confirmedService": true,
+            "actions": [
+              "衣類の向きを整える介助を行った"
+            ],
+            "reactions": [
+              "着たい衣類を指差した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "更衣支援後に着心地の希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。衣類の向きを整える介助を行いました。本人が着たい衣類を指差されました。更衣の支援後、本人から着心地についての希望が伝えられました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。衣類の向きを整える介助を実施しました。ご本人が着たい衣類を指差されました。更衣の支援後、本人から着心地についての希望が伝えられました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。更衣の支援を行いました。衣類の向きを整える介助を行った。着たい衣類を指差した。更衣支援後に着心地の希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "更衣介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "更衣介助",
+            "confirmedService": true,
+            "actions": [
+              "袖に腕を通す介助を行った"
+            ],
+            "reactions": [
+              "袖を通す際に腕を伸ばした"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "更衣支援後に衣類を自分で整えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。袖に腕を通す介助を行いました。袖を通す際、本人が腕を伸ばされました。更衣の支援後、本人が衣類を自分で整えられました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。袖に腕を通す介助を実施しました。袖を通す際、本人が腕を伸ばされました。更衣の支援後、本人が衣類を自分で整えられました。",
+        "inputCount": 4,
+        "expressionSeed": 3
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。更衣の支援を行いました。袖に腕を通す介助を行った。袖を通す際に腕を伸ばした。更衣支援後に衣類を自分で整えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "服薬介助・確認",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬に使う水を準備した"
+            ],
+            "reactions": [
+              "薬を本人が受け取った"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "服薬支援後に飲水を希望した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に使う水を準備しました。本人が薬を受け取られました。服薬に関する支援後、本人から飲水を希望する発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に使う水を準備いたしました。ご本人が薬を受け取られました。服薬に関する支援後、本人から飲水を希望する発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に関する支援を行いました。服薬に使う水を準備した。薬を本人が受け取った。服薬支援後に飲水を希望した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "服薬介助・確認",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "薬を手元に置く介助を行った"
+            ],
+            "reactions": [
+              "服薬について質問した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "服薬支援後に休む希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。薬を手元に置く介助を行いました。本人から服薬について質問がありました。服薬に関する支援後、本人から休みたいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。薬を手元に置く介助を実施しました。ご本人から服薬について質問がありました。服薬に関する支援後、本人から休みたいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に関する支援を行いました。薬を手元に置く介助を行った。服薬について質問した。服薬支援後に休む希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "口腔ケア",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "口腔ケア",
+            "confirmedService": true,
+            "actions": [
+              "歯ブラシに歯磨き剤を付ける介助を行った"
+            ],
+            "reactions": [
+              "うがい用の水を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "口腔ケア後に自分で用具を片付けた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。歯ブラシに歯磨き剤を付ける介助を行いました。本人からうがい用の水を希望する発言がありました。口腔ケア後、本人が自分で用具を片付けられました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。歯ブラシに歯磨き剤を付ける介助を実施しました。ご本人からうがい用の水を希望する発言がありました。口腔ケア後、本人が自分で用具を片付けられました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。口腔ケアの支援を行いました。歯ブラシに歯磨き剤を付ける介助を行った。うがい用の水を希望した。口腔ケア後に自分で用具を片付けた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "口腔ケア",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "口腔ケア",
+            "confirmedService": true,
+            "actions": [
+              "義歯を洗う介助を行った"
+            ],
+            "reactions": [
+              "磨く場所を本人が伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "口腔ケア後に口元を自分で拭いた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。義歯を洗う介助を行いました。本人が磨く場所を伝えられました。口腔ケア後、本人が口元を自分で拭かれました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。義歯を洗う介助を実施しました。ご本人が磨く場所を伝えられました。口腔ケア後、本人が口元を自分で拭かれました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。口腔ケアの支援を行いました。義歯を洗う介助を行った。磨く場所を本人が伝えた。口腔ケア後に口元を自分で拭いた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "起床介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "起床介助",
+            "confirmedService": true,
+            "actions": [
+              "掛け物を外す介助を行った"
+            ],
+            "reactions": [
+              "もう少し休みたいと伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "起床支援後に座って過ごす希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。掛け物を外す介助を行いました。本人からもう少し休みたいとの希望がありました。起床の支援後、本人から座って過ごしたいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。掛け物を外す介助を実施しました。ご本人からもう少し休みたいとの希望がありました。起床の支援後、本人から座って過ごしたいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。起床の支援を行いました。掛け物を外す介助を行った。もう少し休みたいと伝えた。起床支援後に座って過ごす希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "起床介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "起床介助",
+            "confirmedService": true,
+            "actions": [
+              "起床時の履物を準備した"
+            ],
+            "reactions": [
+              "起きる準備ができたと伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "起床支援後に洗顔を希望した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。起床時の履物を準備しました。本人から起きる準備ができたとの発言がありました。起床の支援後、本人から洗顔を希望する発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。起床時の履物を準備いたしました。ご本人から起きる準備ができたとの発言がありました。起床の支援後、本人から洗顔を希望する発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。起床の支援を行いました。起床時の履物を準備した。起きる準備ができたと伝えた。起床支援後に洗顔を希望した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "就寝介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "就寝介助",
+            "confirmedService": true,
+            "actions": [
+              "枕の位置を整える介助を行った"
+            ],
+            "reactions": [
+              "掛け物の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "就寝支援後に横になって休んだ",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。枕の位置を整える介助を行いました。本人から掛け物の希望が伝えられました。就寝の支援後、本人は横になって休まれました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。枕の位置を整える介助を実施しました。ご本人から掛け物の希望が伝えられました。就寝の支援後、本人は横になって休まれました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。就寝に向けた支援を行いました。枕の位置を整える介助を行った。掛け物の希望を伝えた。就寝支援後に横になって休んだ。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "就寝介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "就寝介助",
+            "confirmedService": true,
+            "actions": [
+              "掛け物を掛ける介助を行った"
+            ],
+            "reactions": [
+              "照明について希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "就寝支援後に照明を消す希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。掛け物を掛ける介助を行いました。本人から照明についての希望が伝えられました。就寝の支援後、本人から照明を消してほしいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。掛け物を掛ける介助を実施しました。ご本人から照明についての希望が伝えられました。就寝の支援後、本人から照明を消してほしいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。就寝に向けた支援を行いました。掛け物を掛ける介助を行った。照明について希望を伝えた。就寝支援後に照明を消す希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "清容・保清",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "清容・保清",
+            "confirmedService": true,
+            "actions": [
+              "タオルを手元へ渡す支援を行った"
+            ],
+            "reactions": [
+              "拭く場所を本人が伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "清容支援後に鏡で確認した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。タオルを手元へ渡す支援を行いました。本人が拭く場所を伝えられました。清容・保清の支援後、本人が鏡で確認されました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。タオルを手元へ渡す支援を実施しました。ご本人が拭く場所を伝えられました。清容・保清の支援後、本人が鏡で確認されました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。清容・保清の支援を行いました。タオルを手元へ渡す支援を行った。拭く場所を本人が伝えた。清容支援後に鏡で確認した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "清容・保清",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "清容・保清",
+            "confirmedService": true,
+            "actions": [
+              "爪の手入れを介助した"
+            ],
+            "reactions": [
+              "整えたい髪型を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "清容支援後に自分でタオルを片付けた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。爪の手入れを介助しました。本人から整えたい髪型の希望が伝えられました。清容・保清の支援後、本人が自分でタオルを片付けられました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。爪の手入れの介助を行いました。ご本人から整えたい髪型の希望が伝えられました。清容・保清の支援後、本人が自分でタオルを片付けられました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。清容・保清の支援を行いました。爪の手入れを介助した。整えたい髪型を伝えた。清容支援後に自分でタオルを片付けた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "移動介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "移動介助",
+            "confirmedService": true,
+            "actions": [
+              "歩行器を使う移動に付き添った"
+            ],
+            "reactions": [
+              "移動中に休憩を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "移動支援後に目的の場所に着いたと伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。歩行器を使う移動に付き添いました。移動中、本人から休憩したいとの希望がありました。移動の支援後、本人から目的の場所に着いたとの発言がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。歩行器を使う移動の付き添いを行いました。移動中、本人から休憩したいとの希望がありました。移動の支援後、本人から目的の場所に着いたとの発言がありました。",
+        "inputCount": 4,
+        "expressionSeed": 3
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。移動の支援を行いました。歩行器を使う移動に付き添った。移動中に休憩を希望した。移動支援後に目的の場所に着いたと伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "移動介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "移動介助",
+            "confirmedService": true,
+            "actions": [
+              "段差を越える動作を介助した"
+            ],
+            "reactions": [
+              "進む方向を指差した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "移動支援後に座って休む希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。段差を越える動作を介助しました。本人が進む方向を指差されました。移動の支援後、本人から座って休みたいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。段差を越える動作の介助を行いました。ご本人が進む方向を指差されました。移動の支援後、本人から座って休みたいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。移動の支援を行いました。段差を越える動作を介助した。進む方向を指差した。移動支援後に座って休む希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "買い物・外出支援",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "買い物・外出支援",
+            "confirmedService": true,
+            "actions": [
+              "商品をかごに入れる介助を行った"
+            ],
+            "reactions": [
+              "購入する品物の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "外出支援後に購入品を自分で確認した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。商品をかごに入れる介助を行いました。本人から購入する品物の希望が伝えられました。買い物・外出の支援後、本人が購入品を自分で確認されました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。商品をかごに入れる介助を実施しました。ご本人から購入する品物の希望が伝えられました。買い物・外出の支援後、本人が購入品を自分で確認されました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。買い物・外出の支援を行いました。商品をかごに入れる介助を行った。購入する品物の希望を伝えた。外出支援後に購入品を自分で確認した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "買い物・外出支援",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "買い物・外出支援",
+            "confirmedService": true,
+            "actions": [
+              "支払いの手続きを支援した"
+            ],
+            "reactions": [
+              "外出中に休憩を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "外出支援後に帰宅する希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。支払いの手続きを支援しました。外出中、本人から休憩したいとの希望がありました。買い物・外出の支援後、本人から帰宅したいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。支払いの手続きを支援いたしました。外出中、本人から休憩したいとの希望がありました。買い物・外出の支援後、本人から帰宅したいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 3
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。買い物・外出の支援を行いました。支払いの手続きを支援した。外出中に休憩を希望した。外出支援後に帰宅する希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "通院等介助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "通院等介助",
+            "confirmedService": true,
+            "actions": [
+              "受付での手続きを支援した"
+            ],
+            "reactions": [
+              "医師に尋ねたい内容を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "通院支援後に次の予定について質問した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。受付での手続きを支援しました。本人から医師に尋ねたい内容が伝えられました。通院等の支援後、本人から次の予定について質問がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。受付での手続きを支援いたしました。ご本人から医師に尋ねたい内容が伝えられました。通院等の支援後、本人から次の予定について質問がありました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。通院等の支援を行いました。受付での手続きを支援した。医師に尋ねたい内容を伝えた。通院支援後に次の予定について質問した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "通院等介助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "通院等介助",
+            "confirmedService": true,
+            "actions": [
+              "会計の手続きを支援した"
+            ],
+            "reactions": [
+              "待合室で休憩を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "通院支援後に帰宅する希望を伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。会計の手続きを支援しました。待合室で、本人から休憩したいとの希望がありました。通院等の支援後、本人から帰宅したいとの希望がありました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。会計の手続きを支援いたしました。待合室で、本人から休憩したいとの希望がありました。通院等の支援後、本人から帰宅したいとの希望がありました。",
+        "inputCount": 4,
+        "expressionSeed": 3
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。通院等の支援を行いました。会計の手続きを支援した。待合室で休憩を希望した。通院支援後に帰宅する希望を伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "家事援助",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "家事援助",
+            "confirmedService": true,
+            "actions": [
+              "食器を洗う支援を行った"
+            ],
+            "reactions": [
+              "掃除する場所の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "家事支援後に片付いた場所を確認した",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食器を洗う支援を行いました。本人から掃除する場所の希望が伝えられました。家事の支援後、本人が片付いた場所を確認されました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食器を洗う支援を実施しました。ご本人から掃除する場所の希望が伝えられました。家事の支援後、本人が片付いた場所を確認されました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。家事援助を行いました。食器を洗う支援を行った。掃除する場所の希望を伝えた。家事支援後に片付いた場所を確認した。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "家事援助",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "家事援助",
+            "confirmedService": true,
+            "actions": [
+              "ごみをまとめる支援を行った"
+            ],
+            "reactions": [
+              "物を置く位置を本人が伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "家事支援後に自分で物を並べた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。ごみをまとめる支援を行いました。本人が物を置く位置を伝えられました。家事の支援後、本人が自分で物を並べられました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。ごみをまとめる支援を実施しました。ご本人が物を置く位置を伝えられました。家事の支援後、本人が自分で物を並べられました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。家事援助を行いました。ごみをまとめる支援を行った。物を置く位置を本人が伝えた。家事支援後に自分で物を並べた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "その他",
+      "case": 1,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "その他",
+            "confirmedService": true,
+            "actions": [
+              "本人が選ぶための物品を並べる支援を行った"
+            ],
+            "reactions": [
+              "希望する物品を指差した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "支援後に次の希望を本人が伝えた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。本人が選ぶための物品を並べる支援を行いました。本人が希望する物品を指差されました。支援後、本人から次の希望が伝えられました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。本人が選ぶための物品を並べる支援を実施しました。ご本人が希望する物品を指差されました。支援後、本人から次の希望が伝えられました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。生活上の支援を行いました。本人が選ぶための物品を並べる支援を行った。希望する物品を指差した。支援後に次の希望を本人が伝えた。",
+        "inputCount": 3
+      }
+    },
+    {
+      "service": "その他",
+      "case": 2,
+      "facts": {
+        "version": 1,
+        "date": "2026-11-20",
+        "scene": "",
+        "condition": "落ち着いて過ごされていた",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "lengthMode": "normal",
+        "actions": [
+          {
+            "service": "その他",
+            "confirmedService": true,
+            "actions": [
+              "本人の依頼で物品を手元へ渡した"
+            ],
+            "reactions": [
+              "説明をもう一度希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "支援後に自分で物品を使い始めた",
+            "note": ""
+          }
+        ]
+      },
+      "result": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。本人の依頼で物品を手元へ渡しました。本人から説明をもう一度聞きたいとの希望がありました。支援後、本人が自分で物品を使い始められました。",
+        "inputCount": 4
+      },
+      "alternative": {
+        "errors": [],
+        "visit": "訪問時は、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。本人の依頼で物品を手元へ渡いたしました。ご本人から説明をもう一度聞きたいとの希望がありました。支援後、本人が自分で物品を使い始められました。",
+        "inputCount": 4,
+        "expressionSeed": 7
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。生活上の支援を行いました。本人の依頼で物品を手元へ渡した。説明をもう一度希望した。支援後に自分で物品を使い始めた。",
+        "inputCount": 3
+      }
+    }
+  ]
+}

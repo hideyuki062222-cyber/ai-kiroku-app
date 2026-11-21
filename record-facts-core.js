@@ -19,6 +19,399 @@
   '家事援助':['掃除を行った','洗濯を行った','調理を行った'],
   'その他':['本人の見守りを行った','本人に声をかけた']
  };
+ const supportExtras={
+ "食事介助": {
+  "actions": [
+   "食器の位置を整える介助を行った",
+   "食物を食べやすい大きさにする介助を行った"
+  ],
+  "reactions": [
+   [
+    "食べる量の希望を伝えた",
+    "本人から食べる量の希望が伝えられました"
+   ],
+   [
+    "食事中に休憩を希望した",
+    "本人から食事中に休憩したいとの希望がありました"
+   ]
+  ],
+  "after": [
+   [
+    "食事支援後に飲み物を希望した",
+    "食事の支援後、本人から飲み物を希望する発言がありました"
+   ],
+   [
+    "食事支援後に満腹と伝えた",
+    "食事の支援後、本人から満腹との発言がありました"
+   ]
+  ]
+ },
+ "トイレ介助": {
+  "actions": [
+   "トイレの扉の開閉を介助した",
+   "排泄後の手洗いを介助した"
+  ],
+  "reactions": [
+   [
+    "衣類の調整を依頼した",
+    "本人から衣類の調整の依頼がありました"
+   ],
+   [
+    "排泄中に支えてほしいと伝えた",
+    "排泄中、本人から支えてほしいとの希望がありました"
+   ]
+  ],
+  "after": [
+   [
+    "排泄支援後に居室へ戻る希望を伝えた",
+    "排泄の支援後、本人から居室へ戻りたいとの希望がありました"
+   ],
+   [
+    "排泄支援後に休憩を希望した",
+    "排泄の支援後、本人から休憩したいとの希望がありました"
+   ]
+  ]
+ },
+ "入浴介助": {
+  "actions": [
+   "洗身後の体を拭く介助を行った",
+   "シャワーを持つ動作を介助した"
+  ],
+  "reactions": [
+   [
+    "湯の温度の希望を伝えた",
+    "本人から湯の温度の希望が伝えられました"
+   ],
+   [
+    "洗う場所を自分で伝えた",
+    "本人が洗う場所を自分で伝えられました"
+   ]
+  ],
+  "after": [
+   [
+    "入浴支援後に水分を希望した",
+    "入浴の支援後、本人から水分を希望する発言がありました"
+   ],
+   [
+    "入浴支援後に休憩を希望した",
+    "入浴の支援後、本人から休憩したいとの希望がありました"
+   ]
+  ]
+ },
+ "入浴準備": {
+  "actions": [
+   "着替えを手元に置く支援を行った",
+   "入浴用のタオルを準備した"
+  ],
+  "reactions": [
+   [
+    "使用するタオルを自分で選んだ",
+    "本人が使用するタオルを自分で選ばれました"
+   ],
+   [
+    "準備する物品の希望を伝えた",
+    "本人から準備する物品の希望が伝えられました"
+   ]
+  ],
+  "after": [
+   [
+    "入浴準備後に浴室へ向かう希望を伝えた",
+    "入浴の準備後、本人から浴室へ向かいたいとの希望がありました"
+   ],
+   [
+    "入浴準備後に開始を待つと伝えた",
+    "入浴の準備後、本人から開始を待つとの発言がありました"
+   ]
+  ]
+ },
+ "更衣介助": {
+  "actions": [
+   "衣類の向きを整える介助を行った",
+   "袖に腕を通す介助を行った"
+  ],
+  "reactions": [
+   [
+    "着たい衣類を指差した",
+    "本人が着たい衣類を指差されました"
+   ],
+   [
+    "袖を通す際に腕を伸ばした",
+    "袖を通す際、本人が腕を伸ばされました"
+   ]
+  ],
+  "after": [
+   [
+    "更衣支援後に着心地の希望を伝えた",
+    "更衣の支援後、本人から着心地についての希望が伝えられました"
+   ],
+   [
+    "更衣支援後に衣類を自分で整えた",
+    "更衣の支援後、本人が衣類を自分で整えられました"
+   ]
+  ]
+ },
+ "服薬介助・確認": {
+  "actions": [
+   "服薬に使う水を準備した",
+   "薬を手元に置く介助を行った"
+  ],
+  "reactions": [
+   [
+    "薬を本人が受け取った",
+    "本人が薬を受け取られました"
+   ],
+   [
+    "服薬について質問した",
+    "本人から服薬について質問がありました"
+   ]
+  ],
+  "after": [
+   [
+    "服薬支援後に飲水を希望した",
+    "服薬に関する支援後、本人から飲水を希望する発言がありました"
+   ],
+   [
+    "服薬支援後に休む希望を伝えた",
+    "服薬に関する支援後、本人から休みたいとの希望がありました"
+   ]
+  ]
+ },
+ "口腔ケア": {
+  "actions": [
+   "歯ブラシに歯磨き剤を付ける介助を行った",
+   "義歯を洗う介助を行った"
+  ],
+  "reactions": [
+   [
+    "うがい用の水を希望した",
+    "本人からうがい用の水を希望する発言がありました"
+   ],
+   [
+    "磨く場所を本人が伝えた",
+    "本人が磨く場所を伝えられました"
+   ]
+  ],
+  "after": [
+   [
+    "口腔ケア後に自分で用具を片付けた",
+    "口腔ケア後、本人が自分で用具を片付けられました"
+   ],
+   [
+    "口腔ケア後に口元を自分で拭いた",
+    "口腔ケア後、本人が口元を自分で拭かれました"
+   ]
+  ]
+ },
+ "起床介助": {
+  "actions": [
+   "掛け物を外す介助を行った",
+   "起床時の履物を準備した"
+  ],
+  "reactions": [
+   [
+    "もう少し休みたいと伝えた",
+    "本人からもう少し休みたいとの希望がありました"
+   ],
+   [
+    "起きる準備ができたと伝えた",
+    "本人から起きる準備ができたとの発言がありました"
+   ]
+  ],
+  "after": [
+   [
+    "起床支援後に座って過ごす希望を伝えた",
+    "起床の支援後、本人から座って過ごしたいとの希望がありました"
+   ],
+   [
+    "起床支援後に洗顔を希望した",
+    "起床の支援後、本人から洗顔を希望する発言がありました"
+   ]
+  ]
+ },
+ "就寝介助": {
+  "actions": [
+   "枕の位置を整える介助を行った",
+   "掛け物を掛ける介助を行った"
+  ],
+  "reactions": [
+   [
+    "掛け物の希望を伝えた",
+    "本人から掛け物の希望が伝えられました"
+   ],
+   [
+    "照明について希望を伝えた",
+    "本人から照明についての希望が伝えられました"
+   ]
+  ],
+  "after": [
+   [
+    "就寝支援後に横になって休んだ",
+    "就寝の支援後、本人は横になって休まれました"
+   ],
+   [
+    "就寝支援後に照明を消す希望を伝えた",
+    "就寝の支援後、本人から照明を消してほしいとの希望がありました"
+   ]
+  ]
+ },
+ "清容・保清": {
+  "actions": [
+   "タオルを手元へ渡す支援を行った",
+   "爪の手入れを介助した"
+  ],
+  "reactions": [
+   [
+    "拭く場所を本人が伝えた",
+    "本人が拭く場所を伝えられました"
+   ],
+   [
+    "整えたい髪型を伝えた",
+    "本人から整えたい髪型の希望が伝えられました"
+   ]
+  ],
+  "after": [
+   [
+    "清容支援後に鏡で確認した",
+    "清容・保清の支援後、本人が鏡で確認されました"
+   ],
+   [
+    "清容支援後に自分でタオルを片付けた",
+    "清容・保清の支援後、本人が自分でタオルを片付けられました"
+   ]
+  ]
+ },
+ "移動介助": {
+  "actions": [
+   "歩行器を使う移動に付き添った",
+   "段差を越える動作を介助した"
+  ],
+  "reactions": [
+   [
+    "移動中に休憩を希望した",
+    "移動中、本人から休憩したいとの希望がありました"
+   ],
+   [
+    "進む方向を指差した",
+    "本人が進む方向を指差されました"
+   ]
+  ],
+  "after": [
+   [
+    "移動支援後に目的の場所に着いたと伝えた",
+    "移動の支援後、本人から目的の場所に着いたとの発言がありました"
+   ],
+   [
+    "移動支援後に座って休む希望を伝えた",
+    "移動の支援後、本人から座って休みたいとの希望がありました"
+   ]
+  ]
+ },
+ "買い物・外出支援": {
+  "actions": [
+   "商品をかごに入れる介助を行った",
+   "支払いの手続きを支援した"
+  ],
+  "reactions": [
+   [
+    "購入する品物の希望を伝えた",
+    "本人から購入する品物の希望が伝えられました"
+   ],
+   [
+    "外出中に休憩を希望した",
+    "外出中、本人から休憩したいとの希望がありました"
+   ]
+  ],
+  "after": [
+   [
+    "外出支援後に購入品を自分で確認した",
+    "買い物・外出の支援後、本人が購入品を自分で確認されました"
+   ],
+   [
+    "外出支援後に帰宅する希望を伝えた",
+    "買い物・外出の支援後、本人から帰宅したいとの希望がありました"
+   ]
+  ]
+ },
+ "通院等介助": {
+  "actions": [
+   "受付での手続きを支援した",
+   "会計の手続きを支援した"
+  ],
+  "reactions": [
+   [
+    "医師に尋ねたい内容を伝えた",
+    "本人から医師に尋ねたい内容が伝えられました"
+   ],
+   [
+    "待合室で休憩を希望した",
+    "待合室で、本人から休憩したいとの希望がありました"
+   ]
+  ],
+  "after": [
+   [
+    "通院支援後に次の予定について質問した",
+    "通院等の支援後、本人から次の予定について質問がありました"
+   ],
+   [
+    "通院支援後に帰宅する希望を伝えた",
+    "通院等の支援後、本人から帰宅したいとの希望がありました"
+   ]
+  ]
+ },
+ "家事援助": {
+  "actions": [
+   "食器を洗う支援を行った",
+   "ごみをまとめる支援を行った"
+  ],
+  "reactions": [
+   [
+    "掃除する場所の希望を伝えた",
+    "本人から掃除する場所の希望が伝えられました"
+   ],
+   [
+    "物を置く位置を本人が伝えた",
+    "本人が物を置く位置を伝えられました"
+   ]
+  ],
+  "after": [
+   [
+    "家事支援後に片付いた場所を確認した",
+    "家事の支援後、本人が片付いた場所を確認されました"
+   ],
+   [
+    "家事支援後に自分で物を並べた",
+    "家事の支援後、本人が自分で物を並べられました"
+   ]
+  ]
+ },
+ "その他": {
+  "actions": [
+   "本人が選ぶための物品を並べる支援を行った",
+   "本人の依頼で物品を手元へ渡した"
+  ],
+  "reactions": [
+   [
+    "希望する物品を指差した",
+    "本人が希望する物品を指差されました"
+   ],
+   [
+    "説明をもう一度希望した",
+    "本人から説明をもう一度聞きたいとの希望がありました"
+   ]
+  ],
+  "after": [
+   [
+    "支援後に次の希望を本人が伝えた",
+    "支援後、本人から次の希望が伝えられました"
+   ],
+   [
+    "支援後に自分で物品を使い始めた",
+    "支援後、本人が自分で物品を使い始められました"
+   ]
+  ]
+ }
+};
+ for(const [service,extra] of Object.entries(supportExtras))serviceActions[service].push(...extra.actions);
  const profileFields={
   usual:['普段の体調・様子',['穏やかに過ごすことが多い','疲れやすい','日によって変動がある']],
   communication:['コミュニケーション方法',['短い言葉で伝える','ゆっくり話す','写真・絵で伝える','筆談する']],
@@ -87,6 +480,7 @@
   '家事援助':['片付けの希望を伝えた','自分で洗濯物を畳んだ','声かけにうなずいて応じた'],
   'その他':['声かけにうなずいて応じた','自分の希望を伝えた','介助を断る意思を示した']
  };
+ for(const [service,extra] of Object.entries(supportExtras))reactions[service].push(...extra.reactions.map(([label])=>label));
  const selfChoices={
   '入浴介助':['上半身を洗った','髪を洗った','体を拭いた'],
   '更衣介助':['衣類を脱いだ','衣類を着た','衣類を選んだ'],
@@ -98,6 +492,7 @@
  const afterChoices=['椅子に座って過ごした','ベッドで休んだ','自分で次の行動を始めた'];
  const medicationAfter=['服薬後に体調の訴えがあった','服薬後に特に変化がなかった'];
  const methodChoices=['短い言葉で声をかけた','ゆっくり話した','写真・絵を用いて伝えた','筆談で伝えた','本人のペースを待った','手順を一つずつ伝えた'];
+ const afterFor=service=>unique([...afterChoices,...(service==='服薬介助・確認'?medicationAfter:[]),...(supportExtras[service]?.after||[]).map(([label])=>label)]);
  function suggestions(profile){
   const data=profile?.data||profile||{},comm=data.communication?.choices||[],care=data.personalCare?.choices||[];
   return unique([['短い言葉で伝える',0],['ゆっくり話す',1],['写真・絵で伝える',2],['筆談する',3]].filter(([v])=>comm.includes(v)).map(([,n])=>methodChoices[n]).concat(care.includes('本人のペースを待つ')?[methodChoices[4]]:[],care.includes('一つずつ手順を伝える')?[methodChoices[5]]:[]));
@@ -120,7 +515,7 @@
    if(!Array.isArray(a.actions)||a.actions.some(v=>!serviceActions[a.service].includes(v))){errors.push('② 支援の選択内容を確認してください。');continue;}
    if(a.reactions&&(!Array.isArray(a.reactions)||a.reactions.some(v=>!reactions[a.service]?.includes(v))))errors.push('② 本人の反応の選択内容を確認してください。');
    if(a.methods&&(!Array.isArray(a.methods)||a.methods.some(v=>!methodChoices.includes(v))))errors.push('② 当日の支援方法を確認してください。');
-   if(a.after&&![...afterChoices,...(a.service==='服薬介助・確認'?medicationAfter:[])].includes(a.after))errors.push('② 支援後の状態を確認してください。');
+   if(a.after&&!afterFor(a.service).includes(a.after))errors.push('② 支援後の状態を確認してください。');
    if(!performed(a)&&((a.reactions||[]).length||a.self||a.after))errors.push('② '+a.service+'：本人の反応に加えて、当日実施した支援を選択してください。');
    if(a.service==='服薬介助・確認'){
     const rs=a.reactions||[],confirmed=a.actions.includes('服薬したことを確認した')||rs.includes('本人が自分で服薬した');
@@ -131,8 +526,14 @@
   if(f.lengthMode&&!['short','normal','long'].includes(f.lengthMode))errors.push('記録の長さを確認してください。');
   return unique(errors);
  }
- const polite=v=>text(v).replace(/^本人のペースを待った$/,'本人のペースに合わせて待った').replace(/行った$/,'行いました').replace(/付き添った$/,'付き添いました').replace(/声をかけた$/,'声をかけました').replace(/整えた$/,'整えました').replace(/した$/,'しました').replace(/伝えた$/,'伝えました').replace(/待った$/,'待ちました');
- const connective=s=>s.replace(/しました$/,'し').replace(/行いました$/,'行い').replace(/かけました$/,'かけ').replace(/整えました$/,'整え').replace(/付き添いました$/,'付き添い').replace(/おられました$/,'おられ').replace(/ていました$/,'ており').replace(/見られました$/,'見られ').replace(/ありませんでした$/,'なく').replace(/ありました$/,'あり').replace(/でした$/,'で').replace(/していません$/,'しておらず').replace(/れました$/,'れ').replace(/伝えました$/,'伝え').replace(/待ちました$/,'待ち');
+ const polite=v=>{let s=text(v).replace(/^本人のペースを待った$/,'本人のペースに合わせて待った');
+  for(const [pattern,replacement] of [[/行った$/,'行いました'],[/付き添った$/,'付き添いました'],[/声をかけた$/,'声をかけました'],[/整えた$/,'整えました'],[/した$/,'しました'],[/伝えた$/,'伝えました'],[/待った$/,'待ちました']])if(pattern.test(s))return s.replace(pattern,replacement);
+  return s;
+ };
+ const connective=s=>{
+  for(const [pattern,replacement] of [[/いたしました$/,'し'],[/確かめました$/,'確かめ'],[/いらっしゃいました$/,'いらっしゃり'],[/行いました$/,'行い'],[/付き添いました$/,'付き添い'],[/かけました$/,'かけ'],[/整えました$/,'整え'],[/伝えました$/,'伝え'],[/待ちました$/,'待ち'],[/おられました$/,'おられ'],[/ていました$/,'ており'],[/見られました$/,'見られ'],[/ありませんでした$/,'なく'],[/ありました$/,'あり'],[/していません$/,'しておらず'],[/しました$/,'し'],[/でした$/,'で'],[/れました$/,'れ']])if(pattern.test(s))return s.replace(pattern,replacement);
+  return s;
+ };
  function joinClauses(clauses,mode='normal'){
   const xs=unique(clauses);if(!xs.length)return '';
   if(mode==='long')return xs.map(sentence).join('');
@@ -179,8 +580,10 @@
   '本人が医師へ症状を伝えた':'本人が医師へ症状を伝えられました','待ち時間に疲れを訴えた':'待ち時間に本人から疲れの訴えがありました',
   '片付けの希望を伝えた':'本人から片付けの希望が伝えられました','自分で洗濯物を畳んだ':'本人が自分で洗濯物を畳まれました'
  };
+ for(const extra of Object.values(supportExtras))for(const [label,value] of extra.reactions)reactionSentences[label]=value;
+ const extraAfterSentences=Object.fromEntries(Object.values(supportExtras).flatMap(extra=>extra.after));
  function selfSentence(v){const map={'上半身を洗った':'上半身は本人が自分で洗われました','髪を洗った':'洗髪は本人が行われました','体を拭いた':'体は本人が自分で拭かれました','衣類を脱いだ':'衣類を脱ぐ動作は本人が行われました','衣類を着た':'衣類を着る動作は本人が行われました','衣類を選んだ':'衣類は本人が選ばれました','衣類を下げた':'衣類を下げる動作は本人が行われました','衣類を上げた':'衣類を上げる動作は本人が行われました','排泄後に手を洗った':'排泄後、本人が自分で手を洗われました','歯を磨いた':'歯磨きは本人が行われました','口をすすいだ':'口をすすぐ動作は本人が行われました','立ち上がった':'本人が自分で立ち上がられました','歩いて移動した':'本人が自分で歩いて移動されました','食具を操作した':'食具の操作は本人が行われました','食物を口元へ運んだ':'食物を口元へ運ぶ動作は本人が行われました','手を洗った':'手洗いは本人が行われました','自分で選択した':'本人が自分で選択されました'};return map[v]||(text(v)?'本人が自分で行った内容：'+text(v):'');}
- function afterSentence(v){if(v==='服薬後に体調の訴えがあった')return '服薬後、本人から体調についての訴えがありました';if(v==='服薬後に特に変化がなかった')return '服薬後、特に変化は見られませんでした';return ({'椅子に座って過ごした':'支援後は、椅子に座って過ごされました','ベッドで休んだ':'支援後は、ベッドで休まれました','自分で次の行動を始めた':'支援後、本人は自分で次の行動を始められました'})[v]||(v?'支援後の状態：'+text(v):'');}
+ function afterSentence(v){if(extraAfterSentences[v])return extraAfterSentences[v];if(v==='服薬後に体調の訴えがあった')return '服薬後、本人から体調についての訴えがありました';if(v==='服薬後に特に変化がなかった')return '服薬後、特に変化は見られませんでした';return ({'椅子に座って過ごした':'支援後は、椅子に座って過ごされました','ベッドで休んだ':'支援後は、ベッドで休まれました','自分で次の行動を始めた':'支援後、本人は自分で次の行動を始められました'})[v]||(v?'支援後の状態：'+text(v):'');}
  function actionClauses(a){
   const xs=unique(a.actions||[]),out=[];
   if(!xs.length&&a.confirmedService===true)return [serviceStatements[a.service],...(a.service==='服薬介助・確認'&&a.unconfirmed?['服用済みかは確認していません']:[])];
@@ -188,6 +591,7 @@
    const prompt=xs.includes(serviceActions[a.service][0]),prepare=xs.includes(serviceActions[a.service][1]),confirm=xs.includes(serviceActions[a.service][2]);
    if(confirm){out.push((prepare?'服薬の準備を介助し'+(prompt?'て声をかけ、':'、'):prompt?'服薬の声かけを行い、':'')+'本人が'+((a.reactions||[]).includes('本人が自分で服薬した')?'自分で':'')+'薬を服用されたことを確認しました');}
    else {if(prompt)out.push('服薬に向けて声をかけました');if(prepare)out.push('服薬の準備を介助しました');}
+   for(const v of xs)if(!serviceActions[a.service].slice(0,3).includes(v))out.push(polite(v));
    if(a.unconfirmed)out.push('服用済みかは確認していません');return out;
   }
   const assists=xs.filter(v=>v.endsWith('を介助した'));
@@ -220,11 +624,29 @@
   if(preparation)remaining.actions=remaining.actions.filter(v=>v!=='服薬の準備を介助した');
   return {lead:(preparation?'服薬の準備を介助しました。':'')+prompt[1]+'、'+sentence(prompt[3]||'本人はうなずいて応じられました'),acts:actionClauses(remaining),reactions:a.reactions.filter(v=>v!==response)};
  }
- function compose(f,_profile){
+ let expressionCounter=0;
+ function nextExpressionSeed(){const n=expressionCounter;expressionCounter=(expressionCounter+1)%1048576;return n;}
+ // Mixed-radix selection, applied ONLY to controlled clauses, never to staff quotations/notes.
+ function expressionPicker(seed){
+  let n=Number.isSafeInteger(seed)&&seed>=0?seed:0;
+  const pick=choices=>{const v=choices[n%choices.length];n=Math.floor(n/choices.length);return v;};
+  return {pick,phrase(value){
+   const choices=[value];
+   const alternatives=[[/を介助しました$/,'の介助を行いました'],[/を行いました$/,'を実施しました'],[/に付き添いました$/,'の付き添いを行いました'],[/声をかけました$/,'声かけを行いました'],[/ことを確認しました$/,'ことを確かめました'],[/見られました$/,'見受けられました'],[/おられました$/,'いらっしゃいました'],[/うなずいて応じられました$/,'うなずきで応じられました']];
+   for(const [pattern,replacement] of alternatives)if(pattern.test(value)){choices.push(value.replace(pattern,replacement));break;}
+   if(choices.length===1&&/しました$/.test(value))choices.push(value.replace(/しました$/,'いたしました'));
+   if(choices.length===1&&/^本人(?:[はがの]|から)/.test(value))choices.push(value.replace(/^本人/,'ご本人'));
+   return pick(choices);
+  }};
+ }
+ function compose(f,_profile,expressionSeed=0){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
-  const observation=v=>observations[v]||text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
+  const variant=expressionPicker(expressionSeed);
+  const observed=new Map();
+  const observation=v=>{const key=observations[v]||v;if(observed.has(key))return observed.get(key);const out=observations[v]?variant.phrase(observations[v]):text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');observed.set(key,out);return out;};
   const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition].filter(v=>v&&v!=='その他').map(observation));
-  let visit=obs.length?'訪問時、'+joinClauses(obs,mode):'';
+  const render=xs=>joinClauses(xs,mode==='normal'&&xs.length>1?variant.pick(['normal','long']):mode);
+  let visit=obs.length?variant.pick(['訪問時、','訪問時は、'])+render(obs):'';
   if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))visit+=(visit?'':'訪問時、')+sentence(observation(f.health));
   if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
   if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
@@ -236,7 +658,8 @@
    const method=unique(a.methods||[]).map(polite);
    const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
-   let body=(own?own+'職員は':'')+(composed.lead||'')+joinClauses(acts.concat(method),mode)+joinClauses(rs,mode)+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
+   const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
+   let body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
    if(mode==='long')body='【'+a.service+'】\n'+body;
    sections.push(body);
   }
@@ -247,5 +670,5 @@
   const inputCount=[f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount};
  }
- const api={INTRO,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={INTRO,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);
