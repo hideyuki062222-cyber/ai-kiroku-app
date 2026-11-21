@@ -64,7 +64,8 @@ async function scenario(browser,width){
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));const answers=[];page.on('dialog',d=>d.type()==='prompt'?d.accept(answers.shift()||d.defaultValue()):d.type()==='confirm'?d.accept():d.dismiss());page.answerPrompts=values=>answers.push(...values);return page;
  }
  const legacyGrant=enabled=>{tables.organization_facility_editors=[{organization_id:A,user_id:EDITOR,enabled}];tables.organization_feature_permissions=enabled?['resident_info','handoff_settings','meal_settings','assignment_settings'].map(feature=>({organization_id:A,user_id:EDITOR,feature,scope:'legacy'})):[];};
- const base=`http://127.0.0.1:${server.address().port}/ai-kiroku-app/`,visit=async(page,area)=>{await page.goto(base+area+'/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>!document.getElementById('nexiaStaffNameCheck'));};
+ // The absence of an overlay can precede its creation. Wait for positive auth and initial sync before editing.
+ const base=`http://127.0.0.1:${server.address().port}/ai-kiroku-app/`,visit=async(page,area)=>{await page.goto(base+area+'/',{waitUntil:'domcontentloaded'});if(area==='home')await page.locator('#portal').waitFor({state:'visible'});else await page.waitForFunction(()=>window.__nexiaStaffNameReady===true);if(area==='assignment')await page.waitForFunction(()=>document.getElementById('cloudState')?.textContent==='共有中');await page.waitForLoadState('networkidle');};
  const shot=async(page,name)=>{assert((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,name+' horizontal overflow');await page.screenshot({path:path.join(out,width+'-'+name+'.png'),fullPage:false});};
  try{
   const manager=await create(ADMIN),editor=await create(EDITOR);
