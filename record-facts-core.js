@@ -656,66 +656,123 @@
    return pick(choices);
   }};
  }
+ // Plan only supplied evidence before choosing sentence structure. A service is a
+ // scope, an intervention is a range, and neither is an observed action/response.
+ function evidencePlan(f){
+  const seen=new Set(),visit=[];
+  for(const key of ['scene','condition','health','statement','difference','concern']){
+   const value=text(f[key]);if(!value||value==='その他')continue;
+   const identity=['scene','condition','health'].includes(key)?'observation:'+(observations[value]||value):key+':'+value;if(seen.has(identity))continue;seen.add(identity);
+   visit.push({kind:key,value,source:key});
+  }
+  return {visit,intervention:f.interventionLevel||'',services:(f.actions||[]).map((a,i)=>({
+   ...a,actions:unique(a.actions||[]),reactions:unique(a.reactions||[]),methods:unique(a.methods||[]),source:'actions.'+i,
+   scopeOnly:!(a.actions||[]).length&&!text(a.self)&&!text(a.note)
+  })).filter(performed),supportNote:text(f.supportNote),response:text(f.response),after:text(f.after)};
+ }
+ const needsDetail=a=>performed(a)&&!(a.actions||[]).length&&!text(a.self)&&!text(a.note);
+ const interventionPrefix={active:'今回は直接介助を中心に、',partial:'今回は必要な部分への支援として、',prompt:'今回は声かけ・促しを中心に、',watch:'今回は見守りを中心に、',minimal:'今回は最小限の支援・確認の範囲で、'};
+ function fitsIntervention(a,level){
+  if(needsDetail(a))return false;
+  const values=(a.actions||[]).join(' ');
+  return ({active:/介助|清拭/.test(values),partial:/介助|清拭/.test(values),prompt:/声かけ|声をかけ/.test(values),watch:/見守り/.test(values),minimal:true})[level]||false;
+ }
+ // Detail changes grammatical attribution, not observations or clinical findings.
+ const longObservations={
+  '笑顔が見られた':'本人の表情には笑顔が見られました',
+  '眠そうな様子が見られた':'本人には眠そうな様子が見られました',
+  '疲れた様子が見られた':'本人には疲れた様子が見られました',
+  '不安そうな様子が見られた':'本人には不安そうな様子が見られました'
+ };
+ const shortScenes={'ベッド上で側臥位で休んでいた':'ベッド上で側臥位で休息中でした','ベッド上で仰臥位で休んでいた':'ベッド上で仰臥位で休息中でした','ベッド上で仰臥位で寝ていた':'ベッド上で仰臥位で入眠中でした','ベッドで休んでいた':'ベッドで休息中でした'};
+ const serviceContexts={'起床介助':'起床時は、','就寝介助':'就寝の支援では、','食事介助':'食事の支援では、','トイレ介助':'排泄の支援では、','入浴介助':'入浴の支援では、','入浴準備':'入浴準備では、','服薬介助・確認':'服薬の支援では、','口腔ケア':'口腔ケアでは、','更衣介助':'更衣の支援では、','清容・保清':'清容・保清では、','移動介助':'移動の支援では、','買い物・外出支援':'買い物・外出では、','通院等介助':'通院等の支援では、','家事援助':'家事援助では、','その他':'今回の支援では、'};
+ const longMethods={
+  '短い言葉で声をかけた':'本人への声かけには、短い言葉を用いました',
+  'ゆっくり話した':'本人に伝える際は、ゆっくり話しました',
+  '写真・絵を用いて伝えた':'本人に伝える際は、写真・絵を用いました',
+  '筆談で伝えた':'本人には筆談で伝えました',
+  '本人のペースを待った':'支援中は本人のペースに合わせて待ちました',
+  '手順を一つずつ伝えた':'支援の手順は、一つずつ本人に伝えました'
+ };
  function compose(f,_profile,expressionSeed=0){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
-  const variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
-  const observed=new Map();
-  const observation=v=>{const key=observations[v]||v;if(observed.has(key))return observed.get(key);const out=observations[v]?variant.phrase(observations[v]):text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');observed.set(key,out);return out;};
-  const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition].filter(v=>v&&v!=='その他').map(observation));
-  const render=xs=>joinClauses(xs,mode==='normal'&&xs.length>1?variant.pick(['normal','long']):mode);
-  let visit=obs.length?variant.pick(['訪問時、','訪問時は、'])+render(obs):'';
-  if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))visit+=(visit?'':'訪問時、')+sentence(observation(f.health));
-  if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
-  if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
-  if(text(f.concern))visit+=sentence(f.concern);
+  const plan=evidencePlan(f),mode=f.lengthMode||'normal',variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
+  const observation=e=>observations[e.value]?variant.phrase(observations[e.value]):e.value.replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
+  const render=xs=>joinClauses(xs,mode==='short'?'short':mode==='normal'&&xs.length>1?variant.pick(['normal','long']):'long');
+  const posture=plan.visit.filter(e=>['scene','condition'].includes(e.kind)),other=plan.visit.filter(e=>!['scene','condition'].includes(e.kind));
+  let visit='';
   if(mode==='long'){
-   // All observations stay at the visit; no health, statement or change is inferred.
-   const parts=[];
-   if(obs.length)parts.push(structure(['訪問時、','訪問時は、'])+joinClauses(obs,structure(['long','normal'])));
-   if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))parts.push(sentence(observation(f.health)));
-   if(text(f.statement))parts.push(sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました'));
-   if(text(f.difference))parts.push(sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference))));
-   if(text(f.concern))parts.push(sentence(f.concern));
-   visit=parts.join('');
-  }
-  const sections=[];
-  if(f.interventionLevel)sections.push(sentence(interventionText[f.interventionLevel]));
-  for(const a of f.actions||[]){if(!performed(a))continue;
-   const composed=supportClauses(a),deferUnconfirmed=a.service==='服薬介助・確認'&&a.unconfirmed&&composed.reactions.includes('服薬を拒否した');
-   const acts=deferUnconfirmed?composed.acts.filter(v=>v!=='服用済みかは確認していません'):composed.acts,own=text(a.self)?sentence(selfSentence(a.self)):'';
-   const method=unique(a.methods||[]).map(polite);
-   const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
-   const note=sentence(a.note),after=sentence(afterSentence(a.after));
-   const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
-   let body;
-   const positive=acts.filter(v=>v!=='服用済みかは確認していません');
-   const uncertainty=(deferUnconfirmed||acts.includes('服用済みかは確認していません'))?'服用済みかは確認していません。':'';
-   if(mode==='long'){
-    // Prose makes the selected facts and their subjects explicit. No headings/padding.
-    // Keep dose uncertainty separate: it must not become a consequence of another fact.
-    const help=lead+joinClauses(positive.map(variant.phrase),structure(['long','normal']));
-    const how=method.length?structure(['支援の際は、','支援方法として、',''])+joinClauses(method,'long'):'';
-    const reaction=joinClauses(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v),'long');
-    // Self-help order can change without implying an unobserved sequence or outcome.
-    const assistance=help?(own?'職員は':'')+help:'';
-    const work=own?structure([own+assistance,assistance+own]):assistance;
-    const middle=structure([work+how+reaction,how+work+reaction,work+reaction+how]);
-    body=middle+uncertainty+after+note;
-   }else if(mode==='normal'){
-    const help=lead+render(positive.map(variant.phrase));
-    const how=method.length?structure(['','支援の際は、','支援方法として、'])+render(method):'';
-    body=own+(help?(own?'職員は':'')+help:'')+how+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+uncertainty+after+note;
-   }else{
-    body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
+   visit=plan.visit.map(e=>{
+    if(e.kind==='scene')return sentence(structure(['訪問した際、本人は','訪問時、本人は'])+observation(e));
+    if(e.kind==='condition')return sentence(longObservations[e.value]?variant.phrase(longObservations[e.value]):observation(e));
+    if(e.kind==='health'){
+     const value=observation(e);return sentence('体調については、'+value.replace(/^体調は/,''));
+    }
+    if(e.kind==='statement')return sentence('本人から「'+e.value+'」との発言・訴えがありました');
+    if(e.kind==='difference')return sentence('普段との違いとして、'+(observations[e.value]||e.value));
+    return sentence(e.value); // Exact free observations are never rewritten.
+   }).join('');
+   if(!posture.length&&visit&&!visit.startsWith('訪問'))visit='訪問時、'+visit;
+  }else{
+   if(posture.length)visit=variant.pick(['訪問時、','訪問時は、'])+render(posture.map(e=>mode==='short'?(shortScenes[e.value]||observation(e)):observation(e)));
+   for(const e of other){
+    if(e.kind==='health')visit+=(visit?'':'訪問時、')+sentence(observation(e));
+    else if(e.kind==='statement')visit+=sentence('本人から「'+e.value+'」との発言・訴えがありました');
+    else if(e.kind==='difference')visit+=sentence('普段との違いとして、'+(observations[e.value]||e.value));
+    else visit+=sentence(e.value);
    }
-   sections.push(body);
   }
-  if(text(f.supportNote))sections.push(sentence(f.supportNote));
-  if(text(f.response))sections.push(sentence('支援中、'+(reactionSentences[f.response]||text(f.response))));
-  if(text(f.after))sections.push(sentence(afterSentence(f.after)));
-  const care=INTRO+(mode==='long'?'\n':'')+sections.join(mode==='short'?'':'\n');
-  const inputCount=[f.interventionLevel,f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
-  return {errors:[],visit,care,inputCount};
+  const target=plan.intervention?plan.services.findIndex(a=>fitsIntervention(a,plan.intervention)):-1;
+  const sections=[];
+  const scopeOnlyRecord=plan.services.length===1&&plan.services[0].scopeOnly&&!plan.services[0].methods.length;
+  // If no selected action supports a more specific relation, retain only the
+  // selected overall range. Never infer physical help from an intervention.
+  if(plan.intervention&&target<0&&!scopeOnlyRecord)sections.push(sentence(interventionText[plan.intervention]));
+  plan.services.forEach((a,index)=>{
+   const composed=supportClauses(a),positive=composed.acts.filter(v=>v!=='服用済みかは確認していません');
+   const own=text(a.self)?selfSentence(a.self):'';
+   const responses=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した'));
+   const reactions=responses.map(v=>reactionSentences[v]?variant.phrase(reactionSentences[v]):v);
+   const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
+   const prefix=index===target?interventionPrefix[plan.intervention]:'';
+   let work=lead+render(positive.map(variant.phrase));
+   if(prefix&&plan.intervention==='watch'&&a.actions.length===1&&/の見守りを行った$/.test(a.actions[0])){
+    work=sentence(a.actions[0].replace(/を行った$/,'')+'を中心に、職員が対応しました');
+   }else if(prefix)work=prefix+work;
+   const uncertain=a.service==='服薬介助・確認'&&a.unconfirmed?'服用済みかは確認していません。':'';
+   const after=sentence(afterSentence(a.after)),note=sentence(a.note);
+   let body;
+   if(a.scopeOnly&&!a.methods.length){
+    body=work;if(plan.intervention&&scopeOnlyRecord){const scope={active:'直接介助を中心に',partial:'必要な部分への介助として',prompt:'声かけ・促しを中心に',watch:'見守りを中心に',minimal:'最小限の支援・確認を中心に'}[plan.intervention];body=sentence(serviceStatements[a.service].replace(/を行いました$/,'は、'+scope+'行いました'));}body+=render(reactions)+uncertain+after+note;
+   }else if(mode==='short'){
+    // Only clauses with the same worker subject are compacted together.
+    const how=a.methods.map(polite);
+    const concise=!lead&&how.length&&work?sentence(connective(work.replace(/。$/,''))+'、'+joinClauses(how,'short').replace(/。$/,'')):work+render(how);
+    body=(own?sentence(own)+(work&&!prefix?'職員は':''):'')+concise+render(reactions)+uncertain+after+note;
+   }else if(mode==='normal'){
+    const how=render(a.methods.map(v=>v==='ゆっくり話した'?structure(['ゆっくり話しました','ゆっくりと話しました','本人にゆっくり話しました']):polite(v)));
+    body=(own?sentence(own)+(work&&!prefix?'職員は':''):'')+work+how+render(reactions)+uncertain+after+note;
+   }else{
+    // Subjects and the service context are explicit in long records. Time/cause
+    // is only linked for the matching selected prompt and its observed reply.
+    let help=work;
+    if(a.actions.includes('起き上がりを介助した'))help=help.replace(/起き上がり(?:を介助しました|の介助を行いました)/,'本人が起き上がる動作を職員が介助しました');
+    if(help&&!/職員[はが]/.test(help))help=prefix&&help.startsWith(prefix)?prefix+(lead?'職員が':'職員は')+help.slice(prefix.length):(lead?'職員が':'職員は')+help;
+    const how=a.methods.map(v=>sentence(v==='ゆっくり話した'?structure([longMethods[v],'本人にはゆっくり話しました','本人に対しては、ゆっくり話しました']):(longMethods[v]||polite(v)))).join('');
+    const self=sentence(own.replace(/は本人が行われました$/,'は本人が自分で行われました')),reaction=joinClauses(reactions,'long');
+    const middle=structure([self+help+how+reaction,how+self+help+reaction]);
+    body=middle+uncertain+after+note;
+   }
+   if(mode!=='short'&&!a.scopeOnly&&!body.startsWith('今回の'))body=serviceContexts[a.service]+body.replace(/^今回は/,'');
+   sections.push(body);
+  });
+  if(plan.supportNote)sections.push(sentence(plan.supportNote));
+  if(plan.response&&!plan.services.some(a=>a.reactions.some(r=>r.replace(/^声かけに/,'')===plan.response.replace(/^声かけに/,''))))sections.push(sentence('支援中、'+(reactionSentences[plan.response]||plan.response)));
+  if(plan.after&&!(plan.services.length===1&&plan.services[0].after===plan.after))sections.push(sentence(afterSentence(plan.after)));
+  const care=INTRO+sections.join(mode==='short'?'':'\n');
+  const inputCount=[f.interventionLevel,f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+plan.services.reduce((n,a)=>n+(a.confirmedService===true&&!a.actions.length?1:0)+a.actions.length+a.reactions.length+a.methods.length+[a.self,a.after,a.note].filter(text).length,0);
+  return {errors:[],visit,care,inputCount,needsDetail:plan.services.filter(needsDetail).map(a=>a.service)};
  }
- const api={INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+
+ const api={evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);

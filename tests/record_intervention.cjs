@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),C=require('../record-facts-core'),S=require('../record-similarity'),{empty,med,profile}=require('./fixtures/record_quality_cases.cjs');let checks=0;const rows=[];
 for(const service of Object.keys(C.serviceActions))for(const level of ['',...Object.keys(C.interventionLabels)])for(const mode of ['short','normal','long']){
  const facts={...empty,lengthMode:mode,interventionLevel:level,scene:'椅子・座椅子に座っていた',health:'痛みの訴えがあった',statement:'右膝が痛い',difference:'普段より動作がゆっくりだった',actions:[{service,confirmedService:true,actions:[C.serviceActions[service][0]],reactions:[C.reactions[service][0]],methods:['ゆっくり話した'],after:'椅子に座って過ごした',note:'本人から水分の希望があった'}]},out=C.compose(facts);
- assert.deepEqual(out.errors,[]);assert(out.care.startsWith(C.INTRO));assert(out.visit.includes('右膝が痛い'));assert(out.care.includes('水分の希望'));assert(out.care.includes('ゆっくり話しました'));assert(out.care.includes('支援後は、椅子'));assert.deepEqual(out,C.compose(facts,profile));if(level)assert(out.care.includes('今回は'));else assert(!out.care.includes('今回は'));if(service==='服薬介助・確認')assert(!out.care.includes('服用されたことを'));checks++;
+ assert.deepEqual(out.errors,[]);assert(out.care.startsWith(C.INTRO));assert(out.visit.includes('右膝が痛い'));assert(out.care.includes('水分の希望'));assert(out.care.includes('ゆっくり話しました'));assert(out.care.includes('支援後は、椅子'));assert.deepEqual(out,C.compose(facts,profile));if(level)assert(({active:/直接介助/,partial:/必要な部分/,prompt:/声かけ・促し/,watch:/見守りを中心/,minimal:/最小限の支援・確認/})[level].test(out.care));else assert(!out.care.includes('今回は'));if(service==='服薬介助・確認')assert(!out.care.includes('服用されたことを'));checks++;
  if(service==='服薬介助・確認')rows.push({level,mode,result:out});
 }
 for(const level of Object.keys(C.interventionLabels)){

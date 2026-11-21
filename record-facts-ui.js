@@ -7,7 +7,7 @@
  const legacyLabels={usual:'普段の様子',trait:'本人の特性',caution:'注意事項',communication:'伝え方',support_method:'基本的な支援方法'};
  const legacyFields={usual:'profileUsual',trait:'profileTrait',caution:'profileCaution',communication:'profileCommunication',support_method:'profileSupportMethod'};
  let db,editor=null,profileVersion=0,profileDirty=false,dailyDirty=false,dailyProfile=null,previousUser=q('user').value,previousOrg=localStorage.getItem('activeOrganizationId');
- let actionState=new Map(),plannedServices=new Set();
+ let actionState=new Map(),plannedServices=new Set(),quickDetailBusy=false,quickDetailSignature='';
  const getDb=()=>db||(db=supabase.createClient(AI_KIROKU_CONFIG.supabaseUrl,AI_KIROKU_CONFIG.supabasePublishableKey));
  const check=r=>{if(r.error)throw Error(r.error.message);return r.data;};
  async function context(){
@@ -38,13 +38,34 @@
  function markDaily(){dailyDirty=true;stash();syncButtons();}
  function syncButtons(){for(const e of q('factActions').querySelectorAll('[data-fact-service]')){const a=readCard(e);e.querySelector('[data-performed]').textContent=C.performed(a)?'実施したサービス':'予定・実施は未確認';for(const b of e.querySelectorAll('[data-preset]')){const p=C.quickChoices[a.service].find(p=>p.id===b.dataset.preset);b.setAttribute('aria-pressed',String(p.actions.length===a.actions.length&&p.actions.every(v=>a.actions.includes(v))&&!!p.unconfirmed===!!a.unconfirmed&&(p.self||'')===(a.self||'')));}}
  }
- function collect(){return {version:1,composerRevision:3,interventionLevel:q('interventionLevel').value,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};}
+ function collect(){return {version:1,composerRevision:4,interventionLevel:q('interventionLevel').value,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};}
  function resetDaily(){
-  window.__nexiaPreviousExpression=null;
+  window.__nexiaPreviousExpression=null;quickDetailSignature='';if(q('factQuickDetail')){q('factQuickDetail').hidden=true;q('factQuickDetail').replaceChildren();}
   for(const id of ['interventionLevel','visitScene','condition','health','input','factStatement','factDifference','factConcern','factResponse','factAfter'])q(id).value='';
   actionState=new Map();document.querySelectorAll('input[name=serviceContent]').forEach(c=>{c.checked=false;c.indeterminate=plannedServices.has(c.value);});dailyProfile=null;q('factActions').replaceChildren();actionRows({read:false});syncButtons();dailyDirty=false;
   q('visitResult').textContent='ここに訪問時の記録文が表示されます。';q('careResult').textContent='ここに支援中の記録文が表示されます。';
   q('inputCount').textContent='0文字';q('recordCommitButton')?.setAttribute('disabled','');q('factErrors').textContent='';q('factCompositionStatus').textContent='';q('factReference').textContent='プロフィールは当日の出来事として自動記載しません。';
+ }
+ // Reuse the existing factual presets. Nothing is checked on behalf of staff.
+ function showQuickDetail(f,services){
+  const box=q('factQuickDetail');quickDetailSignature=JSON.stringify({user:q('user').value,org:localStorage.getItem('activeOrganizationId'),facts:f});
+  box.hidden=!services.length;
+  box.innerHTML=services.length?'<p>具体的な介助方法が未入力です。実施した方法を1つ選ぶと、その事実で記録を作り直せます（任意）。反応・体調は自動追加しません。</p>'+services.map(service=>'<div><strong>'+esc(service)+'</strong><div class="fact-presets">'+C.quickChoices[service].map(p=>'<button type="button" data-quick-detail="'+esc(p.id)+'" data-quick-service="'+esc(service)+'">'+esc(p.label)+'</button>').join('')+'</div></div>').join(''):'';
+ }
+ async function applyQuickDetail(e){
+  const b=e.target.closest('[data-quick-detail]');if(!b||quickDetailBusy)return;
+  const signature=JSON.stringify({user:q('user').value,org:localStorage.getItem('activeOrganizationId'),facts:collect()});
+  if(signature!==quickDetailSignature){q('factQuickDetail').hidden=true;q('factCompositionStatus').textContent='入力が変わりました。現在の内容で記録を作成してください。';return;}
+  const service=b.dataset.quickService,card=[...q('factActions').querySelectorAll('[data-fact-service]')].find(c=>c.dataset.factService===service),p=C.quickChoices[service]?.find(p=>p.id===b.dataset.quickDetail);
+  if(!card||!p||!C.needsDetail(readCard(card)))return;
+  // No overwrite of a concurrent/manual record edit.
+  if(q('visitResult').textContent!==q('factQuickDetail').dataset.visit||q('careResult').textContent!==q('factQuickDetail').dataset.care){q('factCompositionStatus').textContent='記録文が編集されています。手修正を保持するため、自動で作り直しません。介助方法は任意欄から選べます。';return;}
+  quickDetailBusy=true;q('factQuickDetail').querySelectorAll('button').forEach(x=>x.disabled=true);
+  try{
+   card.querySelectorAll('[data-action]').forEach(c=>c.checked=p.actions.includes(c.value));card.querySelector('[data-unconfirmed]').value=String(!!p.unconfirmed);if(p.self)card.querySelector('[data-self]').value=p.self;
+   markDaily();card.dispatchEvent(new Event('change',{bubbles:true}));
+   await window.generate(); // Existing signature, duplicate-history and formal-save wrapper.
+  }finally{quickDetailBusy=false;q('factQuickDetail').querySelectorAll('button').forEach(x=>x.disabled=false);}
  }
  function profileForm(data={}){
   q('structuredProfile').innerHTML=Object.entries(C.profileFields).map(([k,[label,choices]])=>`<details><summary>${label}</summary><div class="fact-choices">${choices.map(v=>`<label><input type="checkbox" data-profile="${k}" value="${esc(v)}" ${(data[k]?.choices||[]).includes(v)?'checked':''}>${esc(v)}</label>`).join('')}</div><label>${label}の補足（任意）<textarea data-profile-note="${k}" maxlength="1000">${esc(data[k]?.note||'')}</textarea></label></details>`).join('');
@@ -77,7 +98,7 @@
   const input=q('input'),card=input.closest('.card');card.id='factInputCard';
   const date=document.createElement('label');date.className='fact-date';date.innerHTML=`記録日 <input type="date" id="factDate" min="2000-01-01" max="2100-12-31" required value="${now()}">`;q('user').closest('.grid').before(date);
   const intervention=q('interventionLevel');intervention.closest('.field-group').hidden=false;intervention.value='';intervention.options[0].textContent='未選択（記録に追加しない）';intervention.previousElementSibling.innerHTML='今回の支援介入度（任意）';intervention.nextElementSibling.textContent='今回の支援の範囲を選択。具体的な介助・安全確認・本人の反応は自動追加しません。';
-  const settings=document.createElement('details');settings.className='fact-optional';settings.innerHTML='<summary>日付・サービス種別・長さの設定</summary>';q('user').closest('.grid').after(settings);settings.append(date,q('service').parentElement,q('length').parentElement);const dateCaption=document.createElement('p');dateCaption.id='factDateCaption';dateCaption.className='fact-hint';dateCaption.textContent='記録日：'+now();q('user').closest('.grid').before(dateCaption);q('user').parentElement.querySelector('.notice').hidden=true;q('length').parentElement.querySelector('.notice').textContent='短めは1段落、普通は支援別、長めは項目別に整理します。確認した事実は省略・水増ししません。';
+  const settings=document.createElement('details');settings.className='fact-optional';settings.innerHTML='<summary>日付・サービス種別・長さの設定</summary>';q('user').closest('.grid').after(settings);settings.append(date,q('service').parentElement,q('length').parentElement);const dateCaption=document.createElement('p');dateCaption.id='factDateCaption';dateCaption.className='fact-hint';dateCaption.textContent='記録日：'+now();q('user').closest('.grid').before(dateCaption);q('user').parentElement.querySelector('.notice').hidden=true;q('length').parentElement.querySelector('.notice').textContent='短めは要点を接続し、普通はサービス別、長めは本人と職員・方法・経過を明確に記載します。情報が少ない場合は無理に長くしません。';
   const originalChecks=document.querySelector('input[name=serviceContent]').closest('.field-group');originalChecks.hidden=false;originalChecks.id='factServiceChecks';
   originalChecks.querySelector('label').textContent='サービス内容（実施したもの・複数選択可）';
   const hint=document.createElement('p');hint.className='fact-hint';hint.id='factServiceHint';hint.textContent='実施したサービスをチェック。方法・反応は任意欄で補足できます。';originalChecks.querySelector('.checks').before(hint);
@@ -93,7 +114,7 @@
   const reactions=document.createElement('div');reactions.innerHTML='<label>支援全体で確認した本人の反応<select id="factResponse"><option value="">未入力</option><option>うなずいて応じた</option><option>自分の希望を伝えた</option><option>介助を断る意思を示した</option><option>表情が和らいだ</option></select></label><label>支援全体の終了後に確認した状態<select id="factAfter"><option value="">未入力</option>'+C.afterChoices.map(v=>'<option>'+v+'</option>').join('')+'</select></label>';supplement.append(reactions);q('factSupportDetails').append(supplement);
   const errors=document.createElement('div');errors.id='factErrors';errors.setAttribute('role','alert');errors.tabIndex=-1;workflow.after(errors);
   const actions=card.querySelector('.actions');actions.id='factGenerateActions';actions.setAttribute('aria-label','記録文の生成');
-  const composition=document.createElement('p');composition.id='factCompositionStatus';composition.setAttribute('role','status');errors.after(composition);
+  const composition=document.createElement('p');composition.id='factCompositionStatus';composition.setAttribute('role','status');errors.after(composition);const quick=document.createElement('aside');quick.id='factQuickDetail';quick.hidden=true;quick.setAttribute('aria-label','具体的な介助方法を1回で補う');q('careResultCount').after(quick);quick.addEventListener('click',applyQuickDetail);
   const pref=q('profileDetails'),legacy=document.createElement('details');legacy.id='legacyProfileFields';legacy.innerHTML='<summary>以前からの登録内容（保持しています）</summary>';
   while(pref.children.length>1)legacy.append(pref.children[1]);pref.append(legacy);legacy.querySelectorAll('button').forEach(b=>b.hidden=true);
   const admin=document.createElement('section');admin.innerHTML='<p>プロフィールは入力候補の参考です。当日の観察・実施内容へ自動挿入しません。未登録でも利用できます。</p><p id="factProfileRole"></p><div id="structuredProfile"></div><button id="factProfileSave" type="button">プロフィールを保存</button><p id="factProfileStatus" role="status"></p><details><summary>保存済みの旧冒頭文設定</summary><p id="factOldIntro"></p><p>登録済みの設定は保持します。新しい記録では必須冒頭文を使用します。</p></details>';pref.insertBefore(admin,legacy);
@@ -121,7 +142,8 @@
    if(result.errors.length)return;
    q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;
    for(const id of ['visitResult','careResult'])q(id+'Count').textContent=q(id).textContent.length+'文字';
-   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:1};
+   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:2};
+   q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
    window.__nexiaPreviousExpression={actor:scope.actorId,org:scope.organizationId,client:scope.clientId,row:{organization_id:scope.organizationId,client_id:scope.clientId,visit_note:result.visit,care_note:result.care}};
   },signature:()=>JSON.stringify({org:localStorage.getItem('activeOrganizationId'),facts:collect()})};
   for(const id of ['visitResult','careResult']){q(id).contentEditable='true';q(id).setAttribute('role','textbox');q(id).setAttribute('aria-label',id==='visitResult'?'①の記録文（編集できます）':'②の記録文（編集できます）');q(id).addEventListener('input',()=>q(id+'Count').textContent=q(id).textContent.length+'文字');}
@@ -150,6 +172,7 @@
   if(window.assignmentContext?.organizationId&&(window.assignmentContext.organizationId!==c.org||window.assignmentContext.clientId!==client[0].id))throw Error('担当と選択施設が一致しません。');
   if(code!==q('user').value||service!==q('service').value||JSON.stringify(f)!==JSON.stringify(collect()))throw Error('作成中に入力が変更されました。もう一度作成してください。');
   q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;q('visitResultCount').textContent=result.visit.length+'文字';q('careResultCount').textContent=result.care.length+'文字';q('factCompositionStatus').textContent='確認した入力'+result.inputCount+'項目から作成しました。文章を確認・編集してから正式保存してください。';
+  showQuickDetail(f,result.needsDetail||[]);q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
   const actions=f.actions.filter(C.performed);
   await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:f.interventionLevel,supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor}});
   window.addHistory(code+' / '+service,'【訪問時】'+result.visit+' 【支援中】'+result.care);
