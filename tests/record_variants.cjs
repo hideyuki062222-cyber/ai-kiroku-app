@@ -5,7 +5,7 @@ const fixtures=[{name:'最小限・服薬サービスのみ',facts:{...empty,act
 for(const t of fixtures){
  const baseline=C.compose(t.facts),visits=new Set(),cares=new Set(),pairs=new Set();let min=Infinity,max=0;
  for(let seed=0;seed<5000;seed++){
-  const out=C.compose(t.facts,undefined,seed);assert.deepEqual(out.errors,[]);assert(out.care.startsWith(C.INTRO));assert(!/ましました|ました、/.test(out.visit+out.care),'no double conjugation or unjoined polite clause');assert(out.care.length>=baseline.care.length*0.75&&out.care.length<=baseline.care.length*1.5,'bounded length without padding');
+  const out=C.compose(t.facts,undefined,seed);assert.deepEqual(out.errors,[]);assert(out.care.startsWith(C.INTRO));assert(!/ましました|まし、|ました、/.test(out.visit+out.care),'no double conjugation or unjoined polite clause');assert(out.care.length>=baseline.care.length*0.75&&out.care.length<=baseline.care.length*1.5,'bounded length without padding');
   // Reverse each reviewed synonym, preserving every other byte, including quotes/notes.
   assert.equal(canonical(out.visit),canonical(baseline.visit),t.name+' visit meaning');assert.equal(canonical(out.care),canonical(baseline.care),t.name+' care meaning');
   if(!t.facts.actions.some(a=>(a.actions||[]).includes('服薬したことを確認した')||(a.reactions||[]).includes('本人が自分で服薬した')))assert(!out.care.includes('服用されたことを'));

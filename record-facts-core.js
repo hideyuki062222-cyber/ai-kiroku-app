@@ -135,7 +135,10 @@
   for(const [pattern,replacement] of [[/行った$/,'行いました'],[/付き添った$/,'付き添いました'],[/声をかけた$/,'声をかけました'],[/整えた$/,'整えました'],[/した$/,'しました'],[/伝えた$/,'伝えました'],[/待った$/,'待ちました']])if(pattern.test(s))return s.replace(pattern,replacement);
   return s;
  };
- const connective=s=>s.replace(/いたしました$/,'し').replace(/確かめました$/,'確かめ').replace(/いらっしゃいました$/,'いらっしゃり').replace(/しました$/,'し').replace(/行いました$/,'行い').replace(/かけました$/,'かけ').replace(/整えました$/,'整え').replace(/付き添いました$/,'付き添い').replace(/おられました$/,'おられ').replace(/ていました$/,'ており').replace(/見られました$/,'見られ').replace(/ありませんでした$/,'なく').replace(/ありました$/,'あり').replace(/でした$/,'で').replace(/していません$/,'しておらず').replace(/れました$/,'れ').replace(/伝えました$/,'伝え').replace(/待ちました$/,'待ち');
+ const connective=s=>{
+  for(const [pattern,replacement] of [[/いたしました$/,'し'],[/確かめました$/,'確かめ'],[/いらっしゃいました$/,'いらっしゃり'],[/行いました$/,'行い'],[/付き添いました$/,'付き添い'],[/かけました$/,'かけ'],[/整えました$/,'整え'],[/伝えました$/,'伝え'],[/待ちました$/,'待ち'],[/おられました$/,'おられ'],[/ていました$/,'ており'],[/見られました$/,'見られ'],[/ありませんでした$/,'なく'],[/ありました$/,'あり'],[/していません$/,'しておらず'],[/しました$/,'し'],[/でした$/,'で'],[/れました$/,'れ']])if(pattern.test(s))return s.replace(pattern,replacement);
+  return s;
+ };
  function joinClauses(clauses,mode='normal'){
   const xs=unique(clauses);if(!xs.length)return '';
   if(mode==='long')return xs.map(sentence).join('');
