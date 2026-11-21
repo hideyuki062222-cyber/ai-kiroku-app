@@ -628,12 +628,27 @@
  }
  let expressionCounter=0;
  function nextExpressionSeed(){const n=expressionCounter;expressionCounter=(expressionCounter+1)%1048576;return n;}
- // Mixed-radix selection, applied ONLY to controlled clauses, never to staff quotations/notes.
+ // Deterministic local choices; never applied to staff quotations/notes.
+ // Separate structural choices keep long paragraphs from discarding phrasing choices.
+ function structurePicker(seed){
+  let state=(Number.isSafeInteger(seed)&&seed>=0?seed:0)>>>0;
+  return choices=>{if(!seed)return choices[0];state=(state+0x6d2b79f5)>>>0;let n=state;n=Math.imul(n^(n>>>15),n|1);n^=n+Math.imul(n^(n>>>7),n|61);return choices[((n^(n>>>14))>>>0)%choices.length];};
+ }
+ // Phrase choices remain confined to reviewed, fact-equivalent clauses.
  function expressionPicker(seed){
   let n=Number.isSafeInteger(seed)&&seed>=0?seed:0;
   const pick=choices=>{const v=choices[n%choices.length];n=Math.floor(n/choices.length);return v;};
   return {pick,phrase(value){
    const choices=[value];
+   // A response is bound only when both the matching prompt and response were selected.
+   for(const [,prefix,,reply] of Object.values(promptActions)){
+    const tail=reply||'本人はうなずいて応じられました';
+    if(value===prefix+'、'+tail){
+     const topic=prefix.replace('服薬に向けて声をかけると','服薬に向けた声かけ').replace('食事の際に声をかけると','食事の際の声かけ').replace(/声をかけると$/,'声かけ');
+     choices.push(topic+'に対し、'+tail,'本人は、'+topic+'に'+tail.replace(/^本人は/,''));
+     break;
+    }
+   }
    const alternatives=[[/を介助しました$/,'の介助を行いました'],[/を行いました$/,'を実施しました'],[/に付き添いました$/,'の付き添いを行いました'],[/声をかけました$/,'声かけを行いました'],[/ことを確認しました$/,'ことを確かめました'],[/見られました$/,'見受けられました'],[/おられました$/,'いらっしゃいました'],[/うなずいて応じられました$/,'うなずきで応じられました']];
    for(const [pattern,replacement] of alternatives)if(pattern.test(value)){choices.push(value.replace(pattern,replacement));break;}
    if(choices.length===1&&/しました$/.test(value))choices.push(value.replace(/しました$/,'いたしました'));
@@ -643,7 +658,7 @@
  }
  function compose(f,_profile,expressionSeed=0){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
-  const variant=expressionPicker(expressionSeed);
+  const variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
   const observed=new Map();
   const observation=v=>{const key=observations[v]||v;if(observed.has(key))return observed.get(key);const out=observations[v]?variant.phrase(observations[v]):text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');observed.set(key,out);return out;};
   const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition].filter(v=>v&&v!=='その他').map(observation));
@@ -653,7 +668,16 @@
   if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
   if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
   if(text(f.concern))visit+=sentence(f.concern);
-  if(mode==='long'){const parts=[];if(obs.length)parts.push('【訪問時の状態】\n'+joinClauses(obs,'long'));if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))parts.push('【体調】\n'+sentence(observation(f.health)));if(text(f.statement))parts.push('【本人の発言・訴え】\n'+sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました'));if(text(f.difference))parts.push('【普段との違い】\n'+sentence(observations[f.difference]||text(f.difference)));if(text(f.concern))parts.push('【気になったこと】\n'+sentence(f.concern));visit=parts.join('\n');}
+  if(mode==='long'){
+   // All observations stay at the visit; no health, statement or change is inferred.
+   const parts=[];
+   if(obs.length)parts.push(structure(['訪問時、','訪問時は、'])+joinClauses(obs,structure(['long','normal'])));
+   if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))parts.push(sentence(observation(f.health)));
+   if(text(f.statement))parts.push(sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました'));
+   if(text(f.difference))parts.push(sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference))));
+   if(text(f.concern))parts.push(sentence(f.concern));
+   visit=parts.join('');
+  }
   const sections=[];
   if(f.interventionLevel)sections.push(sentence(interventionText[f.interventionLevel]));
   for(const a of f.actions||[]){if(!performed(a))continue;
@@ -663,8 +687,27 @@
    const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
    const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
-   let body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
-   if(mode==='long'){const blocks=[];if(own)blocks.push('本人が行ったこと：'+own);const help=lead+joinClauses(acts.map(variant.phrase).concat(method),'long');if(help)blocks.push('職員の支援：'+(own?'職員は':'')+help);if(rs.length)blocks.push('本人の反応：'+joinClauses(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v),'long'));if(deferUnconfirmed)blocks.push('服用済みかは確認していません。');if(after)blocks.push('支援後の状態：'+after);if(note)blocks.push('補足：'+note);body='【'+a.service+'】\n'+blocks.join('\n');}
+   let body;
+   const positive=acts.filter(v=>v!=='服用済みかは確認していません');
+   const uncertainty=(deferUnconfirmed||acts.includes('服用済みかは確認していません'))?'服用済みかは確認していません。':'';
+   if(mode==='long'){
+    // Prose makes the selected facts and their subjects explicit. No headings/padding.
+    // Keep dose uncertainty separate: it must not become a consequence of another fact.
+    const help=lead+joinClauses(positive.map(variant.phrase),structure(['long','normal']));
+    const how=method.length?structure(['支援の際は、','支援方法として、',''])+joinClauses(method,'long'):'';
+    const reaction=joinClauses(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v),'long');
+    // Self-help order can change without implying an unobserved sequence or outcome.
+    const assistance=(own?'職員は':'')+help;
+    const work=own?structure([own+assistance,assistance+own]):assistance;
+    const middle=structure([work+how+reaction,how+work+reaction,work+reaction+how]);
+    body=middle+uncertainty+after+note;
+   }else if(mode==='normal'){
+    const help=lead+render(positive.map(variant.phrase));
+    const how=method.length?structure(['','支援の際は、','支援方法として、'])+render(method):'';
+    body=(own?own+'職員は':'')+help+how+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+uncertainty+after+note;
+   }else{
+    body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
+   }
    sections.push(body);
   }
   if(text(f.supportNote))sections.push(sentence(f.supportNote));
