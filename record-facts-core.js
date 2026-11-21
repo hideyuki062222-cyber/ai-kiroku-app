@@ -1,6 +1,8 @@
 /* Deterministic composition of confirmed observations. No network or profile-to-event inference. */
 (function(root){
  'use strict';
+ const interventionLabels={active:'積極的支援（直接介助を多め）',partial:'必要な部分を介助',prompt:'声かけ・促し中心',watch:'見守り中心',minimal:'最小限の支援・確認中心'};
+ const interventionText={active:'今回は直接介助を中心に支援しました',partial:'今回は必要な部分に介助を行いました',prompt:'今回は声かけ・促しを中心に支援しました',watch:'今回は見守りを中心に支援しました',minimal:'今回は最小限の支援・確認を中心に対応しました'};
  const INTRO='指示内容確認しました。前回のサービス記録確認しました。';
  const serviceActions={
   '食事介助':['食事中の見守りを行った','食事の際に声をかけた','食物を口元へ運ぶ介助を行った'],
@@ -501,7 +503,7 @@
  // Scheduled candidates and saved facts without this flag keep their former meaning.
  function performed(a){return a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length;}
  function validate(f){
-  const errors=[];let validDate=false;
+  const errors=[];if(f.interventionLevel&&!Object.hasOwn(interventionLabels,f.interventionLevel))errors.push('今回の支援介入度を確認してください。');let validDate=false;
   try{validDate=/^\d{4}-\d{2}-\d{2}$/.test(f.date||'')&&f.date>='2000-01-01'&&f.date<='2100-12-31'&&new Date(f.date+'T00:00:00Z').toISOString().slice(0,10)===f.date;}catch{}
   if(!validDate)errors.push('記録日を確認してください。');
   if(![f.scene,f.condition,f.health,f.statement,f.difference,f.concern].some(text))errors.push('① 訪問時に確認した状態・表情・体調などを1つ選択、または入力してください。');
@@ -626,12 +628,27 @@
  }
  let expressionCounter=0;
  function nextExpressionSeed(){const n=expressionCounter;expressionCounter=(expressionCounter+1)%1048576;return n;}
- // Mixed-radix selection, applied ONLY to controlled clauses, never to staff quotations/notes.
+ // Deterministic local choices; never applied to staff quotations/notes.
+ // Separate structural choices keep long paragraphs from discarding phrasing choices.
+ function structurePicker(seed){
+  let state=(Number.isSafeInteger(seed)&&seed>=0?seed:0)>>>0;
+  return choices=>{if(!seed)return choices[0];state=(state+0x6d2b79f5)>>>0;let n=state;n=Math.imul(n^(n>>>15),n|1);n^=n+Math.imul(n^(n>>>7),n|61);return choices[((n^(n>>>14))>>>0)%choices.length];};
+ }
+ // Phrase choices remain confined to reviewed, fact-equivalent clauses.
  function expressionPicker(seed){
   let n=Number.isSafeInteger(seed)&&seed>=0?seed:0;
   const pick=choices=>{const v=choices[n%choices.length];n=Math.floor(n/choices.length);return v;};
   return {pick,phrase(value){
    const choices=[value];
+   // A response is bound only when both the matching prompt and response were selected.
+   for(const [,prefix,,reply] of Object.values(promptActions)){
+    const tail=reply||'本人はうなずいて応じられました';
+    if(value===prefix+'、'+tail){
+     const topic=prefix.replace('服薬に向けて声をかけると','服薬に向けた声かけ').replace('食事の際に声をかけると','食事の際の声かけ').replace(/声をかけると$/,'声かけ');
+     choices.push(topic+'に対し、'+tail,'本人は、'+topic+'に'+tail.replace(/^本人は/,''));
+     break;
+    }
+   }
    const alternatives=[[/を介助しました$/,'の介助を行いました'],[/を行いました$/,'を実施しました'],[/に付き添いました$/,'の付き添いを行いました'],[/声をかけました$/,'声かけを行いました'],[/ことを確認しました$/,'ことを確かめました'],[/見られました$/,'見受けられました'],[/おられました$/,'いらっしゃいました'],[/うなずいて応じられました$/,'うなずきで応じられました']];
    for(const [pattern,replacement] of alternatives)if(pattern.test(value)){choices.push(value.replace(pattern,replacement));break;}
    if(choices.length===1&&/しました$/.test(value))choices.push(value.replace(/しました$/,'いたしました'));
@@ -641,7 +658,7 @@
  }
  function compose(f,_profile,expressionSeed=0){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
-  const variant=expressionPicker(expressionSeed);
+  const variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
   const observed=new Map();
   const observation=v=>{const key=observations[v]||v;if(observed.has(key))return observed.get(key);const out=observations[v]?variant.phrase(observations[v]):text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');observed.set(key,out);return out;};
   const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition].filter(v=>v&&v!=='その他').map(observation));
@@ -651,7 +668,18 @@
   if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
   if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
   if(text(f.concern))visit+=sentence(f.concern);
+  if(mode==='long'){
+   // All observations stay at the visit; no health, statement or change is inferred.
+   const parts=[];
+   if(obs.length)parts.push(structure(['訪問時、','訪問時は、'])+joinClauses(obs,structure(['long','normal'])));
+   if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))parts.push(sentence(observation(f.health)));
+   if(text(f.statement))parts.push(sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました'));
+   if(text(f.difference))parts.push(sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference))));
+   if(text(f.concern))parts.push(sentence(f.concern));
+   visit=parts.join('');
+  }
   const sections=[];
+  if(f.interventionLevel)sections.push(sentence(interventionText[f.interventionLevel]));
   for(const a of f.actions||[]){if(!performed(a))continue;
    const composed=supportClauses(a),deferUnconfirmed=a.service==='服薬介助・確認'&&a.unconfirmed&&composed.reactions.includes('服薬を拒否した');
    const acts=deferUnconfirmed?composed.acts.filter(v=>v!=='服用済みかは確認していません'):composed.acts,own=text(a.self)?sentence(selfSentence(a.self)):'';
@@ -659,16 +687,35 @@
    const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
    const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
-   let body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
-   if(mode==='long')body='【'+a.service+'】\n'+body;
+   let body;
+   const positive=acts.filter(v=>v!=='服用済みかは確認していません');
+   const uncertainty=(deferUnconfirmed||acts.includes('服用済みかは確認していません'))?'服用済みかは確認していません。':'';
+   if(mode==='long'){
+    // Prose makes the selected facts and their subjects explicit. No headings/padding.
+    // Keep dose uncertainty separate: it must not become a consequence of another fact.
+    const help=lead+joinClauses(positive.map(variant.phrase),structure(['long','normal']));
+    const how=method.length?structure(['支援の際は、','支援方法として、',''])+joinClauses(method,'long'):'';
+    const reaction=joinClauses(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v),'long');
+    // Self-help order can change without implying an unobserved sequence or outcome.
+    const assistance=help?(own?'職員は':'')+help:'';
+    const work=own?structure([own+assistance,assistance+own]):assistance;
+    const middle=structure([work+how+reaction,how+work+reaction,work+reaction+how]);
+    body=middle+uncertainty+after+note;
+   }else if(mode==='normal'){
+    const help=lead+render(positive.map(variant.phrase));
+    const how=method.length?structure(['','支援の際は、','支援方法として、'])+render(method):'';
+    body=own+(help?(own?'職員は':'')+help:'')+how+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+uncertainty+after+note;
+   }else{
+    body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
+   }
    sections.push(body);
   }
   if(text(f.supportNote))sections.push(sentence(f.supportNote));
   if(text(f.response))sections.push(sentence('支援中、'+(reactionSentences[f.response]||text(f.response))));
   if(text(f.after))sections.push(sentence(afterSentence(f.after)));
   const care=INTRO+(mode==='long'?'\n':'')+sections.join(mode==='short'?'':'\n');
-  const inputCount=[f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
+  const inputCount=[f.interventionLevel,f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount};
  }
- const api={INTRO,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);

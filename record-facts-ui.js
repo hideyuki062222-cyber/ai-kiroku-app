@@ -38,10 +38,10 @@
  function markDaily(){dailyDirty=true;stash();syncButtons();}
  function syncButtons(){for(const e of q('factActions').querySelectorAll('[data-fact-service]')){const a=readCard(e);e.querySelector('[data-performed]').textContent=C.performed(a)?'実施したサービス':'予定・実施は未確認';for(const b of e.querySelectorAll('[data-preset]')){const p=C.quickChoices[a.service].find(p=>p.id===b.dataset.preset);b.setAttribute('aria-pressed',String(p.actions.length===a.actions.length&&p.actions.every(v=>a.actions.includes(v))&&!!p.unconfirmed===!!a.unconfirmed&&(p.self||'')===(a.self||'')));}}
  }
- function collect(){return {version:1,composerRevision:3,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};}
+ function collect(){return {version:1,composerRevision:3,interventionLevel:q('interventionLevel').value,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};}
  function resetDaily(){
   window.__nexiaPreviousExpression=null;
-  for(const id of ['visitScene','condition','health','input','factStatement','factDifference','factConcern','factResponse','factAfter'])q(id).value='';
+  for(const id of ['interventionLevel','visitScene','condition','health','input','factStatement','factDifference','factConcern','factResponse','factAfter'])q(id).value='';
   actionState=new Map();document.querySelectorAll('input[name=serviceContent]').forEach(c=>{c.checked=false;c.indeterminate=plannedServices.has(c.value);});dailyProfile=null;q('factActions').replaceChildren();actionRows({read:false});syncButtons();dailyDirty=false;
   q('visitResult').textContent='ここに訪問時の記録文が表示されます。';q('careResult').textContent='ここに支援中の記録文が表示されます。';
   q('inputCount').textContent='0文字';q('recordCommitButton')?.setAttribute('disabled','');q('factErrors').textContent='';q('factCompositionStatus').textContent='';q('factReference').textContent='プロフィールは当日の出来事として自動記載しません。';
@@ -76,7 +76,7 @@
   window.__nexiaFactsMode=true;
   const input=q('input'),card=input.closest('.card');card.id='factInputCard';
   const date=document.createElement('label');date.className='fact-date';date.innerHTML=`記録日 <input type="date" id="factDate" min="2000-01-01" max="2100-12-31" required value="${now()}">`;q('user').closest('.grid').before(date);
-  const intervention=q('interventionLevel');intervention.closest('.field-group').hidden=true;intervention.value='';
+  const intervention=q('interventionLevel');intervention.closest('.field-group').hidden=false;intervention.value='';intervention.options[0].textContent='未選択（記録に追加しない）';intervention.previousElementSibling.innerHTML='今回の支援介入度（任意）';intervention.nextElementSibling.textContent='今回の支援の範囲を選択。具体的な介助・安全確認・本人の反応は自動追加しません。';
   const settings=document.createElement('details');settings.className='fact-optional';settings.innerHTML='<summary>日付・サービス種別・長さの設定</summary>';q('user').closest('.grid').after(settings);settings.append(date,q('service').parentElement,q('length').parentElement);const dateCaption=document.createElement('p');dateCaption.id='factDateCaption';dateCaption.className='fact-hint';dateCaption.textContent='記録日：'+now();q('user').closest('.grid').before(dateCaption);q('user').parentElement.querySelector('.notice').hidden=true;q('length').parentElement.querySelector('.notice').textContent='短めは1段落、普通は支援別、長めは項目別に整理します。確認した事実は省略・水増ししません。';
   const originalChecks=document.querySelector('input[name=serviceContent]').closest('.field-group');originalChecks.hidden=false;originalChecks.id='factServiceChecks';
   originalChecks.querySelector('label').textContent='サービス内容（実施したもの・複数選択可）';
@@ -116,8 +116,8 @@
   window.shortenCareResult=()=>{q('careResult').textContent=q('careResult').textContent.replace(/\s+/g,' ').trim();q('careResultCount').textContent=q('careResult').textContent.length+'文字';};
   window.generate=generate;window.NexiaFactUI={collect,context,rephrase(record,rows){
    const scope=record.factContext,previous=window.__nexiaPreviousExpression;
-   const candidates=previous?.org===scope.organizationId&&previous?.client===scope.clientId&&previous.actor===scope.actorId?rows.concat(previous.row):rows;
-   const result=window.NexiaRecordSimilarity.chooseExpression(C,record.dailyFacts,scope,candidates,C.nextExpressionSeed());
+   const recent=previous?.org===scope.organizationId&&previous?.client===scope.clientId&&previous.actor===scope.actorId?previous.row:null;
+   const result=window.NexiaRecordSimilarity.chooseExpression(C,record.dailyFacts,scope,rows,C.nextExpressionSeed(),recent);
    if(result.errors.length)return;
    q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;
    for(const id of ['visitResult','careResult'])q(id+'Count').textContent=q(id).textContent.length+'文字';
@@ -150,8 +150,8 @@
   if(window.assignmentContext?.organizationId&&(window.assignmentContext.organizationId!==c.org||window.assignmentContext.clientId!==client[0].id))throw Error('担当と選択施設が一致しません。');
   if(code!==q('user').value||service!==q('service').value||JSON.stringify(f)!==JSON.stringify(collect()))throw Error('作成中に入力が変更されました。もう一度作成してください。');
   q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;q('visitResultCount').textContent=result.visit.length+'文字';q('careResultCount').textContent=result.care.length+'文字';q('factCompositionStatus').textContent='確認した入力'+result.inputCount+'項目から作成しました。文章を確認・編集してから正式保存してください。';
-  q('interventionLevel').value='';const actions=f.actions.filter(C.performed);
-  await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:'',supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor}});
+  const actions=f.actions.filter(C.performed);
+  await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:f.interventionLevel,supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor}});
   window.addHistory(code+' / '+service,'【訪問時】'+result.visit+' 【支援中】'+result.care);
  }
  mount();
