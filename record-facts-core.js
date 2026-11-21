@@ -626,8 +626,15 @@
   if(preparation)remaining.actions=remaining.actions.filter(v=>v!=='服薬の準備を介助した');
   return {lead:(preparation?'服薬の準備を介助しました。':'')+prompt[1]+'、'+sentence(prompt[3]||'本人はうなずいて応じられました'),acts:actionClauses(remaining),reactions:a.reactions.filter(v=>v!==response)};
  }
+ // Restore the old generation-count idea without a resident signature, cloud
+ // counter, or fabricated stock observations. Only a number is persisted.
  let expressionCounter=0;
- function nextExpressionSeed(){const n=expressionCounter;expressionCounter=(expressionCounter+1)%1048576;return n;}
+ try{const n=Number(root.localStorage?.getItem('nexia.record.expression-counter.v1'));if(Number.isSafeInteger(n)&&n>=0)expressionCounter=n%1048576;}catch{}
+ function nextExpressionSeed(){
+  const n=expressionCounter;expressionCounter=(expressionCounter+1)%1048576;
+  try{root.localStorage?.setItem('nexia.record.expression-counter.v1',String(expressionCounter));}catch{}
+  return n;
+ }
  // Deterministic local choices; never applied to staff quotations/notes.
  // Separate structural choices keep long paragraphs from discarding phrasing choices.
  function structurePicker(seed){
@@ -639,7 +646,13 @@
   let n=Number.isSafeInteger(seed)&&seed>=0?seed:0;
   const pick=choices=>{const v=choices[n%choices.length];n=Math.floor(n/choices.length);return v;};
   return {pick,phrase(value){
-   const choices=[value];
+   const equivalent={
+    'ベッド上で側臥位にて休まれていました':['ベッド上で側臥位で休まれていました'],
+    'ベッド上で仰臥位にて休まれていました':['ベッド上で仰臥位で休まれていました'],
+    'ベッド上で仰臥位にて入眠されていました':['ベッド上で仰臥位で入眠されていました'],
+    '体調は良好でした':['体調は良好な状態でした']
+   };
+   const choices=[value,...(equivalent[value]||[])];
    // A response is bound only when both the matching prompt and response were selected.
    for(const [,prefix,,reply] of Object.values(promptActions)){
     const tail=reply||'本人はうなずいて応じられました';
@@ -694,34 +707,54 @@
   '本人のペースを待った':'支援中は本人のペースに合わせて待ちました',
   '手順を一つずつ伝えた':'支援の手順は、一つずつ本人に伝えました'
  };
+ // Separate observation, utterance and comparison instead of appending one
+ // stock sentence per checkbox. No relation of cause/time is inferred.
+ function composeVisit(plan,mode,variant,structure,observation){
+  const seen=plan.visit.filter(e=>['scene','condition','health'].includes(e.kind));
+  const scene=seen.find(e=>e.kind==='scene'),condition=seen.find(e=>e.kind==='condition'),health=seen.find(e=>e.kind==='health');
+  const clauses=[];
+  if(mode==='short'){
+   if(seen.length)clauses.push('訪問時、'+joinClauses(seen.map(e=>shortScenes[e.value]||observation(e)),'short'));
+  }else{
+   // Normal connects posture and expression; long states the resident's
+   // position and observed expression explicitly, using the same evidence.
+   const posture=[scene,condition].filter(Boolean);
+   if(mode==='normal'&&posture.length)clauses.push(structure(['訪問時、','訪問した際は、'])+joinClauses(posture.map(observation),'normal'));
+   if(mode==='long'){
+    if(scene)clauses.push(sentence(structure(['訪問時、本人は','訪問した際、本人は'])+observation(scene)));
+    if(condition)clauses.push(sentence(variant.phrase(longObservations[condition.value]||observations[condition.value]||observation(condition))));
+   }
+   if(health)clauses.push(sentence((scene||condition?'':'訪問時、')+(mode==='long'?'体調については、'+observation(health).replace(/^体調は/,''):observation(health))));
+  }
+  for(const e of plan.visit.filter(e=>!['scene','condition','health'].includes(e.kind))){
+   if(e.kind==='statement')clauses.push(sentence('本人から「'+e.value+'」との発言・訴えがありました'));
+   else if(e.kind==='difference')clauses.push(sentence('普段との違いとして、'+(observations[e.value]||e.value)));
+   else clauses.push(sentence(e.value));
+  }
+  if(!seen.length&&clauses.length)clauses[0]='訪問時、'+clauses[0];
+  return clauses.join('');
+ }
+ // These longer clauses unpack the selected action, not the service category.
+ // No safety check, prompting, response, or outcome is added by an intervention.
+ const explicitHelp={
+  '起き上がりを介助しました':'本人が起き上がる動作を職員が介助しました',
+  '起き上がりの介助を行いました':'本人が起き上がる動作を職員が介助しました',
+  'トイレへの移動を介助しました':'トイレへ移動する際の介助を職員が行いました',
+  '衣類を着る動作を介助しました':'衣類を着る動作は、職員が介助しました',
+  '衣類を脱ぐ動作を介助しました':'衣類を脱ぐ動作は、職員が介助しました',
+  '食物を口元へ運ぶ介助を行いました':'食物を口元へ運ぶ際は、職員が介助を行いました',
+  '浴槽の出入りを介助しました':'浴槽に出入りする動作を職員が介助しました',
+  '車椅子での移動を介助しました':'車椅子で移動する際の介助を職員が行いました',
+  'ベッドへの移乗を介助しました':'ベッドへ移乗する動作を職員が介助しました',
+  '端座位になる動作を介助しました':'端座位になる動作は、職員が介助しました',
+  '受診の手続きを支援しました':'受診に必要な手続きは、職員が支援しました'
+ };
  function compose(f,_profile,expressionSeed=0){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
   const plan=evidencePlan(f),mode=f.lengthMode||'normal',variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
   const observation=e=>observations[e.value]?variant.phrase(observations[e.value]):e.value.replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
   const render=xs=>joinClauses(xs,mode==='short'?'short':mode==='normal'&&xs.length>1?variant.pick(['normal','long']):'long');
-  const posture=plan.visit.filter(e=>['scene','condition'].includes(e.kind)),other=plan.visit.filter(e=>!['scene','condition'].includes(e.kind));
-  let visit='';
-  if(mode==='long'){
-   visit=plan.visit.map(e=>{
-    if(e.kind==='scene')return sentence(structure(['訪問した際、本人は','訪問時、本人は'])+observation(e));
-    if(e.kind==='condition')return sentence(longObservations[e.value]?variant.phrase(longObservations[e.value]):observation(e));
-    if(e.kind==='health'){
-     const value=observation(e);return sentence('体調については、'+value.replace(/^体調は/,''));
-    }
-    if(e.kind==='statement')return sentence('本人から「'+e.value+'」との発言・訴えがありました');
-    if(e.kind==='difference')return sentence('普段との違いとして、'+(observations[e.value]||e.value));
-    return sentence(e.value); // Exact free observations are never rewritten.
-   }).join('');
-   if(!posture.length&&visit&&!visit.startsWith('訪問'))visit='訪問時、'+visit;
-  }else{
-   if(posture.length)visit=variant.pick(['訪問時、','訪問時は、'])+render(posture.map(e=>mode==='short'?(shortScenes[e.value]||observation(e)):observation(e)));
-   for(const e of other){
-    if(e.kind==='health')visit+=(visit?'':'訪問時、')+sentence(observation(e));
-    else if(e.kind==='statement')visit+=sentence('本人から「'+e.value+'」との発言・訴えがありました');
-    else if(e.kind==='difference')visit+=sentence('普段との違いとして、'+(observations[e.value]||e.value));
-    else visit+=sentence(e.value);
-   }
-  }
+  const visit=composeVisit(plan,mode,variant,structure,observation);
   const target=plan.intervention?plan.services.findIndex(a=>fitsIntervention(a,plan.intervention)):-1;
   const sections=[];
   const scopeOnlyRecord=plan.services.length===1&&plan.services[0].scopeOnly&&!plan.services[0].methods.length;
@@ -735,10 +768,18 @@
    const reactions=responses.map(v=>reactionSentences[v]?variant.phrase(reactionSentences[v]):v);
    const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
    const prefix=index===target?interventionPrefix[plan.intervention]:'';
-   let work=lead+render(positive.map(variant.phrase));
+   let work=lead+render(positive.map(variant.phrase).map(v=>mode==='long'?(explicitHelp[v]||v):v));
    if(prefix&&plan.intervention==='watch'&&a.actions.length===1&&/の見守りを行った$/.test(a.actions[0])){
     work=sentence(a.actions[0].replace(/を行った$/,'')+'を中心に、職員が対応しました');
    }else if(prefix)work=prefix+work;
+   // Reorder the same explicitly selected waking assistance and intervention.
+   // This does not turn a service-only selection into a rising/transfer action.
+   if(mode==='long'&&prefix&&!lead&&a.actions.length===1&&a.actions[0]==='起き上がりを介助した'){
+    const range=prefix.replace(/^今回は/,'').replace(/、$/,'');
+    work=structure([work,
+     sentence('本人が起き上がる動作を、'+range+'職員が介助しました'),
+     sentence(range+'、職員は本人が起き上がる動作を介助しました')]);
+   }
    const uncertain=a.service==='服薬介助・確認'&&a.unconfirmed?'服用済みかは確認していません。':'';
    const after=sentence(afterSentence(a.after)),note=sentence(a.note);
    let body;
@@ -760,16 +801,16 @@
     if(help&&!/職員[はが]/.test(help))help=prefix&&help.startsWith(prefix)?prefix+(lead?'職員が':'職員は')+help.slice(prefix.length):(lead?'職員が':'職員は')+help;
     const how=a.methods.map(v=>sentence(v==='ゆっくり話した'?structure([longMethods[v],'本人にはゆっくり話しました','本人に対しては、ゆっくり話しました']):(longMethods[v]||polite(v)))).join('');
     const self=sentence(own.replace(/は本人が行われました$/,'は本人が自分で行われました')),reaction=joinClauses(reactions,'long');
-    const middle=structure([self+help+how+reaction,how+self+help+reaction]);
+    const middle=structure([self+help+how+reaction,how+self+help+reaction,self+how+help+reaction]);
     body=middle+uncertain+after+note;
    }
-   if(mode!=='short'&&!a.scopeOnly&&!body.startsWith('今回の'))body=serviceContexts[a.service]+body.replace(/^今回は/,'');
+   if(mode!=='short'&&!a.scopeOnly&&!body.startsWith('今回の'))body=(mode==='long'?structure([serviceContexts[a.service],serviceStatements[a.service].replace(/を行いました$/,'')+'については、']):serviceContexts[a.service])+body.replace(/^今回は/,'');
    sections.push(body);
   });
   if(plan.supportNote)sections.push(sentence(plan.supportNote));
   if(plan.response&&!plan.services.some(a=>a.reactions.some(r=>r.replace(/^声かけに/,'')===plan.response.replace(/^声かけに/,''))))sections.push(sentence('支援中、'+(reactionSentences[plan.response]||plan.response)));
   if(plan.after&&!(plan.services.length===1&&plan.services[0].after===plan.after))sections.push(sentence(afterSentence(plan.after)));
-  const care=INTRO+sections.join(mode==='short'?'':'\n');
+  const care=INTRO+sections.join('');
   const inputCount=[f.interventionLevel,f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+plan.services.reduce((n,a)=>n+(a.confirmedService===true&&!a.actions.length?1:0)+a.actions.length+a.reactions.length+a.methods.length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount,needsDetail:plan.services.filter(needsDetail).map(a=>a.service)};
  }

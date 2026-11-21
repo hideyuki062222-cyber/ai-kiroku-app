@@ -6,7 +6,7 @@ const manifest=JSON.parse(fs.readFileSync(path.join(assets,'manifest.json'))).so
 const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,[ORG,ADMIN,STAFF,EDITOR,CLIENT,CLIENT2,ASSIGN,SLOT,OLD]=[1,11,12,13,21,22,31,41,51].map(id);
 const date=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const server=http.createServer((req,res)=>{let file=path.join(root,new URL(req.url,'http://local').pathname.replace(/^\/ai-kiroku-app\//,''));try{if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');res.setHeader('content-type',file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.css')?'text/css':'text/javascript');res.end(fs.readFileSync(file));}catch{res.writeHead(404).end();}});
-async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpected=[],contexts=[],variantCalls=[];let chain=Promise.resolve();
+async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpected=[],contexts=[],variantCalls=[],legacyCounters=new Map();let chain=Promise.resolve();
  const atomic=fn=>{const p=chain.then(fn);chain=p.catch(()=>{});return p;};
  try{
  await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/facility_editor_schema.sql'),'utf8'));
@@ -29,7 +29,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
   await ctx.route('**/*',async route=>{
    const req=route.request(),u=new URL(req.url()),method=req.method();
    if(u.hostname==='127.0.0.1'){
-    if(!baseline)return route.continue();let file=path.join(baselineRoot,u.pathname.replace(/^\/ai-kiroku-app\//,''));if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');return route.fulfill({contentType:file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.css')?'text/css':'text/javascript',body:fs.readFileSync(file)});
+    if(!baseline)return route.continue();let file=path.join(typeof baseline==='string'?path.join(assets,'record-ui-'+baseline):baselineRoot,u.pathname.replace(/^\/ai-kiroku-app\//,''));if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');return route.fulfill({contentType:file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.css')?'text/css':'text/javascript',body:fs.readFileSync(file)});
    }
    if(['raw.githubusercontent.com','cdn.jsdelivr.net'].includes(u.hostname)&&!u.pathname.includes('@supabase/')){const m=manifest.find(m=>u.pathname.endsWith('/'+m.path));if(m)return route.fulfill({contentType:'text/html',body:fs.readFileSync(m.pinned)});}
    if(u.hostname==='cdn.jsdelivr.net'&&u.pathname.includes('@supabase/supabase-js@'))return route.fulfill({contentType:'text/javascript',body:fs.readFileSync(path.join(assets,u.pathname.includes('@2.57.4/')?'supabase-2.57.4.js':'supabase-v2.js'))});
@@ -40,7 +40,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
    const result=await atomic(async()=>{
     await pg.exec('reset role;set role authenticated');await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[uid]);
     try{
-     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});return {data:0};}if(!['save_record_profile','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
+     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});const key=String(p.p_signature),n=legacyCounters.get(key)||0;legacyCounters.set(key,n+1);return {data:n};}if(!['save_record_profile','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
       const names=Object.keys(p);const {rows}=await pg.query('select public.'+fn+'('+names.map((k,i)=>k+'=> $'+(i+1)).join(',')+') result',Object.values(p).map(v=>v&&typeof v==='object'?JSON.stringify(v):v));return {data:rows[0].result};}
      const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','organization_feature_permissions','organization_permission_sets','care_record_amendments','clients','client_record_profiles','staff_assignments','client_service_slots','care_records'].includes(table))throw Error('Unexpected table '+table);
      const params=[],where=[];for(const [k,v]of u.searchParams){if(['select','order','limit','offset'].includes(k))continue;if(!/^\w+$/.test(k))throw Error('bad column');const dot=v.indexOf('.'),op=v.slice(0,dot),value=v.slice(dot+1);
@@ -61,6 +61,8 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  const shots=async(page,locator,name)=>{assert((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,name+' page overflow');await page.locator(locator).screenshot({path:path.join(out,width+'-'+name+'.png')});};
  let before=null;
  if(baselineRoot&&process.env.RECORD_COMPARE_LEGACY){const old=await pageFor(STAFF,true);await old.locator('#visitScene').selectOption('椅子・座椅子に座っていた');await old.locator('#condition').selectOption('笑顔が見られた');await old.locator('#interventionLevel').selectOption('watch');await old.locator('#input').fill('本人は食具を操作した。支援中はうなずいて応じた。');await old.getByRole('button',{name:'AIで記録作成',exact:true}).click();await old.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('未保存'));before={visit:await old.locator('#visitResult').innerText(),care:await old.locator('#careResult').innerText()};await shots(old,'#careResult','before-record');await old.close();}
+ await require('./record_nov12_browser_part.cjs')({pageFor,STAFF,width,out});
+ if(process.env.RECORD_NOV12_COMPARE_ONLY){assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);return;}
  await require('./record_narrative_browser_part.cjs')({pageFor,STAFF,width,out});
  const staff=await pageFor(STAFF);assert(await staff.locator('#interventionLevel').isVisible());await staff.locator('#interventionLevel').selectOption('partial');await staff.locator('#length').evaluate(e=>e.closest('details').open=true);await staff.locator('#length').selectOption('long');assert.equal(await staff.locator('#input').inputValue(),'','assignment memo stays background');assert.equal(await staff.locator('#factDate').inputValue(),date);assert(await staff.locator('#factDate').getAttribute('readonly')!==null);
  await staff.getByRole('button',{name:'AIで記録作成',exact:true}).click();await staff.locator('#factErrors').getByText('① 訪問時に確認した状態', {exact:false}).waitFor();assert(await staff.locator('#recordCommitButton').isDisabled());
