@@ -1,0 +1,16 @@
+{
+  "basePR34": "590a7f9b898bd5ea84edbef8ade7288b1202faec",
+  "fictionalOnly": true,
+  "productionTouched": false,
+  "browserWidths": [
+    1440,
+    390
+  ],
+  "coreAndUIHashes": {
+    "record-facts-core.js": "5e7307be46085d7469cf54eccd9253a5ed2f05726bfbbaae5396ceb1ad19a885",
+    "record-facts-ui.js": "0eb8799433db1e7720d0c1530d58bf408eb50c2f1c4bcb31473fa0a4c30c65bc",
+    "index.html": "4d55501823a521f46377354f0548972136261a6881bcef053f7eac9ef76da0d6"
+  },
+  "realPipeline": "pinned HTML -> collect -> compose/rephrase -> scoped similarity -> real SDK -> isolated Postgres/RLS -> history after reload",
+  "hardwareTested": false
+}

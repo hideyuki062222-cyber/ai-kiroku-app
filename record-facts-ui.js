@@ -109,8 +109,8 @@
   for(const id of ['visitScene','condition','health'])q(id).parentElement.querySelector('.notice')?.remove();
 
   const supplement=document.createElement('details');supplement.className='fact-optional';supplement.id='factSupplement';supplement.innerHTML='<summary>全体の補足・反応・支援後（必要なとき）</summary><p>選択肢にない支援や反応、未実施の理由などを入力できます。</p>';
-  const inputLabel=input.previousElementSibling;inputLabel.textContent='介護者が実施したこと・補足（任意）';inputLabel.before(supplement);inputLabel.classList.add('fact-free-label');input.classList.add('fact-free-note');
-  input.placeholder='必要なときだけ、実際に行った介助・本人の反応などを補足';input.rows=2;input.maxLength=5000;
+  const inputLabel=input.previousElementSibling;inputLabel.textContent='介護者が実施したこと・短いメモ（任意）';inputLabel.before(supplement);inputLabel.classList.add('fact-free-label');input.classList.add('fact-free-note');
+  input.placeholder='例：起き上がり介助／本人から返事／支援後は椅子で過ごす';input.rows=2;input.maxLength=5000;
   const reactions=document.createElement('div');reactions.innerHTML='<label>支援全体で確認した本人の反応<select id="factResponse"><option value="">未入力</option><option>うなずいて応じた</option><option>自分の希望を伝えた</option><option>介助を断る意思を示した</option><option>表情が和らいだ</option></select></label><label>支援全体の終了後に確認した状態<select id="factAfter"><option value="">未入力</option>'+C.afterChoices.map(v=>'<option>'+v+'</option>').join('')+'</select></label>';supplement.append(reactions);q('factSupportDetails').append(supplement);
   const errors=document.createElement('div');errors.id='factErrors';errors.setAttribute('role','alert');errors.tabIndex=-1;workflow.after(errors);
   const actions=card.querySelector('.actions');actions.id='factGenerateActions';actions.setAttribute('aria-label','記録文の生成');
@@ -142,7 +142,7 @@
    if(result.errors.length)return;
    q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;
    for(const id of ['visitResult','careResult'])q(id+'Count').textContent=q(id).textContent.length+'文字';
-   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:3};
+   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:3,...(record.dailyFacts.supportNote?{memoComposerRevision:1}:{})};
    q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
    window.__nexiaPreviousExpression={actor:scope.actorId,org:scope.organizationId,client:scope.clientId,row:{organization_id:scope.organizationId,client_id:scope.clientId,visit_note:result.visit,care_note:result.care}};
   },signature:()=>JSON.stringify({org:localStorage.getItem('activeOrganizationId'),facts:collect()})};
@@ -171,7 +171,7 @@
   const c=await context(),client=check(await c.db.from('clients').select('id').eq('organization_id',c.org).eq('code',code).eq('is_active',true));if(client.length!==1)throw Error('利用者IDを確認できません。');
   if(window.assignmentContext?.organizationId&&(window.assignmentContext.organizationId!==c.org||window.assignmentContext.clientId!==client[0].id))throw Error('担当と選択施設が一致しません。');
   if(code!==q('user').value||service!==q('service').value||JSON.stringify(f)!==JSON.stringify(collect()))throw Error('作成中に入力が変更されました。もう一度作成してください。');
-  q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;q('visitResultCount').textContent=result.visit.length+'文字';q('careResultCount').textContent=result.care.length+'文字';q('factCompositionStatus').textContent='確認した入力'+result.inputCount+'項目から作成しました。文章を確認・編集してから正式保存してください。';
+  q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;q('visitResultCount').textContent=result.visit.length+'文字';q('careResultCount').textContent=result.care.length+'文字';q('factCompositionStatus').textContent=(result.memoConflict?'服薬確認と未確認・拒否が重なっています。経過を確認できるようメモの原文を残しています。':result.memoReview?.length?'意味を確定できないメモは原文のまま残しています。':'確認した事実から文章を整えました。')+'文章を確認してから正式保存してください。';
   showQuickDetail(f,result.needsDetail||[]);q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
   const actions=f.actions.filter(C.performed);
   await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:f.interventionLevel,supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor}});
