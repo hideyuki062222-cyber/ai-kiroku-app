@@ -1,10 +1,53 @@
-#factInputCard .fact-required{font-size:13px;color:#9b351b;margin-left:8px}#factInputCard h3{font-size:18px;margin:18px 0 8px}.fact-date{display:grid;gap:8px;max-width:320px;margin:12px 0}.fact-date input{min-height:46px;font-size:16px}.fact-service{border:1px solid #c7dcd6;border-radius:12px;padding:12px;margin:10px 0;background:#f6fbf8}.fact-service summary{font-weight:800;min-height:44px;cursor:pointer}.fact-service summary span{display:block;font-size:13px;font-weight:400;color:#52685f}.fact-choices{display:flex;gap:8px;flex-wrap:wrap}.fact-choices label{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border:1px solid #d9e5df;border-radius:9px;min-height:48px;font-size:16px;line-height:1.5}.fact-choices input{width:22px!important;height:22px!important;min-height:22px;flex-shrink:0}.fact-service input[data-action-note],.fact-service select{width:100%;font-size:16px;min-height:46px}.fact-background pre{white-space:pre-wrap;overflow-wrap:anywhere;font:15px/1.7 system-ui;padding:12px;background:#f4f7f5}.fact-observation,#structuredProfile details{margin:12px 0;padding:12px;border:1px solid #d7e1dc;border-radius:10px}#structuredProfile summary{min-height:44px;cursor:pointer;font-weight:700}#factErrors{white-space:pre-line;color:#9e2929;font-weight:700}#factProfileStatus{white-space:pre-line}#factProfileSave{min-height:48px}#legacyProfileFields{padding:12px;border-top:1px solid #ddd}#legacyProfileFields button[hidden]{display:none!important}.result[contenteditable=true]{outline-offset:4px;min-height:100px;white-space:pre-wrap}.result[contenteditable=true]:focus{outline:2px solid #42796c}
-@media(max-width:650px){.fact-choices{display:grid;grid-template-columns:minmax(0,1fr)}.fact-date{max-width:100%}.fact-service{padding:10px}.fact-service label{display:block;margin:8px 0}.fact-service .fact-choices label{display:flex}.fact-date input,#factInputCard input,#structuredProfile input{min-width:0}#factInputCard select{min-height:46px;font-size:16px}}
-/* Everyday input stays visible; optional details never shrink the text. */
-#factInputCard [hidden]{display:none!important}#factWorkflow h2{font-size:19px;margin:20px 0 10px}.fact-hint{font-size:14px;line-height:1.6;color:#52685f;margin:6px 0 12px}.fact-service-picker,.fact-presets,.fact-visit-choices{display:flex;flex-wrap:wrap;gap:8px}.fact-service-picker button,.fact-presets button,.fact-visit-choices button{min-height:46px;padding:10px 12px;font-size:16px;border:1px solid #b8ccc5;border-radius:10px;background:#fff;color:#193e37;text-align:left;cursor:pointer}.fact-service-picker button[aria-pressed=true],.fact-presets button[aria-pressed=true],.fact-visit-choices button[aria-pressed=true]{background:#246b63;color:#fff;border-color:#246b63}.fact-presets button{font-weight:700}.fact-service-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}#factInputCard .fact-service-heading h3{margin:0;font-size:18px}.fact-confirmed{font-size:13px;padding:4px 7px;background:#e5efeb;border-radius:6px}.fact-reactions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.fact-patient{margin:14px 0}.fact-patient p{margin:4px 0}.fact-patient small{font-size:13px;color:#52685f}.fact-chip{display:flex!important;align-items:center;gap:8px;background:white;border:1px solid #c6d8d0;border-radius:9px;padding:9px!important;min-height:48px;font-size:15px;line-height:1.5;margin:0!important;font-weight:500!important}.fact-chip input{width:22px!important;height:22px!important;min-height:22px;flex-shrink:0}.fact-chip:has(input:checked){background:#e1f0e9;border-color:#43826c}.fact-chip small{display:block;font-size:12px;color:#52685f}.fact-optional,#otherServices,.fact-methods{margin:12px 0;border:1px solid #d7e1dc;border-radius:10px;padding:10px}.fact-optional>summary,#otherServices>summary,.fact-methods>summary,[data-service-details]>summary{min-height:44px;padding:8px 0;cursor:pointer;font-size:15px;font-weight:700}.fact-service textarea,#factSupplement textarea{width:100%;min-height:90px;font-size:16px}.fact-empty{color:#53695e;font-size:14px;line-height:1.7}.fact-background{margin:10px 0}.fact-background summary{padding:9px 0;min-height:44px;font-size:14px;cursor:pointer}#factGenerateActions{position:sticky;bottom:0;background:#fff;padding:12px 0;z-index:5;border-top:1px solid #d7e1dc;display:flex;gap:10px}#factGenerateActions button{min-height:50px;font-size:17px}#factGenerateActions .primary{flex:1;background:#246b63}#factCompositionStatus{font-size:14px;color:#365d50;line-height:1.6}#factLegacyObservations .notice{font-size:14px}#factInputCard .result{white-space:pre-wrap}#factWorkflow button:focus-visible,.fact-chip:focus-within{outline:3px solid #d6a32a;outline-offset:2px}
-@media(min-width:900px){#factActions{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:start}.fact-service{margin:12px 0}.fact-visit-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:650px){#factInputCard{padding:16px}.fact-service-picker,.fact-presets,.fact-visit-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.fact-service-picker button,.fact-presets button,.fact-visit-choices button{font-size:15px;padding:10px}.fact-service .fact-chip{display:flex}.fact-reactions{gap:6px}.fact-chip{font-size:15px}.fact-date{margin:8px 0}.fact-service-heading{align-items:start}#factGenerateActions{bottom:0;padding-bottom:max(12px,env(safe-area-inset-bottom))}#factInputCard input,#factInputCard select,#factInputCard textarea{min-width:0}#factServicePicker>details{padding:6px 10px}.fact-service .fact-choices{grid-template-columns:1fr}}
+/* Keep the November 12 service checkbox layout; details are optional. */
+#factInputCard [hidden]{display:none!important}
+#factInputCard .fact-date{display:grid;gap:8px;max-width:320px;margin:10px 0}
+#factInputCard input,#factInputCard select,#factInputCard textarea{min-width:0;font-size:16px}
+#factInputCard select,#factInputCard input[type=date]{min-height:46px}
+#factDateCaption{margin:0 0 8px;font-size:14px;color:#365d50}
+.fact-hint{font-size:14px;line-height:1.6;color:#52685f;margin:8px 0 12px}
+#factServiceChecks .checks label{display:flex;align-items:center;gap:8px;min-height:48px;box-sizing:border-box;font-size:16px;line-height:1.5}
+#factServiceChecks input[type=checkbox],.fact-choices input,.fact-chip input{width:22px!important;height:22px!important;min-height:22px;flex:0 0 22px;margin:0}
+#factServiceChecks .checks label:has(input:checked),.fact-chip:has(input:checked){background:#e1f0e9;border-color:#43826c}
+#factServiceChecks small{font-size:12px;white-space:nowrap;color:#52685f}
+#factServiceChecks label:has(input:indeterminate){border-style:dashed}
+.fact-optional,.fact-methods{margin:10px 0;padding:10px 12px;border:1px solid #d7e1dc;border-radius:10px}
+.fact-optional>summary,.fact-methods>summary,[data-service-details]>summary{min-height:44px;box-sizing:border-box;padding:10px 0;cursor:pointer;font-size:16px;font-weight:700}
+.fact-service{border:1px solid #c7dcd6;border-radius:12px;padding:12px;margin:12px 0;background:#f6fbf8}
+.fact-service-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#factInputCard .fact-service-heading h3{font-size:18px;margin:0}
+.fact-confirmed{font-size:13px;padding:4px 7px;background:#e5efeb;border-radius:6px}
+.fact-presets,.fact-choices{display:flex;gap:8px;flex-wrap:wrap}
+.fact-presets button{min-height:46px;padding:10px 12px;font-size:16px;border:1px solid #b8ccc5;border-radius:10px;background:#fff;color:#193e37;text-align:left;cursor:pointer;font-weight:700}
+.fact-presets button[aria-pressed=true]{background:#246b63;color:#fff;border-color:#246b63}
+.fact-choices label,.fact-chip{display:flex!important;align-items:center;gap:8px;padding:10px 12px!important;background:#fff;border:1px solid #d9e5df;border-radius:9px;min-height:48px;box-sizing:border-box;font-size:16px;line-height:1.5;margin:0!important;font-weight:500!important}
+.fact-reactions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fact-patient{margin:14px 0}.fact-patient p{margin:4px 0}.fact-patient small,.fact-chip small{font-size:13px;color:#52685f}
+.fact-service select,.fact-service textarea,#factSupplement textarea,#factObservationDetails textarea{width:100%;box-sizing:border-box;font-size:16px;min-height:46px}
+.fact-service textarea,#factSupplement textarea,#factObservationDetails textarea{min-height:90px}
+.fact-empty{font-size:14px;line-height:1.7;color:#53695e}
+.fact-background{margin:8px 0}.fact-background summary{min-height:44px;padding:10px 0;box-sizing:border-box;font-size:16px;cursor:pointer}
+.fact-background pre{white-space:pre-wrap;overflow-wrap:anywhere;font:15px/1.7 system-ui;padding:12px;background:#f4f7f5}
+#factErrors{white-space:pre-line;color:#9e2929;font-weight:700}
+#factCompositionStatus{font-size:14px;line-height:1.6;color:#365d50}
+#factGenerateActions{position:static;background:#fff;padding:12px 0;z-index:5;border-top:1px solid #d7e1dc;display:flex;gap:10px}
+#factGenerateActions button{min-height:50px;font-size:17px}
+#factGenerateActions .primary{flex:1;background:#246b63}
+#factProfileStatus{white-space:pre-line}#factProfileSave{min-height:48px}
+#structuredProfile details{margin:12px 0;padding:12px;border:1px solid #d7e1dc;border-radius:10px}
+#structuredProfile summary{min-height:44px;cursor:pointer;font-weight:700}
+#legacyProfileFields{padding:12px;border-top:1px solid #ddd}#legacyProfileFields button[hidden]{display:none!important}
+.result[contenteditable=true]{outline-offset:4px;min-height:100px;white-space:pre-wrap}.result[contenteditable=true]:focus{outline:2px solid #42796c}
+#recordSimilarityNotice{padding:12px;border-left:4px solid #b3802e;background:#fff8e6;margin:12px 0;overflow-wrap:anywhere}
+#recordSimilarityNotice p{white-space:pre-wrap;line-height:1.7;margin:6px 0}
+#recordSimilarityNotice summary{min-height:44px;padding:8px 0;box-sizing:border-box;cursor:pointer;font-size:16px;font-weight:700}
+#recordSimilarityNotice h3{font-size:16px;margin:12px 0 4px}
+#factInputCard input:focus-visible,#factInputCard select:focus-visible,#factWorkflow button:focus-visible,.fact-chip:focus-within{outline:3px solid #d6a32a;outline-offset:2px}
+@media(min-width:900px){#factActions{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:12px;align-items:start}}
+@media(max-width:650px){
+ #factInputCard{padding:18px}#factServiceChecks .checks{gap:6px}#factServiceChecks .checks label{padding:8px;flex-wrap:wrap}
+ #factServiceChecks small{margin-left:30px}.fact-date{max-width:100%}
+ .fact-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .fact-choices{display:grid;grid-template-columns:minmax(0,1fr)}.fact-reactions{gap:6px}
+ #factGenerateActions{padding-bottom:max(12px,env(safe-area-inset-bottom))}
+}
 @media print{#factGenerateActions{position:static}}
-#factServiceSelect{margin:10px 0}#factServiceSelect>summary{min-height:44px;padding:10px 0;font-size:15px;font-weight:700;cursor:pointer}#factServiceSelect[open]>summary{padding-bottom:14px}#factServiceSelect:not([open]){border-bottom:1px solid #d7e1dc}#factDateCaption{margin:0 0 8px}#factInputCard:has(#factDateCaption)>.fact-background{margin:4px 0 10px}
-
-#factWorkflow .fact-chip,#factWorkflow .fact-service-picker button,#factWorkflow .fact-presets button,#factWorkflow .fact-visit-choices button{font-size:16px}

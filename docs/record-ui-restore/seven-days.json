@@ -1,0 +1,1580 @@
+{
+  "passed": true,
+  "checks": 390,
+  "results": [
+    {
+      "id": "服薬介助・確認-1",
+      "service": "服薬介助・確認",
+      "day": 1,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-09",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の声かけを行った",
+              "服薬したことを確認した"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けて声をかけると、本人はうなずいて応じられました。本人が薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けて声をかけると、本人はうなずいて応じられました。本人が薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "服薬介助・確認-2",
+      "service": "服薬介助・確認",
+      "day": 2,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-10",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の声かけを行った",
+              "服薬したことを確認した"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けて声をかけると、本人はうなずいて応じられました。本人が薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けて声をかけると、本人はうなずいて応じられました。本人が薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "服薬介助・確認-3",
+      "service": "服薬介助・確認",
+      "day": 3,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-11",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の準備を介助した",
+              "服薬したことを確認した"
+            ],
+            "reactions": [
+              "本人が自分で服薬した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の準備を介助し、本人が自分で薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の準備を介助し、本人が自分で薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "服薬介助・確認-4",
+      "service": "服薬介助・確認",
+      "day": 4,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-12",
+        "condition": "不安そうな様子が見られた",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の声かけを行った"
+            ],
+            "reactions": [
+              "服薬を拒否した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": "",
+            "unconfirmed": true
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けて声をかけ、服用済みかは確認していません。本人は服薬を拒否されました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けて声をかけました。本人は服薬を拒否されました。服用済みかは確認していません。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "服薬介助・確認-5",
+      "service": "服薬介助・確認",
+      "day": 5,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-13",
+        "condition": "疲れた様子が見られた",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の声かけを行った",
+              "服薬したことを確認した"
+            ],
+            "reactions": [
+              "服薬に時間を要した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の声かけを行い、本人が薬を服用されたことを確認しました。服薬に時間を要していました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の声かけを行い、本人が薬を服用されたことを確認しました。服薬に時間を要していました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "服薬介助・確認-6",
+      "service": "服薬介助・確認",
+      "day": 6,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-14",
+        "condition": "会話は少なめだった",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の準備を介助した",
+              "服薬したことを確認した"
+            ],
+            "reactions": [],
+            "methods": [],
+            "self": "",
+            "after": "服薬後に体調の訴えがあった",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の準備を介助し、本人が薬を服用されたことを確認しました。服薬後、本人から体調についての訴えがありました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の準備を介助し、本人が薬を服用されたことを確認しました。服薬後、本人から体調についての訴えがありました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 11,
+        "afterGenerate": 11,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "服薬介助・確認-7",
+      "service": "服薬介助・確認",
+      "day": 7,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-15",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "服薬介助・確認",
+            "confirmedService": true,
+            "actions": [
+              "服薬の準備を介助した",
+              "服薬したことを確認した"
+            ],
+            "reactions": [
+              "本人が自分で服薬した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の準備を介助し、本人が自分で薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の準備を介助し、本人が自分で薬を服用されたことを確認しました。",
+        "inputCount": 4
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-1",
+      "service": "トイレ介助",
+      "day": 1,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-09",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "トイレへの移動を介助した"
+            ],
+            "reactions": [
+              "排泄の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。トイレへの移動を介助しました。本人から排泄の希望が伝えられました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。トイレへの移動を介助しました。本人から排泄の希望が伝えられました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-2",
+      "service": "トイレ介助",
+      "day": 2,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-10",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "トイレへの移動を介助した"
+            ],
+            "reactions": [
+              "排泄の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。トイレへの移動を介助しました。本人から排泄の希望が伝えられました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。トイレへの移動を介助しました。本人から排泄の希望が伝えられました。",
+        "inputCount": 3
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-3",
+      "service": "トイレ介助",
+      "day": 3,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-11",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "排泄中の見守りを行った"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "衣類を下げた",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。衣類を下げる動作は本人が行われました。職員は排泄中の見守りを行いましました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。衣類を下げる動作は本人が行われました。職員は排泄中の見守りを行いましました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-4",
+      "service": "トイレ介助",
+      "day": 4,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-12",
+        "condition": "不安そうな様子が見られた",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "排泄時の衣類の上げ下げを介助した"
+            ],
+            "reactions": [
+              "排泄時に痛みを訴えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄時の衣類の上げ下げを介助しました。排泄時に本人から痛みの訴えがありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄時の衣類の上げ下げを介助しました。排泄時に本人から痛みの訴えがありました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-5",
+      "service": "トイレ介助",
+      "day": 5,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-13",
+        "condition": "疲れた様子が見られた",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "便座への移乗を介助した"
+            ],
+            "reactions": [
+              "排泄に時間を要した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。便座への移乗を介助しました。排泄に時間を要しました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。便座への移乗を介助しました。排泄に時間を要しました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 10,
+        "afterGenerate": 10,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-6",
+      "service": "トイレ介助",
+      "day": 6,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-14",
+        "condition": "会話は少なめだった",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "排泄後の清拭を介助した"
+            ],
+            "reactions": [
+              "排泄の希望を伝えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄後の清拭を介助しました。本人から排泄の希望が伝えられました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄後の清拭を介助しました。本人から排泄の希望が伝えられました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 10,
+        "afterGenerate": 10,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "トイレ介助-7",
+      "service": "トイレ介助",
+      "day": 7,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-15",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "トイレ介助",
+            "confirmedService": true,
+            "actions": [
+              "排泄中の見守りを行った"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "衣類を下げた",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。衣類を下げる動作は本人が行われました。職員は排泄中の見守りを行いましました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。衣類を下げる動作は本人が行われました。職員は排泄中の見守りを行いましました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-1",
+      "service": "入浴介助",
+      "day": 1,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-09",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "洗身を介助した"
+            ],
+            "reactions": [
+              "入浴を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。洗身を介助しました。本人から入浴の希望がありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。洗身を介助しました。本人から入浴の希望がありました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-2",
+      "service": "入浴介助",
+      "day": 2,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-10",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "洗身を介助した"
+            ],
+            "reactions": [
+              "入浴を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。洗身を介助しました。本人から入浴の希望がありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。洗身を介助しました。本人から入浴の希望がありました。",
+        "inputCount": 3
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-3",
+      "service": "入浴介助",
+      "day": 3,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-11",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "背部の洗身を介助した"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "上半身を洗った",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。職員は背部の洗身を介助しました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。職員は背部の洗身を介助しました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-4",
+      "service": "入浴介助",
+      "day": 4,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-12",
+        "condition": "不安そうな様子が見られた",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "入浴中の見守りを行った"
+            ],
+            "reactions": [
+              "入浴を希望した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴中の見守りを行いましました。本人から入浴の希望がありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴中の見守りを行いましました。本人から入浴の希望がありました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-5",
+      "service": "入浴介助",
+      "day": 5,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-13",
+        "condition": "疲れた様子が見られた",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "浴槽の出入りを介助した"
+            ],
+            "reactions": [
+              "入浴中に疲れを訴えた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。浴槽の出入りを介助しました。入浴中に本人から疲れの訴えがありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。浴槽の出入りを介助しました。入浴中に本人から疲れの訴えがありました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 10,
+        "afterGenerate": 10,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-6",
+      "service": "入浴介助",
+      "day": 6,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-14",
+        "condition": "会話は少なめだった",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "下肢の洗身を介助した"
+            ],
+            "reactions": [
+              "入浴を希望した"
+            ],
+            "methods": [],
+            "self": "上半身を洗った",
+            "after": "椅子に座って過ごした",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。職員は下肢の洗身を介助しました。本人から入浴の希望がありました。支援後は、椅子に座って過ごされました。",
+        "inputCount": 5
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。職員は下肢の洗身を介助しました。本人から入浴の希望がありました。支援後は、椅子に座って過ごされました。",
+        "inputCount": 5
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 14,
+        "afterGenerate": 14,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "入浴介助-7",
+      "service": "入浴介助",
+      "day": 7,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-15",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "入浴介助",
+            "confirmedService": true,
+            "actions": [
+              "背部の洗身を介助した"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "上半身を洗った",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。職員は背部の洗身を介助しました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。職員は背部の洗身を介助しました。本人は声かけにうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-1",
+      "service": "食事介助",
+      "day": 1,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-09",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食事中の見守りを行った"
+            ],
+            "reactions": [
+              "食事を希望する発言があった"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事中の見守りを行いましました。本人から食事を希望する発言がありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事中の見守りを行いましました。本人から食事を希望する発言がありました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-2",
+      "service": "食事介助",
+      "day": 2,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-10",
+        "condition": "落ち着いて過ごされていた",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食事中の見守りを行った"
+            ],
+            "reactions": [
+              "食事を希望する発言があった"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事中の見守りを行いましました。本人から食事を希望する発言がありました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、落ち着いて過ごされていました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事中の見守りを行いましました。本人から食事を希望する発言がありました。",
+        "inputCount": 3
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 9,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-3",
+      "service": "食事介助",
+      "day": 3,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-11",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食事中の見守りを行った"
+            ],
+            "reactions": [
+              "自分で食具を操作した"
+            ],
+            "methods": [],
+            "self": "食物を口元へ運んだ",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ動作は本人が行われました。職員は食事中の見守りを行いましました。本人が自分で食具を操作されました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ動作は本人が行われました。職員は食事中の見守りを行いましました。本人が自分で食具を操作されました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-4",
+      "service": "食事介助",
+      "day": 4,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-12",
+        "condition": "不安そうな様子が見られた",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食事の際に声をかけた"
+            ],
+            "reactions": [
+              "食事を断る意思を示した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事の際に声をかけましました。本人は食事を断る意思を示されました。",
+        "inputCount": 3
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、不安そうな様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事の際に声をかけましました。本人は食事を断る意思を示されました。",
+        "inputCount": 3
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 10,
+        "afterGenerate": 10,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-5",
+      "service": "食事介助",
+      "day": 5,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-13",
+        "condition": "疲れた様子が見られた",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食事の際に声をかけた",
+              "食事中の見守りを行った"
+            ],
+            "reactions": [
+              "声かけにうなずいて応じた"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事の際に声をかけまし、食事中の見守りを行いましました。\n支援中、本人はうなずいて応じられました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、疲れた様子が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食事の際に声をかけると、本人はうなずいて応じられました。食事中の見守りを行いましました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 11,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-6",
+      "service": "食事介助",
+      "day": 6,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-14",
+        "condition": "会話は少なめだった",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食物を口元へ運ぶ介助を行った"
+            ],
+            "reactions": [
+              "食事に時間を要した"
+            ],
+            "methods": [],
+            "self": "",
+            "after": "ベッドで休んだ",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ介助を行いましました。食事に時間を要しました。支援後は、ベッドで休まれました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、会話は少なめでした。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ介助を行いましました。食事に時間を要しました。支援後は、ベッドで休まれました。",
+        "inputCount": 4
+      },
+      "matchCount": 0,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 12,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    },
+    {
+      "id": "食事介助-7",
+      "service": "食事介助",
+      "day": 7,
+      "person": "架空利用者A（施設A）",
+      "facts": {
+        "version": 1,
+        "composerRevision": 3,
+        "lengthMode": "normal",
+        "scene": "",
+        "health": "",
+        "statement": "",
+        "difference": "",
+        "concern": "",
+        "supportNote": "",
+        "response": "",
+        "after": "",
+        "date": "2026-11-15",
+        "condition": "笑顔が見られた",
+        "actions": [
+          {
+            "service": "食事介助",
+            "confirmedService": true,
+            "actions": [
+              "食事中の見守りを行った"
+            ],
+            "reactions": [
+              "自分で食具を操作した"
+            ],
+            "methods": [],
+            "self": "食物を口元へ運んだ",
+            "after": "",
+            "note": ""
+          }
+        ]
+      },
+      "before": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ動作は本人が行われました。職員は食事中の見守りを行いましました。本人が自分で食具を操作されました。",
+        "inputCount": 4
+      },
+      "after": {
+        "errors": [],
+        "visit": "訪問時、笑顔が見られました。",
+        "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ動作は本人が行われました。職員は食事中の見守りを行いましました。本人が自分で食具を操作されました。",
+        "inputCount": 4
+      },
+      "matchCount": 1,
+      "operations": {
+        "beforeGenerate": 12,
+        "afterGenerate": 9,
+        "save": 1,
+        "additionalSimilarityOperations": 0
+      }
+    }
+  ]
+}

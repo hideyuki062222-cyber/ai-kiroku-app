@@ -9,6 +9,7 @@
   let originalGenerate=null;
   let originalSave=null;
   let originalAddHistory=null;
+  let comparison=null;
 
   function q(id){return document.getElementById(id)}
   function removeSensitiveCache(){try{CACHE_KEYS.forEach(k=>localStorage.removeItem(k))}catch(_e){}}
@@ -75,6 +76,7 @@
   }
   function clearPending(message=''){
     pendingRecord=null;pendingHistoryArgs=null;pendingSignature='';
+    clearComparison();
     const btn=ensureSaveUi();if(btn)btn.disabled=true;
     if(message)setStatus(message,'warn');
   }
@@ -222,8 +224,12 @@
       if(failed)return;
       if(!captured||!currentResultIsValid()){setStatus('記録文を作成できませんでした。入力内容を確認してください。','error');return}
       pendingRecord=captured;pendingHistoryArgs=historyArgs;pendingSignature=formSignature();syncPendingText();
-      const btn=ensureSaveUi();if(btn)btn.disabled=false;
-      setStatus('未保存です。内容を確認して「この内容を正式保存」を押してください。','warn');
+      try{
+        generationBusy=true;setGenerateDisabled(true);await reviewHistory();
+        const btn=ensureSaveUi();if(btn)btn.disabled=false;
+        setStatus('未保存です。内容を確認して正式保存してください。','warn');
+      }catch(e){clearComparison();setStatus('過去記録との比較ができていません。'+e.message+' 内容を保持したまま「AIで記録作成」を押して再確認してください。','error');}
+      finally{generationBusy=false;setGenerateDisabled(false);}
     };
     wrapped.__formalSaveWrapped=true;window.generate=wrapped;
   }
@@ -233,6 +239,42 @@
     const db=getDb();if(!db)return 0;
     const {count,error}=await db.from('care_records').select('id',{count:'exact',head:true}).eq('assignment_id',id);
     if(error)throw error;return count||0;
+  }
+  function clearComparison(){
+    comparison=null;q('recordSimilarityNotice')?.remove();
+    const btn=q('recordCommitButton');if(btn)btn.textContent='この内容を正式保存';
+  }
+  function renderComparison(){
+    q('recordSimilarityNotice')?.remove();
+    if(!comparison||comparison.record!==pendingRecord)return;
+    const checker=window.NexiaRecordSimilarity,scope=pendingRecord.factContext;
+    const visit=q('visitResult')?.textContent||'',care=q('careResult')?.textContent||'';
+    const matches=checker.compare({...scope,visitNote:visit,careNote:care},comparison.rows);
+    comparison.text=JSON.stringify([visit,care]);
+    const notice=document.createElement('section');notice.id='recordSimilarityNotice';notice.setAttribute('aria-live','polite');notice.dataset.matches=String(matches.length);
+    const title=document.createElement('p');title.textContent=matches.length?`過去の記録と文章が一致・類似しています（${matches.length}件）。当日の支援・本人の状態・反応を確認してください。同じ事実であれば、文章を変えずに正式保存できます。`:`閲覧可能な直近${checker.LIMIT}件では、同じ・似た文章は見つかりませんでした。`;
+    notice.append(title);
+    const range=document.createElement('p');range.className='notice';range.textContent=`比較対象：この施設・利用者の閲覧可能な直近${checker.LIMIT}件（今回${comparison.rows.length}件）。必須冒頭文・空白・句読点を除いて比較。意味の正しさを保証する判定ではありません。`;notice.append(range);
+    if(matches.length){
+      const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='比較した過去記録を見る（最大3件）';details.append(summary);
+      for(const r of matches.slice(0,3)){const heading=document.createElement('h3'),text=document.createElement('p');heading.textContent=`${r.service_date||String(r.created_at||'').slice(0,10)||'日付不明'}：${r.kind==='exact'?'文章が一致':'似た文章'}`;text.textContent='① '+(r.visit_note||'')+'\n② '+(r.care_note||'');details.append(heading,text);}
+      notice.append(details);
+    }
+    q('recordSaveStatus').before(notice);
+    q('recordCommitButton').textContent=matches.length?'当日の事実として正式保存':'この内容を正式保存';
+  }
+  async function reviewHistory(){
+    if(!window.__nexiaFactsMode)return;
+    const checker=window.NexiaRecordSimilarity,record=pendingRecord,scope=record?.factContext;
+    if(!checker||!window.NexiaFactUI?.context||!scope)throw Error('過去記録の比較処理を読み込めません。再読み込みしてください。');
+    const signature=formSignature();
+    const unchanged=()=>pendingRecord===record&&signature===formSignature()&&q('user')?.value===record.userCode&&localStorage.getItem('activeOrganizationId')===scope.organizationId;
+    const verify=()=>{if(!unchanged())throw Error('比較中に施設・利用者・入力・文章が変更されました。内容を確認して保存し直してください。');};
+    setStatus('同じ施設・利用者の過去記録を確認しています…');
+    const c=await window.NexiaFactUI.context();verify();
+    if(c.org!==scope.organizationId||c.actor!==scope.actorId)throw Error('作成時と現在の施設・ログイン職員が一致しません。作り直してください。');
+    const history=await checker.load(c.db,scope);verify();
+    syncPendingText();comparison={record,rows:history.rows,text:''};renderComparison();
   }
   async function commitPendingRecord(){
     if(saveBusy||!pendingRecord)return;
@@ -245,19 +287,27 @@
     if(window.__nexiaFactsMode&&!(q('careResult')?.textContent||'').startsWith(window.NexiaFactCore.INTRO))return setStatus('②の必須冒頭文を先頭に戻してから保存してください。','error');
     syncPendingText();
     if(!currentResultIsValid())return setStatus('保存する記録文を確認できません。もう一度作成してください。','error');
+    if(window.__nexiaFactsMode){
+      if(!comparison||comparison.record!==pendingRecord)return setStatus('過去記録との比較が完了していません。「AIで記録作成」を押して再確認してください。','error');
+      if(localStorage.getItem('activeOrganizationId')!==pendingRecord.factContext.organizationId)return setStatus('施設が変更されています。記録を作り直してください。','error');
+      if(comparison.text!==JSON.stringify([pendingRecord.visitNote,pendingRecord.careNote])){renderComparison();if(q('recordSimilarityNotice')?.dataset.matches!=='0')return setStatus('編集した文章の類似状況を更新しました。当日の事実と確認してから正式保存してください。','warn');}
+    }
+    const savingRecord=pendingRecord,savingSignature=formSignature(),savingVisit=pendingRecord.visitNote,savingCare=pendingRecord.careNote;
     saveBusy=true;const btn=ensureSaveUi();if(btn)btn.disabled=true;setGenerateDisabled(true);
     try{
       const existing=await assignmentRecordCount();
       if(existing>0&&!confirm(`この担当には正式記録がすでに${existing}件あります。\n追加記録として保存しますか？`)){
         setStatus('保存を中止しました。既存の記録を確認してください。','warn');return;
       }
+      if(pendingRecord!==savingRecord||formSignature()!==savingSignature||q('visitResult')?.textContent!==savingVisit||q('careResult')?.textContent!==savingCare)throw Error('確認中に入力・文章が変更されました。内容を確認して保存し直してください。');
       setStatus('クラウドへ正式保存しています…');
       await originalSave(pendingRecord);
       if(typeof originalAddHistory==='function'&&pendingHistoryArgs)originalAddHistory(...pendingHistoryArgs);
       pendingRecord=null;pendingHistoryArgs=null;pendingSignature='';
+      clearComparison();
       setStatus('✓ 正式にクラウド保存しました。','success');
       window.dispatchEvent(new CustomEvent('nexia-record-saved'));
-    }catch(e){console.error(e);setStatus('保存できていません。通信状態を確認して、もう一度お試しください。','error')}
+    }catch(e){console.error(e);setStatus('保存できていません。'+(e?.message||'通信状態を確認して、もう一度お試しください。'),'error')}
     finally{saveBusy=false;setGenerateDisabled(false);if(btn)btn.disabled=!pendingRecord}
   }
   function wrapShorten(){
@@ -266,6 +316,9 @@
     wrapped.__formalSaveWrapped=true;window.shortenCareResult=wrapped;
   }
   function guardPendingChanges(){
+    for(const id of ['visitResult','careResult'])q(id)?.addEventListener('input',()=>{if(comparison&&pendingRecord)renderComparison();});
+    document.addEventListener('change',e=>{if(['user','orgSwitch'].includes(e.target.id)){clearComparison();q('recordCommitButton').disabled=true;}});
+    window.addEventListener('storage',e=>{if(e.key==='activeOrganizationId')clearPending();});
     ['user','service','scene','condition','health','length','interventionLevel','input'].forEach(id=>q(id)?.addEventListener('change',()=>{if(pendingRecord&&pendingSignature!==formSignature())setStatus('入力内容が変更されています。保存前に記録文を作り直してください。','warn')}));
     document.querySelectorAll('input[name="serviceContent"]').forEach(el=>el.addEventListener('change',()=>{if(pendingRecord&&pendingSignature!==formSignature())setStatus('サービス内容が変更されています。保存前に記録文を作り直してください。','warn')}));
     window.addEventListener('beforeunload',e=>{if(!pendingRecord)return;e.preventDefault();e.returnValue=''});

@@ -35,6 +35,15 @@
  const unique=xs=>[...new Set(xs.filter(Boolean))];
  // Every preset names all of its included facts. Nothing is checked by default.
  serviceActions['入浴介助'].push('下肢の洗身を介助した','背部の洗身を介助した');
+ const detailedActions={
+  'トイレ介助':['パッドの交換を介助した','便座への移乗を介助した'],
+  '食事介助':['食具の操作を介助した','食事姿勢を整える介助を行った'],
+  '口腔ケア':['口をすすぐ動作を介助した'],'更衣介助':['衣類の留め具を扱う動作を介助した'],
+  '起床介助':['端座位になる動作を介助した'],'就寝介助':['就寝前の物品を準備した'],
+  '清容・保清':['手洗いを介助した'],'移動介助':['立ち上がる動作を介助した'],
+  '通院等介助':['診察室への移動に付き添った']
+ };
+ for(const [service,actions] of Object.entries(detailedActions))serviceActions[service].push(...actions);
  const presets={
   '服薬介助・確認':[['声かけ＋服用確認',[0,2]],['準備の介助＋服用確認',[1,2]],['声かけのみ（服用未確認）',[0]],['準備の介助のみ（服用未確認）',[1]]],
   '食事介助':[['食事中の見守り',[0]],['声かけ＋見守り',[1,0]],['口元へ運ぶ介助',[2]]],
@@ -52,9 +61,18 @@
   '家事援助':[['掃除',[0]],['洗濯',[1]],['調理',[2]]], 'その他':[['見守り',[0]],['声かけ',[1]]]
  };
  const quickChoices=Object.fromEntries(Object.entries(presets).map(([s,ps])=>[s,ps.map(([label,indices],i)=>({id:s+'-'+i,label,actions:indices.map(n=>serviceActions[s][n]),unconfirmed:s==='服薬介助・確認'&&i>=2}))]));
+ // Optional shortcuts explicitly state the person's own action and the worker's help.
+ for(const [service,label,actions,self] of [
+  ['入浴介助','上半身は本人・背部の洗身を介助',['背部の洗身を介助した'],'上半身を洗った'],
+  ['トイレ介助','衣類は本人が下げた・職員は見守り',['排泄中の見守りを行った'],'衣類を下げた'],
+  ['食事介助','本人が口元へ運んだ・職員は見守り',['食事中の見守りを行った'],'食物を口元へ運んだ'],
+  ['口腔ケア','歯磨きは本人・職員は見守り',['口腔ケア中の見守りを行った'],'歯を磨いた'],
+  ['更衣介助','脱衣は本人・着衣を介助',['衣類を着る動作を介助した'],'衣類を脱いだ'],
+  ['移動介助','立ち上がりは本人・歩行に付き添い',['歩行に付き添った'],'立ち上がった']
+ ])quickChoices[service].push({id:service+'-self',label,actions,self});
  const reactions={
   '服薬介助・確認':['声かけにうなずいて応じた','本人が自分で服薬した','服薬を拒否した','服薬に時間を要した'],
-  '食事介助':['自分で食具を操作した','食事を希望する発言があった','食事を断る意思を示した','食事に時間を要した'],
+  '食事介助':['自分で食具を操作した','食事を希望する発言があった','食事を断る意思を示した','食事に時間を要した','声かけにうなずいて応じた'],
   'トイレ介助':['排泄の希望を伝えた','声かけにうなずいて応じた','排泄時に痛みを訴えた','排泄に時間を要した'],
   '入浴介助':['入浴を希望した','声かけにうなずいて応じた','入浴を断る意思を示した','入浴中に疲れを訴えた'],
   '入浴準備':['入浴を希望した','自分で衣類を選んだ','声かけにうなずいて応じた'],
@@ -84,7 +102,9 @@
   const data=profile?.data||profile||{},comm=data.communication?.choices||[],care=data.personalCare?.choices||[];
   return unique([['短い言葉で伝える',0],['ゆっくり話す',1],['写真・絵で伝える',2],['筆談する',3]].filter(([v])=>comm.includes(v)).map(([,n])=>methodChoices[n]).concat(care.includes('本人のペースを待つ')?[methodChoices[4]]:[],care.includes('一つずつ手順を伝える')?[methodChoices[5]]:[]));
  }
- function performed(a){return (a.actions||[]).length||text(a.note)||(a.methods||[]).length;}
+ // An explicit service checkbox confirms only that service, never its usual steps.
+ // Scheduled candidates and saved facts without this flag keep their former meaning.
+ function performed(a){return a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length;}
  function validate(f){
   const errors=[];let validDate=false;
   try{validDate=/^\d{4}-\d{2}-\d{2}$/.test(f.date||'')&&f.date>='2000-01-01'&&f.date<='2100-12-31'&&new Date(f.date+'T00:00:00Z').toISOString().slice(0,10)===f.date;}catch{}
@@ -95,6 +115,7 @@
   if(!f.actions.some(performed)&&!text(f.supportNote))errors.push('② 当日実施した支援を1つ選択、または補足に具体的に入力してください。担当からの候補だけでは実施済みにしません。');
   const seen=new Set();
   for(const a of f.actions){
+   if(Object.hasOwn(a,'confirmedService')&&typeof a.confirmedService!=='boolean')errors.push('② 実施サービスの確認内容を確認してください。');
    if(!Object.hasOwn(serviceActions,a.service)||seen.has(a.service)){errors.push('② サービスの選択内容を確認してください。');continue;}seen.add(a.service);
    if(!Array.isArray(a.actions)||a.actions.some(v=>!serviceActions[a.service].includes(v))){errors.push('② 支援の選択内容を確認してください。');continue;}
    if(a.reactions&&(!Array.isArray(a.reactions)||a.reactions.some(v=>!reactions[a.service]?.includes(v))))errors.push('② 本人の反応の選択内容を確認してください。');
@@ -118,6 +139,20 @@
   const out=[];for(let i=0;i<xs.length;i+=mode==='short'?3:2){const group=xs.slice(i,i+(mode==='short'?3:2));out.push(sentence(group.slice(0,-1).map(connective).join('、')+(group.length>1?'、':'')+group.at(-1)));}return out.join('');
  }
  const observations={
+  'ベッド上で仰臥位で寝ていた':'ベッド上で仰臥位にて入眠されていました',
+  'ベッド上で仰臥位で休んでいた':'ベッド上で仰臥位にて休まれていました',
+  'ベッド上で側臥位で休んでいた':'ベッド上で側臥位にて休まれていました',
+  'ベッド上で上体を起こしていた':'ベッド上で上体を起こして過ごされていました',
+  'ベッド端に座っていた':'ベッド端に座っておられました',
+  '座ってテレビを見ていた':'座った状態でテレビを見ておられました',
+  'ベッド上でテレビを見ていた':'ベッド上でテレビを見ておられました',
+  'スマートフォンを操作していた':'スマートフォンを操作されていました',
+  '音楽を聴いて過ごしていた':'音楽を聴いて過ごされていました',
+  '食事をしていた':'食事をされていました','飲み物を飲んでいた':'飲み物を飲んでおられました',
+  '室内を歩いていた':'室内を歩いておられました','身の回りの物を整理していた':'身の回りの物を整理されていました',
+  '横になって休んでいた':'横になって休まれていました','入眠していた':'入眠されていました',
+  '起床直後だった':'起床直後でした','テレビをつけて静かに過ごしていた':'テレビをつけて静かに過ごされていました',
+  '何もせずゆっくり過ごしていた':'ゆっくり過ごされていました','疲れた様子があった':'疲れた様子が見られました',
   '椅子・座椅子に座っていた':'椅子・座椅子に座っておられました','ベッドで休んでいた':'ベッドで休んでおられました',
   '落ち着いて過ごされていた':'落ち着いて過ごされていました','普段と変わりなく過ごされていた':'普段と変わりなく過ごされていました',
   '笑顔が見られた':'笑顔が見られました','眠そうな様子が見られた':'眠そうな様子が見られました','疲れた様子が見られた':'疲れた様子が見られました','不安そうな様子が見られた':'不安そうな様子が見られました',
@@ -148,6 +183,7 @@
  function afterSentence(v){if(v==='服薬後に体調の訴えがあった')return '服薬後、本人から体調についての訴えがありました';if(v==='服薬後に特に変化がなかった')return '服薬後、特に変化は見られませんでした';return ({'椅子に座って過ごした':'支援後は、椅子に座って過ごされました','ベッドで休んだ':'支援後は、ベッドで休まれました','自分で次の行動を始めた':'支援後、本人は自分で次の行動を始められました'})[v]||(v?'支援後の状態：'+text(v):'');}
  function actionClauses(a){
   const xs=unique(a.actions||[]),out=[];
+  if(!xs.length&&a.confirmedService===true)return [serviceStatements[a.service],...(a.service==='服薬介助・確認'&&a.unconfirmed?['服用済みかは確認していません']:[])];
   if(a.service==='服薬介助・確認'){
    const prompt=xs.includes(serviceActions[a.service][0]),prepare=xs.includes(serviceActions[a.service][1]),confirm=xs.includes(serviceActions[a.service][2]);
    if(confirm){out.push((prepare?'服薬の準備を介助し'+(prompt?'て声をかけ、':'、'):prompt?'服薬の声かけを行い、':'')+'本人が'+((a.reactions||[]).includes('本人が自分で服薬した')?'自分で':'')+'薬を服用されたことを確認しました');}
@@ -159,21 +195,48 @@
   for(const v of xs)if(assists.length<2||!assists.includes(v))out.push(polite(v));
   return out;
  }
+ const serviceStatements={
+  '服薬介助・確認':'服薬に関する支援を行いました','トイレ介助':'排泄に関する支援を行いました',
+  '食事介助':'食事の支援を行いました','入浴介助':'入浴の支援を行いました','入浴準備':'入浴準備を行いました',
+  '更衣介助':'更衣の支援を行いました','口腔ケア':'口腔ケアの支援を行いました','起床介助':'起床の支援を行いました',
+  '就寝介助':'就寝に向けた支援を行いました','清容・保清':'清容・保清の支援を行いました','移動介助':'移動の支援を行いました',
+  '買い物・外出支援':'買い物・外出の支援を行いました','通院等介助':'通院等の支援を行いました',
+  '家事援助':'家事援助を行いました','その他':'生活上の支援を行いました'
+ };
+ // Bind an observed response to the matching, explicitly selected prompt.
+ // Without that prompt, the response is retained independently; no action is inferred.
+ const promptActions={
+  '服薬介助・確認':['服薬の声かけを行った','服薬に向けて声をかけると'],
+  '食事介助':['食事の際に声をかけた','食事の際に声をかけると'],
+  '口腔ケア':['歯磨きの声かけを行った','歯磨きの声をかけると'],
+  '起床介助':['起床の声かけを行った','起床の声をかけると','起床の声かけに返事をした','本人は返事をされました'],
+  '就寝介助':['就寝準備の声かけを行った','就寝準備の声をかけると']
+ };
+ function supportClauses(a){
+  const prompt=promptActions[a.service],response=prompt?.[2]||'声かけにうなずいて応じた';
+  if(!prompt||!a.actions.includes(prompt[0])||!a.reactions?.includes(response))return {acts:actionClauses(a),reactions:a.reactions||[]};
+  const remaining={...a,confirmedService:false,actions:a.actions.filter(v=>v!==prompt[0])};
+  const preparation=a.service==='服薬介助・確認'&&remaining.actions.includes('服薬の準備を介助した');
+  if(preparation)remaining.actions=remaining.actions.filter(v=>v!=='服薬の準備を介助した');
+  return {lead:(preparation?'服薬の準備を介助しました。':'')+prompt[1]+'、'+sentence(prompt[3]||'本人はうなずいて応じられました'),acts:actionClauses(remaining),reactions:a.reactions.filter(v=>v!==response)};
+ }
  function compose(f,_profile){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
   const observation=v=>observations[v]||text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
-  const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition,f.health].filter(v=>v&&v!=='その他').map(observation));
+  const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition].filter(v=>v&&v!=='その他').map(observation));
   let visit=obs.length?'訪問時、'+joinClauses(obs,mode):'';
+  if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))visit+=(visit?'':'訪問時、')+sentence(observation(f.health));
   if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
   if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
   if(text(f.concern))visit+=sentence(f.concern);
   const sections=[];
   for(const a of f.actions||[]){if(!performed(a))continue;
-   const acts=actionClauses(a),own=text(a.self)?sentence(selfSentence(a.self)):'';
+   const composed=supportClauses(a),deferUnconfirmed=a.service==='服薬介助・確認'&&a.unconfirmed&&composed.reactions.includes('服薬を拒否した');
+   const acts=deferUnconfirmed?composed.acts.filter(v=>v!=='服用済みかは確認していません'):composed.acts,own=text(a.self)?sentence(selfSentence(a.self)):'';
    const method=unique(a.methods||[]).map(polite);
-   const rs=unique(a.reactions||[]).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
+   const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
-   let body=(own?own+'職員は':'')+joinClauses(acts.concat(method),mode)+joinClauses(rs,mode)+after+note;
+   let body=(own?own+'職員は':'')+(composed.lead||'')+joinClauses(acts.concat(method),mode)+joinClauses(rs,mode)+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
    if(mode==='long')body='【'+a.service+'】\n'+body;
    sections.push(body);
   }
@@ -181,7 +244,7 @@
   if(text(f.response))sections.push(sentence('支援中、'+(reactionSentences[f.response]||text(f.response))));
   if(text(f.after))sections.push(sentence(afterSentence(f.after)));
   const care=INTRO+(mode==='long'?'\n':'')+sections.join(mode==='short'?'':'\n');
-  const inputCount=[f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
+  const inputCount=[f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount};
  }
  const api={INTRO,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;

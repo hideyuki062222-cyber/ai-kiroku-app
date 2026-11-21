@@ -18,7 +18,7 @@ def test_record_requires_explicit_formal_save():
 
 def test_record_entrypoint_loads_current_safety_bundle():
     html = text("index.html")
-    assert "common-nav.js?v=20261120-quality-1" in html
+    assert "common-nav.js?v=20261121-daily-1" in html
     assert "担当情報をクラウドから安全に確認しています" in html
     assert 'q.get("client")' not in html
     assert 'q.get("memo")' not in html
