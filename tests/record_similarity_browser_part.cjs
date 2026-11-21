@@ -7,6 +7,7 @@ module.exports=async function({pg,atomic,pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,C
  await page.locator('input[name=serviceContent][value="入浴介助"]').check();await page.locator('#condition').selectOption('笑顔が見られた');
  await page.locator('#factSupportDetails > summary').click();await page.locator('[data-preset="入浴介助-self"]').click();
  assert.equal(await page.locator('[data-self]').inputValue(),'上半身を洗った');assert.equal(await page.locator('[data-action]:checked').count(),1);assert.equal(await page.locator('[data-preset][aria-pressed=true]').count(),1);
+ await page.locator('[data-preset="入浴介助-1"]').click();assert.equal(await page.locator('[data-self]').inputValue(),'上半身を洗った','changing assistance must preserve the confirmed independent action');await page.locator('[data-preset="入浴介助-self"]').click();
  const generate=async()=>{await page.getByRole('button',{name:'AIで記録作成',exact:true}).click();await page.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('未保存'));};
  await generate();assert((await page.locator('#careResult').innerText()).includes('背部の洗身を介助'));assert.equal(await page.locator('#recordSimilarityNotice').getAttribute('data-matches'),'0');
  const body=await page.locator('#careResult').innerText(),visit=await page.locator('#visitResult').innerText();
