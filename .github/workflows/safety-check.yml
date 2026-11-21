@@ -101,6 +101,7 @@ jobs:
           node tests/record_support_catalog.cjs
           node tests/record_intervention.cjs
           node tests/record_narrative_quality.cjs
+          node tests/record_evidence_quality.cjs
           node tests/record_similarity.cjs
           node tests/record_seven_days.cjs
           node tests/attendance_dom.cjs

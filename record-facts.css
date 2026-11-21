@@ -51,3 +51,7 @@
  #factGenerateActions{padding-bottom:max(12px,env(safe-area-inset-bottom))}
 }
 @media print{#factGenerateActions{position:static}}
+
+#factQuickDetail{padding:12px;border:1px solid #b8ccc5;border-radius:10px;background:#f6fbf8;margin:10px 0}
+#factQuickDetail p{font-size:15px;line-height:1.65;margin:0 0 10px}
+#factQuickDetail strong{display:block;margin:10px 0 6px}

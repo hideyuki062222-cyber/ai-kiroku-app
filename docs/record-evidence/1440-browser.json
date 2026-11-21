@@ -1,0 +1,1404 @@
+{
+  "passed": true,
+  "width": 1440,
+  "oneClick": true,
+  "manualEditProtected": true,
+  "staleChoiceRejected": true,
+  "realProductionData": false,
+  "results": [
+    {
+      "baseline": true,
+      "service": "起床介助",
+      "modes": {
+        "short": {
+          "visit": "訪問時、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。起床の支援を行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 3,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれていました。笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。\n起床の支援を実施しました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 3,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれていました。笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。\n今回は直接介助を中心に支援しました。\n起床の支援を行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 3,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      }
+    },
+    {
+      "service": "起床介助",
+      "basic": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      },
+      "oneClick": {
+        "facts": {
+          "version": 1,
+          "composerRevision": 4,
+          "interventionLevel": "active",
+          "lengthMode": "long",
+          "date": "2026-11-21",
+          "scene": "ベッド上で側臥位で休んでいた",
+          "condition": "笑顔が見られた",
+          "health": "体調良好",
+          "statement": "",
+          "difference": "",
+          "concern": "",
+          "actions": [
+            {
+              "service": "起床介助",
+              "confirmedService": true,
+              "actions": [
+                "起き上がりを介助した"
+              ],
+              "reactions": [],
+              "methods": [],
+              "unconfirmed": false,
+              "note": "",
+              "self": "",
+              "after": ""
+            }
+          ],
+          "supportNote": "",
+          "response": "",
+          "after": ""
+        },
+        "care": "指示内容確認しました。前回のサービス記録確認しました。起床時は、直接介助を中心に、本人が起き上がる動作を職員が介助しました。"
+      },
+      "modes": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に、起き上がりの介助を行い、ゆっくり話しました。本人は起床の声かけに返事をされました。支援後は、椅子に座って過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [
+                  "起き上がりを介助した"
+                ],
+                "reactions": [
+                  "起床の声かけに返事をした"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": "椅子に座って過ごした"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床時は、直接介助を中心に、起き上がりを介助しました。本人にゆっくり話しました。ご本人は起床の声かけに返事をされました。支援後は、椅子に座って過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [
+                  "起き上がりを介助した"
+                ],
+                "reactions": [
+                  "起床の声かけに返事をした"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": "椅子に座って過ごした"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床時は、直接介助を中心に、本人が起き上がる動作を職員が介助しました。本人に対しては、ゆっくり話しました。本人は起床の声かけに返事をされました。支援後は、椅子に座って過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [
+                  "起き上がりを介助した"
+                ],
+                "reactions": [
+                  "起床の声かけに返事をした"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": "椅子に座って過ごした"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      }
+    },
+    {
+      "service": "服薬介助・確認",
+      "basic": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に関する支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に関する支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に関する支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      },
+      "oneClick": {
+        "facts": {
+          "version": 1,
+          "composerRevision": 4,
+          "interventionLevel": "active",
+          "lengthMode": "long",
+          "date": "2026-11-21",
+          "scene": "ベッド上で側臥位で休んでいた",
+          "condition": "笑顔が見られた",
+          "health": "体調良好",
+          "statement": "",
+          "difference": "",
+          "concern": "",
+          "actions": [
+            {
+              "service": "服薬介助・確認",
+              "confirmedService": true,
+              "actions": [
+                "服薬の声かけを行った",
+                "服薬したことを確認した"
+              ],
+              "reactions": [],
+              "methods": [],
+              "unconfirmed": false,
+              "note": "",
+              "self": "",
+              "after": ""
+            }
+          ],
+          "supportNote": "",
+          "response": "",
+          "after": ""
+        },
+        "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。\n服薬の支援では、職員は服薬の声かけを行い、本人が薬を服用されたことを確かめました。"
+      },
+      "modes": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。本人は、服薬に向けた声かけにうなずいて応じられました。本人が薬を服用されたことを確認しました。ゆっくり話しました。服薬後、特に変化は見られませんでした。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [
+                  "服薬の声かけを行った",
+                  "服薬したことを確認した"
+                ],
+                "reactions": [
+                  "声かけにうなずいて応じた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": "服薬後に特に変化がなかった"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。\n服薬の支援では、服薬に向けた声かけに対し、本人はうなずいて応じられました。本人が薬を服用されたことを確認しました。本人にゆっくり話しました。服薬後、特に変化は見られませんでした。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [
+                  "服薬の声かけを行った",
+                  "服薬したことを確認した"
+                ],
+                "reactions": [
+                  "声かけにうなずいて応じた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": "服薬後に特に変化がなかった"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。\n服薬の支援では、職員が本人は、服薬に向けた声かけにうなずいて応じられました。本人が薬を服用されたことを確かめました。本人に対しては、ゆっくり話しました。服薬後、特に変化は見られませんでした。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [
+                  "服薬の声かけを行った",
+                  "服薬したことを確認した"
+                ],
+                "reactions": [
+                  "声かけにうなずいて応じた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": "服薬後に特に変化がなかった"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      }
+    },
+    {
+      "service": "トイレ介助",
+      "basic": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄に関する支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄に関する支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄に関する支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      },
+      "oneClick": {
+        "facts": {
+          "version": 1,
+          "composerRevision": 4,
+          "interventionLevel": "active",
+          "lengthMode": "long",
+          "date": "2026-11-21",
+          "scene": "ベッド上で側臥位で休んでいた",
+          "condition": "笑顔が見られた",
+          "health": "体調良好",
+          "statement": "",
+          "difference": "",
+          "concern": "",
+          "actions": [
+            {
+              "service": "トイレ介助",
+              "confirmedService": true,
+              "actions": [
+                "排泄時の衣類の上げ下げを介助した"
+              ],
+              "reactions": [],
+              "methods": [],
+              "unconfirmed": false,
+              "note": "",
+              "self": "",
+              "after": ""
+            }
+          ],
+          "supportNote": "",
+          "response": "",
+          "after": ""
+        },
+        "care": "指示内容確認しました。前回のサービス記録確認しました。排泄の支援では、直接介助を中心に、職員は排泄時の衣類の上げ下げの介助を行いました。"
+      },
+      "modes": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。衣類を下げる動作は本人が行われました。今回は必要な部分への支援として、パッドの交換の介助を行い、ゆっくり話しました。本人から排泄の希望が伝えられました。支援後は、椅子に座って過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [
+                  "パッドの交換を介助した"
+                ],
+                "reactions": [
+                  "排泄の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "衣類を下げた",
+                "after": "椅子に座って過ごした"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄の支援では、衣類を下げる動作は本人が行われました。今回は必要な部分への支援として、パッドの交換を介助しました。本人にゆっくり話しました。ご本人から排泄の希望が伝えられました。支援後は、椅子に座って過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [
+                  "パッドの交換を介助した"
+                ],
+                "reactions": [
+                  "排泄の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "衣類を下げた",
+                "after": "椅子に座って過ごした"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄の支援では、衣類を下げる動作は本人が自分で行われました。今回は必要な部分への支援として、職員はパッドの交換の介助を行いました。本人に対しては、ゆっくり話しました。本人から排泄の希望が伝えられました。支援後は、椅子に座って過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [
+                  "パッドの交換を介助した"
+                ],
+                "reactions": [
+                  "排泄の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "衣類を下げた",
+                "after": "椅子に座って過ごした"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      }
+    },
+    {
+      "service": "入浴介助",
+      "basic": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      },
+      "oneClick": {
+        "facts": {
+          "version": 1,
+          "composerRevision": 4,
+          "interventionLevel": "active",
+          "lengthMode": "long",
+          "date": "2026-11-21",
+          "scene": "ベッド上で側臥位で休んでいた",
+          "condition": "笑顔が見られた",
+          "health": "体調良好",
+          "statement": "",
+          "difference": "",
+          "concern": "",
+          "actions": [
+            {
+              "service": "入浴介助",
+              "confirmedService": true,
+              "actions": [
+                "背部の洗身を介助した"
+              ],
+              "reactions": [],
+              "methods": [],
+              "unconfirmed": false,
+              "note": "",
+              "self": "上半身を洗った",
+              "after": ""
+            }
+          ],
+          "supportNote": "",
+          "response": "",
+          "after": ""
+        },
+        "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援では、上半身は本人が自分で洗われました。今回は直接介助を中心に、職員は背部の洗身の介助を行いました。"
+      },
+      "modes": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。上半身は本人が自分で洗われました。今回は必要な部分への支援として、背部の洗身の介助を行い、ゆっくり話しました。本人から湯の温度の希望が伝えられました。入浴の支援後、本人から休憩したいとの希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [
+                  "背部の洗身を介助した"
+                ],
+                "reactions": [
+                  "湯の温度の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "上半身を洗った",
+                "after": "入浴支援後に休憩を希望した"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援では、上半身は本人が自分で洗われました。今回は必要な部分への支援として、背部の洗身を介助しました。本人にゆっくり話しました。ご本人から湯の温度の希望が伝えられました。入浴の支援後、本人から休憩したいとの希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [
+                  "背部の洗身を介助した"
+                ],
+                "reactions": [
+                  "湯の温度の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "上半身を洗った",
+                "after": "入浴支援後に休憩を希望した"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援では、上半身は本人が自分で洗われました。今回は必要な部分への支援として、職員は背部の洗身の介助を行いました。本人に対しては、ゆっくり話しました。本人から湯の温度の希望が伝えられました。入浴の支援後、本人から休憩したいとの希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [
+                  "背部の洗身を介助した"
+                ],
+                "reactions": [
+                  "湯の温度の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "上半身を洗った",
+                "after": "入浴支援後に休憩を希望した"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      }
+    },
+    {
+      "service": "食事介助",
+      "basic": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援は、直接介助を中心に行いました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      },
+      "oneClick": {
+        "facts": {
+          "version": 1,
+          "composerRevision": 4,
+          "interventionLevel": "active",
+          "lengthMode": "long",
+          "date": "2026-11-21",
+          "scene": "ベッド上で側臥位で休んでいた",
+          "condition": "笑顔が見られた",
+          "health": "体調良好",
+          "statement": "",
+          "difference": "",
+          "concern": "",
+          "actions": [
+            {
+              "service": "食事介助",
+              "confirmedService": true,
+              "actions": [
+                "食事中の見守りを行った"
+              ],
+              "reactions": [],
+              "methods": [],
+              "unconfirmed": false,
+              "note": "",
+              "self": "食物を口元へ運んだ",
+              "after": ""
+            }
+          ],
+          "supportNote": "",
+          "response": "",
+          "after": ""
+        },
+        "care": "指示内容確認しました。前回のサービス記録確認しました。今回は直接介助を中心に支援しました。\n食事の支援では、食物を口元へ運ぶ動作は本人が自分で行われました。職員は食事中の見守りを実施しました。"
+      },
+      "modes": {
+        "short": {
+          "visit": "訪問時は、ベッド上で側臥位で休息中で、笑顔が見られました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食物を口元へ運ぶ動作は本人が行われました。食事中の見守りを中心に、職員が対応し、ゆっくり話しました。本人から食べる量の希望が伝えられました。食事の支援後、本人から満腹との発言がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "short",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [
+                  "食事中の見守りを行った"
+                ],
+                "reactions": [
+                  "食べる量の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "食物を口元へ運んだ",
+                "after": "食事支援後に満腹と伝えた"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "normal": {
+          "visit": "訪問時は、ベッド上で側臥位にて休まれており、笑顔が見受けられました。体調は良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援では、食物を口元へ運ぶ動作は本人が行われました。食事中の見守りを中心に、職員が対応しました。本人にゆっくり話しました。ご本人から食べる量の希望が伝えられました。食事の支援後、本人から満腹との発言がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "normal",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [
+                  "食事中の見守りを行った"
+                ],
+                "reactions": [
+                  "食べる量の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "食物を口元へ運んだ",
+                "after": "食事支援後に満腹と伝えた"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。本人から「このあと椅子で過ごしたい」との発言・訴えがありました。普段との違いとして、普段より動作がゆっくりでした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援では、食物を口元へ運ぶ動作は本人が自分で行われました。食事中の見守りを中心に、職員が対応しました。本人に対しては、ゆっくり話しました。本人から食べる量の希望が伝えられました。食事の支援後、本人から満腹との発言がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "long",
+            "date": "2026-11-21",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "このあと椅子で過ごしたい",
+            "difference": "普段より動作がゆっくりだった",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [
+                  "食事中の見守りを行った"
+                ],
+                "reactions": [
+                  "食べる量の希望を伝えた"
+                ],
+                "methods": [
+                  "ゆっくり話した"
+                ],
+                "unconfirmed": false,
+                "note": "",
+                "self": "食物を口元へ運んだ",
+                "after": "食事支援後に満腹と伝えた"
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": ""
+          }
+        }
+      }
+    }
+  ]
+}
