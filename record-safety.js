@@ -267,13 +267,14 @@
     if(!window.__nexiaFactsMode)return;
     const checker=window.NexiaRecordSimilarity,record=pendingRecord,scope=record?.factContext;
     if(!checker||!window.NexiaFactUI?.context||!scope)throw Error('過去記録の比較処理を読み込めません。再読み込みしてください。');
-    const signature=formSignature();
+    const signature=formSignature(),generatedVisit=record.visitNote,generatedCare=record.careNote;
     const unchanged=()=>pendingRecord===record&&signature===formSignature()&&q('user')?.value===record.userCode&&localStorage.getItem('activeOrganizationId')===scope.organizationId;
     const verify=()=>{if(!unchanged())throw Error('比較中に施設・利用者・入力・文章が変更されました。内容を確認して保存し直してください。');};
     setStatus('同じ施設・利用者の過去記録を確認しています…');
     const c=await window.NexiaFactUI.context();verify();
     if(c.org!==scope.organizationId||c.actor!==scope.actorId)throw Error('作成時と現在の施設・ログイン職員が一致しません。作り直してください。');
     const history=await checker.load(c.db,scope);verify();
+    if(q('visitResult')?.textContent===generatedVisit&&q('careResult')?.textContent===generatedCare)window.NexiaFactUI.rephrase?.(record,history.rows);
     syncPendingText();comparison={record,rows:history.rows,text:''};renderComparison();
   }
   async function commitPendingRecord(){

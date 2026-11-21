@@ -131,8 +131,11 @@
   if(f.lengthMode&&!['short','normal','long'].includes(f.lengthMode))errors.push('記録の長さを確認してください。');
   return unique(errors);
  }
- const polite=v=>text(v).replace(/^本人のペースを待った$/,'本人のペースに合わせて待った').replace(/行った$/,'行いました').replace(/付き添った$/,'付き添いました').replace(/声をかけた$/,'声をかけました').replace(/整えた$/,'整えました').replace(/した$/,'しました').replace(/伝えた$/,'伝えました').replace(/待った$/,'待ちました');
- const connective=s=>s.replace(/しました$/,'し').replace(/行いました$/,'行い').replace(/かけました$/,'かけ').replace(/整えました$/,'整え').replace(/付き添いました$/,'付き添い').replace(/おられました$/,'おられ').replace(/ていました$/,'ており').replace(/見られました$/,'見られ').replace(/ありませんでした$/,'なく').replace(/ありました$/,'あり').replace(/でした$/,'で').replace(/していません$/,'しておらず').replace(/れました$/,'れ').replace(/伝えました$/,'伝え').replace(/待ちました$/,'待ち');
+ const polite=v=>{let s=text(v).replace(/^本人のペースを待った$/,'本人のペースに合わせて待った');
+  for(const [pattern,replacement] of [[/行った$/,'行いました'],[/付き添った$/,'付き添いました'],[/声をかけた$/,'声をかけました'],[/整えた$/,'整えました'],[/した$/,'しました'],[/伝えた$/,'伝えました'],[/待った$/,'待ちました']])if(pattern.test(s))return s.replace(pattern,replacement);
+  return s;
+ };
+ const connective=s=>s.replace(/いたしました$/,'し').replace(/確かめました$/,'確かめ').replace(/いらっしゃいました$/,'いらっしゃり').replace(/しました$/,'し').replace(/行いました$/,'行い').replace(/かけました$/,'かけ').replace(/整えました$/,'整え').replace(/付き添いました$/,'付き添い').replace(/おられました$/,'おられ').replace(/ていました$/,'ており').replace(/見られました$/,'見られ').replace(/ありませんでした$/,'なく').replace(/ありました$/,'あり').replace(/でした$/,'で').replace(/していません$/,'しておらず').replace(/れました$/,'れ').replace(/伝えました$/,'伝え').replace(/待ちました$/,'待ち');
  function joinClauses(clauses,mode='normal'){
   const xs=unique(clauses);if(!xs.length)return '';
   if(mode==='long')return xs.map(sentence).join('');
@@ -220,11 +223,29 @@
   if(preparation)remaining.actions=remaining.actions.filter(v=>v!=='服薬の準備を介助した');
   return {lead:(preparation?'服薬の準備を介助しました。':'')+prompt[1]+'、'+sentence(prompt[3]||'本人はうなずいて応じられました'),acts:actionClauses(remaining),reactions:a.reactions.filter(v=>v!==response)};
  }
- function compose(f,_profile){
+ let expressionCounter=0;
+ function nextExpressionSeed(){const n=expressionCounter;expressionCounter=(expressionCounter+1)%1048576;return n;}
+ // Mixed-radix selection, applied ONLY to controlled clauses, never to staff quotations/notes.
+ function expressionPicker(seed){
+  let n=Number.isSafeInteger(seed)&&seed>=0?seed:0;
+  const pick=choices=>{const v=choices[n%choices.length];n=Math.floor(n/choices.length);return v;};
+  return {pick,phrase(value){
+   const choices=[value];
+   const alternatives=[[/を介助しました$/,'の介助を行いました'],[/を行いました$/,'を実施しました'],[/に付き添いました$/,'の付き添いを行いました'],[/声をかけました$/,'声かけを行いました'],[/ことを確認しました$/,'ことを確かめました'],[/見られました$/,'見受けられました'],[/おられました$/,'いらっしゃいました'],[/うなずいて応じられました$/,'うなずきで応じられました']];
+   for(const [pattern,replacement] of alternatives)if(pattern.test(value)){choices.push(value.replace(pattern,replacement));break;}
+   if(choices.length===1&&/しました$/.test(value))choices.push(value.replace(/しました$/,'いたしました'));
+   if(choices.length===1&&/^本人(?:[はがの]|から)/.test(value))choices.push(value.replace(/^本人/,'ご本人'));
+   return pick(choices);
+  }};
+ }
+ function compose(f,_profile,expressionSeed=0){
   const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
-  const observation=v=>observations[v]||text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
+  const variant=expressionPicker(expressionSeed);
+  const observed=new Map();
+  const observation=v=>{const key=observations[v]||v;if(observed.has(key))return observed.get(key);const out=observations[v]?variant.phrase(observations[v]):text(v).replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');observed.set(key,out);return out;};
   const mode=f.lengthMode||'normal',obs=unique([f.scene,f.condition].filter(v=>v&&v!=='その他').map(observation));
-  let visit=obs.length?'訪問時、'+joinClauses(obs,mode):'';
+  const render=xs=>joinClauses(xs,mode==='normal'&&xs.length>1?variant.pick(['normal','long']):mode);
+  let visit=obs.length?variant.pick(['訪問時、','訪問時は、'])+render(obs):'';
   if(f.health&&f.health!=='その他'&&!obs.includes(observation(f.health)))visit+=(visit?'':'訪問時、')+sentence(observation(f.health));
   if(text(f.statement))visit+=sentence('本人から「'+text(f.statement)+'」との発言・訴えがありました');
   if(text(f.difference))visit+=sentence('普段との違いとして、'+(observations[f.difference]||text(f.difference)));
@@ -236,7 +257,8 @@
    const method=unique(a.methods||[]).map(polite);
    const rs=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した')).map(v=>reactionSentences[v]||text(v));
    const note=sentence(a.note),after=sentence(afterSentence(a.after));
-   let body=(own?own+'職員は':'')+(composed.lead||'')+joinClauses(acts.concat(method),mode)+joinClauses(rs,mode)+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
+   const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
+   let body=(own?own+'職員は':'')+lead+render(acts.map(variant.phrase).concat(method))+render(rs.map(v=>Object.values(reactionSentences).includes(v)?variant.phrase(v):v))+(deferUnconfirmed?'服用済みかは確認していません。':'')+after+note;
    if(mode==='long')body='【'+a.service+'】\n'+body;
    sections.push(body);
   }
@@ -247,5 +269,5 @@
   const inputCount=[f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+(f.actions||[]).reduce((n,a)=>n+(a.confirmedService===true&&!(a.actions||[]).length?1:0)+unique(a.actions||[]).length+unique(a.reactions||[]).length+unique(a.methods||[]).length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount};
  }
- const api={INTRO,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={INTRO,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);

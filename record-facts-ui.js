@@ -40,6 +40,7 @@
  }
  function collect(){return {version:1,composerRevision:3,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};}
  function resetDaily(){
+  window.__nexiaPreviousExpression=null;
   for(const id of ['visitScene','condition','health','input','factStatement','factDifference','factConcern','factResponse','factAfter'])q(id).value='';
   actionState=new Map();document.querySelectorAll('input[name=serviceContent]').forEach(c=>{c.checked=false;c.indeterminate=plannedServices.has(c.value);});dailyProfile=null;q('factActions').replaceChildren();actionRows({read:false});syncButtons();dailyDirty=false;
   q('visitResult').textContent='ここに訪問時の記録文が表示されます。';q('careResult').textContent='ここに支援中の記録文が表示されます。';
@@ -113,7 +114,16 @@
   window.addEventListener('storage',e=>{if(e.key==='activeOrganizationId'&&e.newValue!==previousOrg){profileDirty=false;editor=null;previousOrg=e.newValue;plannedServices=new Set();document.querySelectorAll('[data-planned-service]').forEach(b=>b.hidden=true);resetDaily();}});
   const oldClear=window.clearAll;window.clearAll=()=>{oldClear();resetDaily();};
   window.shortenCareResult=()=>{q('careResult').textContent=q('careResult').textContent.replace(/\s+/g,' ').trim();q('careResultCount').textContent=q('careResult').textContent.length+'文字';};
-  window.generate=generate;window.NexiaFactUI={collect,context,signature:()=>JSON.stringify({org:localStorage.getItem('activeOrganizationId'),facts:collect()})};
+  window.generate=generate;window.NexiaFactUI={collect,context,rephrase(record,rows){
+   const scope=record.factContext,previous=window.__nexiaPreviousExpression;
+   const candidates=previous?.org===scope.organizationId&&previous?.client===scope.clientId&&previous.actor===scope.actorId?rows.concat(previous.row):rows;
+   const result=window.NexiaRecordSimilarity.chooseExpression(C,record.dailyFacts,scope,candidates,C.nextExpressionSeed());
+   if(result.errors.length)return;
+   q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;
+   for(const id of ['visitResult','careResult'])q(id+'Count').textContent=q(id).textContent.length+'文字';
+   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:1};
+   window.__nexiaPreviousExpression={actor:scope.actorId,org:scope.organizationId,client:scope.clientId,row:{organization_id:scope.organizationId,client_id:scope.clientId,visit_note:result.visit,care_note:result.care}};
+  },signature:()=>JSON.stringify({org:localStorage.getItem('activeOrganizationId'),facts:collect()})};
   for(const id of ['visitResult','careResult']){q(id).contentEditable='true';q(id).setAttribute('role','textbox');q(id).setAttribute('aria-label',id==='visitResult'?'①の記録文（編集できます）':'②の記録文（編集できます）');q(id).addEventListener('input',()=>q(id+'Count').textContent=q(id).textContent.length+'文字');}
   document.querySelectorAll('button[onclick="generate()"]').forEach(b=>{if(b.textContent.trim()==='別の文章を作る')b.textContent='入力内容で作り直す';});
   document.querySelector('button[onclick="shortenCareResult()"]')?.replaceChildren(document.createTextNode('文章の空白を整える'));
@@ -134,7 +144,7 @@
   const currentOrg=localStorage.getItem('activeOrganizationId'),currentUser=q('user').value;
   if(previousOrg&&currentOrg!==previousOrg||previousUser&&currentUser!==previousUser){previousOrg=currentOrg;previousUser=currentUser;plannedServices=new Set();document.querySelectorAll('[data-planned-service]').forEach(b=>b.hidden=true);resetDaily();q('factErrors').textContent='施設・利用者の選択が変わったため、当日の入力をクリアしました。選択内容を確認して入力し直してください。';return;}
   previousOrg=currentOrg;previousUser=currentUser;
-  const f=collect(),result=C.compose(f);q('factErrors').textContent=result.errors.join('\n');if(result.errors.length){q('factErrors').focus();return;}
+  const f=collect(),result=C.compose(f,undefined,C.nextExpressionSeed());q('factErrors').textContent=result.errors.join('\n');if(result.errors.length){q('factErrors').focus();return;}
   const code=q('user').value,service=q('service').value;if(!code){q('factErrors').textContent='利用者を選択してください。';return;}
   const c=await context(),client=check(await c.db.from('clients').select('id').eq('organization_id',c.org).eq('code',code).eq('is_active',true));if(client.length!==1)throw Error('利用者IDを確認できません。');
   if(window.assignmentContext?.organizationId&&(window.assignmentContext.organizationId!==c.org||window.assignmentContext.clientId!==client[0].id))throw Error('担当と選択施設が一致しません。');
