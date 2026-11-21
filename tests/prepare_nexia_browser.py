@@ -1,5 +1,6 @@
 """Cache public application dependencies for isolated Chromium QA; no Supabase access."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -43,6 +44,18 @@ def main():
     for version, name in [("2.57.4/dist/umd/supabase.min.js", "supabase-2.57.4.js"), ("2", "supabase-v2.js")]:
         url = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@" + version
         subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(assets / name)], check=True)
+    # Historical UI comparisons use immutable commits and verified file bytes.
+    versions = json.loads((ROOT / "tests/fixtures/record_ui_versions.json").read_text())
+    for label, version in versions.items():
+        folder = assets / ("record-ui-" + label)
+        folder.mkdir(exist_ok=True)
+        for name, expected in version["files"].items():
+            target = folder / name
+            if not target.exists() or hashlib.sha256(target.read_bytes()).hexdigest() != expected:
+                url = "https://raw.githubusercontent.com/hideyuki062222-cyber/ai-kiroku-app/" + version["commit"] + "/" + name
+                subprocess.run(["curl", "-fsSL", "--max-time", "30", url, "-o", str(target)], check=True)
+            if hashlib.sha256(target.read_bytes()).hexdigest() != expected:
+                raise ValueError("Historical UI asset hash mismatch: " + label + "/" + name)
     (assets / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     print("Prepared public source and SDK assets:", assets)
 

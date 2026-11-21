@@ -223,8 +223,8 @@ function applyAssignmentContext(){
   if(generationStart<0||generationEnd<0)throw new Error('記録生成処理の読み込み位置を確認できません。');
   h=h.slice(0,generationStart)+'async function generate(){throw new Error("事実入力画面を読み込めませんでした。再読み込みしてください。");}\n'+h.slice(generationEnd);
   h=h.replace('    const payload = {','    if(record.factContext && (record.factContext.organizationId!==membership.organization_id || record.factContext.clientId!==row.id || record.factContext.actorId!==session.user.id))throw new Error("作成時の施設・利用者・職員が一致しません。作り直してください。");\n    const payload = {');
-  h=h.replace('</head>','<link rel="stylesheet" href="./record-facts.css?v=20261120-quality-1"></head>');
-  h=h.replace('</body>','<script src="./facility-permissions.js?v=20261120-scoped-quality-1"><\/script><script src="./record-facts-core.js?v=20261120-quality-1"><\/script><script src="./record-facts-ui.js?v=20261120-scoped-quality-1"><\/script><script src="./common-nav.js?v=20261120-quality-1"><\/script></body>');
+  h=h.replace('</head>','<link rel="stylesheet" href="./record-facts.css?v=20261120-restore-1"></head>');
+  h=h.replace('</body>','<script src="./facility-permissions.js?v=20261120-scoped-quality-1"><\/script><script src="./record-facts-core.js?v=20261120-restore-1"><\/script><script src="./record-facts-ui.js?v=20261120-restore-1"><\/script><script src="./common-nav.js?v=20261120-quality-1"><\/script></body>');
   document.open();
   document.write(h);
   document.close();
