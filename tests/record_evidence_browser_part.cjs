@@ -19,7 +19,8 @@ module.exports=async function({pageFor,STAFF,width,out,pg,atomic,CLIENT,baseline
   const basic={};for(const mode of ['short','normal','long']){basic[mode]=await generate(page,mode);assert(await page.locator('#factQuickDetail').isVisible());assert.equal(basic[mode].facts.actions[0].actions.length,0);assert(!/起き上が|うなず|返事|薬を服用された|背部の洗身|衣類の上げ下げ/.test(basic[mode].care));}
   if(x.service==='起床介助')await picture(page,'after-basic');
   const original=await page.evaluate(()=>NexiaFactUI.collect());
-  // One click sets exactly the labelled preset and regenerates. A double tap is idempotent.
+  await page.locator('#factQuickDetail > summary').click();
+  // One choice sets exactly the labelled preset and regenerates. A double tap is idempotent.
   await page.locator('[data-quick-detail="'+x.preset+'"]').evaluate(b=>{b.click();b.click();});
   await page.waitForFunction(()=>document.getElementById('factQuickDetail').hidden&&document.getElementById('recordSaveStatus').textContent.includes('未保存')&&!document.getElementById('recordCommitButton').disabled);
   const one=await page.evaluate(()=>({facts:NexiaFactUI.collect(),care:document.getElementById('careResult').textContent}));
@@ -43,8 +44,8 @@ module.exports=async function({pageFor,STAFF,width,out,pg,atomic,CLIENT,baseline
  }
  const end=await atomic(async()=>{await pg.exec('reset role');return (await pg.query('select count(*)::int n from public.care_records')).rows[0].n;});assert.equal(end,recordCount+1);await atomic(async()=>{await pg.exec('reset role');for(const row of preserved)assert.deepEqual((await pg.query('select to_jsonb(r) data from public.care_records r where id=$1',[row.id])).rows[0].data,row.data);});
  // Hand-edited output and changed input must not be overwritten by a stale shortcut.
- const edited=await pageFor(STAFF,false,false);await configure(edited,cases[0]);await generate(edited,'normal');await edited.locator('#careResult').fill('職員が確認して編集した文章。');await edited.locator('[data-quick-detail="起床介助-0"]').click();assert.equal(await edited.locator('#careResult').innerText(),'職員が確認して編集した文章。');assert.equal((await edited.evaluate(()=>NexiaFactUI.collect())).actions[0].actions.length,0);
- await generate(edited,'normal');await edited.locator('#condition').selectOption('眠そうな様子が見られた');await edited.locator('[data-quick-detail="起床介助-0"]').click();assert(await edited.locator('#factQuickDetail').isHidden());assert.equal((await edited.evaluate(()=>NexiaFactUI.collect())).actions[0].actions.length,0);await edited.close();
+ const edited=await pageFor(STAFF,false,false);await configure(edited,cases[0]);await generate(edited,'normal');await edited.locator('#careResult').fill('職員が確認して編集した文章。');await edited.locator('#factQuickDetail').evaluate(e=>e.open=true);await edited.locator('[data-quick-detail="起床介助-0"]').click();assert.equal(await edited.locator('#careResult').innerText(),'職員が確認して編集した文章。');assert.equal((await edited.evaluate(()=>NexiaFactUI.collect())).actions[0].actions.length,0);
+ await generate(edited,'normal');await edited.locator('#condition').selectOption('眠そうな様子が見られた');await edited.locator('#factQuickDetail').evaluate(e=>e.open=true);await edited.locator('[data-quick-detail="起床介助-0"]').click();assert(await edited.locator('#factQuickDetail').isHidden());assert.equal((await edited.evaluate(()=>NexiaFactUI.collect())).actions[0].actions.length,0);await edited.close();
  fs.writeFileSync(path.join(out,width+'-evidence.json'),JSON.stringify({passed:true,width,oneClick:true,manualEditProtected:true,staleChoiceRejected:true,realProductionData:false,results},null,2));
  console.log('PASS evidence browser',width,'reported bed-side-position case, 5 services x 3 lengths, one-click method + auto-regenerate, double tap, factual save, preserved edits and stale-input rejection');
 };

@@ -26,5 +26,49 @@
       "record-safety.js": "695013b20218030698d5ac578931bc0b597cf543f58f7caf0bbfff80e1bb40f3",
       "common-nav.js": "2ff1557dffb427180dc6de6e7a649edb5f9ae5048700dc0eae32f4daebeb626a"
     }
+  },
+  "main-before-nov12": {
+    "commit": "e050e93763418a7cf38cf3d9452cf668473238c1",
+    "files": {
+      "index.html": "561ff7b18fae6b14bced872243e5330b47141c4f84ac02201bfce6b152962c28",
+      "common-nav.js": "884d8c5ef27ff91aa2565436cefe5e9f382711e96090417d60a27060db54aee6",
+      "common-theme.css": "a2bbcc954034afd36a6cd2f752e1361d81e7017c7700598c5ec6a8d498dd57f4",
+      "staff-name.js": "e6b5aca93863b6ea55c6e157478675e92236f5764ea73d3fb81059f7f856cf64",
+      "admin-link.js": "3da1475ab2c8c18f23f43f559ef8556d45ba87a678b2eb27fbb87d0bf6f1d933",
+      "client-room-ui.js": "7de5214390d949733eaeeefcf1a464125eee3af46e11fc37d0e1a84a1d407104",
+      "staff-compact.js": "c1fe1a99f611b443a6849f7287bac819a9aebf06a1b75bf8453769a60d22a64c",
+      "record-safety.js": "4cd29862c24f3c5ef17fbdae174cc33a3f6764c2e0569035f7b5b76caedbc012",
+      "care-intro-addon.js": "69178cc66564cdd4c2057fd4769bc80cbad4937580c144b2700fe296919b8111",
+      "assignment-context-guard.js": "d6ffb726000420f86958fa8271179064e6b208b1e18819435bb0162eccbae09e",
+      "record-history.js": "8255f7de39ee2e9ec1e64d8be19fc90721adb9df267e3aa7bf48527e2b2fc48f",
+      "dashboard-return.js": "4e684f8d982d4e7e533bd3c859343f6da2ffe406f1a2a6f5fc3711a3b8343fb3",
+      "record-facts-core.js": "2237950e3bde709345be0969851c820b778d6b2362b7e6f9ff3402ad851630c5",
+      "record-facts-ui.js": "9ab53d29c0de6dc5b6260806d87744d94e028c00ef3e92f2af403311bd8d4664",
+      "record-facts.css": "b31c938b60dd0eaf4837e05efb6eed5a1816214fb3a91fca9cb606c63c517449",
+      "record-similarity.js": "8662bc486d2cdf2d2566a1455f48b9ea4804cf471ecbbe4fc3c5ace0e5a6ae22",
+      "facility-permissions.js": "ece97a8ae612a819d7e87e63053388c868ac1e211d78e31a551361bd84f72274"
+    }
+  },
+  "memo-before": {
+    "commit": "590a7f9b898bd5ea84edbef8ade7288b1202faec",
+    "files": {
+      "index.html": "ba391808723919cdf564539b76a7f864209bd21acbd94970dd72fdb45d00d6c0",
+      "common-nav.js": "884d8c5ef27ff91aa2565436cefe5e9f382711e96090417d60a27060db54aee6",
+      "common-theme.css": "a2bbcc954034afd36a6cd2f752e1361d81e7017c7700598c5ec6a8d498dd57f4",
+      "staff-name.js": "e6b5aca93863b6ea55c6e157478675e92236f5764ea73d3fb81059f7f856cf64",
+      "admin-link.js": "3da1475ab2c8c18f23f43f559ef8556d45ba87a678b2eb27fbb87d0bf6f1d933",
+      "client-room-ui.js": "7de5214390d949733eaeeefcf1a464125eee3af46e11fc37d0e1a84a1d407104",
+      "staff-compact.js": "c1fe1a99f611b443a6849f7287bac819a9aebf06a1b75bf8453769a60d22a64c",
+      "record-safety.js": "4cd29862c24f3c5ef17fbdae174cc33a3f6764c2e0569035f7b5b76caedbc012",
+      "care-intro-addon.js": "69178cc66564cdd4c2057fd4769bc80cbad4937580c144b2700fe296919b8111",
+      "assignment-context-guard.js": "d6ffb726000420f86958fa8271179064e6b208b1e18819435bb0162eccbae09e",
+      "record-history.js": "8255f7de39ee2e9ec1e64d8be19fc90721adb9df267e3aa7bf48527e2b2fc48f",
+      "dashboard-return.js": "4e684f8d982d4e7e533bd3c859343f6da2ffe406f1a2a6f5fc3711a3b8343fb3",
+      "record-facts-core.js": "2c86177e8204d4e02fd1a27a97337e0b8df5a161a9c95ed4148e607eed1ee1ab",
+      "record-facts-ui.js": "91e8248f77ca484f518b24f8025d50676cdae2870fa9694369fb18ca7d9eed73",
+      "record-facts.css": "9fada44ca4502cfb8665af67cb1f321d946fc5b694bbfbc6d4c654cb4d5b0199",
+      "record-similarity.js": "8662bc486d2cdf2d2566a1455f48b9ea4804cf471ecbbe4fc3c5ace0e5a6ae22",
+      "facility-permissions.js": "ece97a8ae612a819d7e87e63053388c868ac1e211d78e31a551361bd84f72274"
+    }
   }
 }

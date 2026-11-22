@@ -6,7 +6,7 @@ module.exports=async function({pageFor,STAFF,width,out}){
   const page=await pageFor(STAFF,false,false);await page.locator('#user').selectOption('resident-101');await page.waitForLoadState('networkidle');
   await page.locator('#interventionLevel').selectOption('prompt');await page.locator('input[name=serviceContent][value="服薬介助・確認"]').check();
   await page.locator('#visitScene').selectOption('椅子・座椅子に座っていた');await page.locator('#condition').selectOption('笑顔が見られた');
-  await page.locator('#factSupportDetails > summary').click();await page.locator('[data-preset="服薬介助・確認-2"]').click();await page.locator('[data-reaction][value="声かけにうなずいて応じた"]').check();
+  await page.locator('#factSupportDetails > summary').click();await page.locator('[data-preset="服薬介助・確認-2"]').click();await page.locator('[data-service-details]').first().evaluate(e=>e.open=true);await page.locator('[data-reaction][value="声かけにうなずいて応じた"]').check();
   await page.locator('[data-service-details]').evaluate(e=>e.open=true);await page.locator('.fact-methods').evaluate(e=>e.open=true);await page.locator('[data-method][value="ゆっくり話した"]').check();await page.locator('[data-after]').selectOption('椅子に座って過ごした');
   await page.locator('#length').evaluate(e=>e.closest('details').open=true);await page.locator('#length').selectOption(mode);
   const fixed=await page.evaluate(()=>NexiaFactUI.collect()),runs=[];

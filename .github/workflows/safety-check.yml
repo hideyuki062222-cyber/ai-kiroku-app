@@ -31,6 +31,9 @@ jobs:
           node --check record-safety.js
           node --check record-facts-core.js
           node --check record-facts-ui.js
+          node --check record-routine-core.js
+          node --check record-routine-ui.js
+          node --check tests/record_routine_browser_part.cjs
           node --check tests/record_quality_browser.cjs
           node --check tests/record_facts_browser.cjs
           node --check care-intro-addon.js
@@ -76,6 +79,7 @@ jobs:
           node tests/facility_editor_database.cjs
           node tests/meal_extras_database.cjs
           node tests/record_facts_database.cjs
+          node tests/record_routine_database.cjs
           node tests/scoped_permissions_database.cjs
           node tests/scoped_permissions_safety.cjs
           node tests/scoped_staff_management_database.cjs
@@ -104,6 +108,9 @@ jobs:
           node tests/record_evidence_quality.cjs
           node tests/record_similarity.cjs
           node tests/record_saved_repeat.cjs
+          node tests/record_nov12_core.cjs
+          node tests/record_memo_core.cjs
+          node tests/record_routine_core.cjs
           node tests/record_seven_days.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner

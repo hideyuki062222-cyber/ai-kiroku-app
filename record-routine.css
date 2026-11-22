@@ -1,0 +1,11 @@
+#routineDaily:empty{display:none}
+.routine-care{padding:12px;border:1px solid #c4d9d1;background:#f6fbf8;border-radius:10px;margin:10px 0}
+.routine-care pre,#routineSettingReference{white-space:pre-wrap;overflow-wrap:anywhere;font:16px/1.65 system-ui;margin:8px 0}
+.routine-care label,#routineSettings label{display:block;margin:10px 0;font-size:16px}
+.routine-care select,.routine-care textarea,#routineSettings select,#routineSettings textarea{width:100%;min-height:46px;font-size:16px;box-sizing:border-box}
+.routine-care [hidden]{display:none!important}
+.routine-care button,#routineSettings button{min-height:46px;font-size:16px;color:#173e36;background:#e3f0e9}
+#routineSettings{margin:12px 0;padding:12px;border:1px solid #c4d9d1;border-radius:10px}
+#routineSettings>summary{min-height:44px;padding:10px 0;cursor:pointer;font-size:16px;font-weight:700}
+.routine-actions{display:flex;gap:10px;flex-wrap:wrap}
+#routineSettingStatus{white-space:pre-wrap;line-height:1.6}

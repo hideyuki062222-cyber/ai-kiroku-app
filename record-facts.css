@@ -55,3 +55,18 @@
 #factQuickDetail{padding:12px;border:1px solid #b8ccc5;border-radius:10px;background:#f6fbf8;margin:10px 0}
 #factQuickDetail p{font-size:15px;line-height:1.65;margin:0 0 10px}
 #factQuickDetail strong{display:block;margin:10px 0 6px}
+
+/* Routine input follows the November 12 form. The full catalogue is opt-in. */
+#factSupportDetails:not([open]) #factActions{display:none}
+#factActions .fact-service{padding:10px;margin:8px 0}
+#factActions .fact-hint,#factActions .fact-confirmed{display:none}
+#factActions [data-service-details]>summary{font-size:15px;font-weight:500}
+#factQuickDetail>summary{min-height:44px;padding:8px 0;box-sizing:border-box;cursor:pointer;font-size:16px;font-weight:700}
+#factQuickDetail:not([open]){padding:4px 12px}
+#factInputCard .fact-free-note{min-height:72px;width:100%;box-sizing:border-box;font-size:16px}
+#factInputCard .fact-free-label{display:block;margin-top:12px}
+#factInputCard .fact-hint{margin:4px 0 8px}
+#factInputCard .fact-optional{margin:6px 0;padding:6px 10px}
+
+#factInputCard .field-group{margin-bottom:12px}
+#factInputCard .grid{margin-bottom:12px}
