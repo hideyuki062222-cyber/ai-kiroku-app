@@ -26,6 +26,7 @@ assert(R.safeCustom('右腕から衣類を通す'));assert.equal(R.customSentenc
 const mf=structuredClone(examples.find(e=>e.service==='服薬介助・確認'&&e.state==='usual').facts);
 mf.actions[0].after='服薬後に特に変化がなかった';
 assert.deepEqual(C.compose(mf).errors,[]);
+const contradict=structuredClone(mf);contradict.supportNote='服用未確認';assert(C.compose(contradict).errors.length,'usual medication cannot override an unconfirmed daily memo');
 mf.actions[0].reactions=['服薬を拒否した'];assert(C.compose(mf).errors.length,'usual medication cannot override refusal');
 const sql=require('node:fs').readFileSync('supabase/migrations/20261122003150_resident_routine_care.sql','utf8');
 const catalog=JSON.parse(sql.match(/\$catalog\$(.*?)\$catalog\$/s)[1]);

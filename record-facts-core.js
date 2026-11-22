@@ -892,6 +892,7 @@
   if(plan.services.length===1&&plan.services[0].service==='服薬介助・確認'){
    const a=plan.services[0],confirmed=a.actions.includes('服薬したことを確認した')||a.reactions.includes('本人が自分で服薬した');
    if((confirmed&&memo.events.some(e=>['uncertain','refusal'].includes(e.kind)))||((a.unconfirmed||a.reactions.includes('服薬を拒否した'))&&memo.events.some(e=>e.canonical==='服薬したことを確認した'))){
+    if(routine?.facts.actions.some(x=>x.service==='服薬介助・確認'&&x.routineApplied))return {errors:['普段のケアの服用確認と、当日の拒否・未確認が重なっています。「変更あり」で実際の経過を確認してください。'],visit:'',care:''};
     memo.conflict=true;memo.events=[{start:0,end:memo.raw.length,source:memo.raw,kind:'raw',normal:memo.raw,long:memo.raw,canonical:''}];memo.unknown=[memo.raw];memo.hasWork=false;
    }
   }
