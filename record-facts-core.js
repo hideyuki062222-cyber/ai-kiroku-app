@@ -501,15 +501,15 @@
  }
  // An explicit service checkbox confirms only that service, never its usual steps.
  // Scheduled candidates and saved facts without this flag keep their former meaning.
- function performed(a){return a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length;}
- function validate(f){
+ function performed(a){return a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length||(a.routineSelfs||[]).length||(a.routineCustom||[]).length;}
+ function validate(f,{allowUnconfirmed=false}={}){
   const errors=[];if(f.interventionLevel&&!Object.hasOwn(interventionLabels,f.interventionLevel))errors.push('今回の支援介入度を確認してください。');let validDate=false;
   try{validDate=/^\d{4}-\d{2}-\d{2}$/.test(f.date||'')&&f.date>='2000-01-01'&&f.date<='2100-12-31'&&new Date(f.date+'T00:00:00Z').toISOString().slice(0,10)===f.date;}catch{}
   if(!validDate)errors.push('記録日を確認してください。');
   if(![f.scene,f.condition,f.health,f.statement,f.difference,f.concern].some(text))errors.push('① 訪問時に確認した状態・表情・体調などを1つ選択、または入力してください。');
   if([f.scene,f.condition,f.health].some(v=>v==='その他')&&![f.statement,f.concern].some(text))errors.push('①「その他」の具体的な内容を発言・気づき欄へ入力してください。');
   if(!Array.isArray(f.actions)){errors.push('② 当日実施した支援を確認してください。');return errors;}
-  if(!f.actions.some(performed)&&!text(f.supportNote))errors.push('② 当日実施した支援を1つ選択、または補足に具体的に入力してください。担当からの候補だけでは実施済みにしません。');
+  if(!allowUnconfirmed&&!f.actions.some(performed)&&!text(f.supportNote))errors.push('② 当日実施した支援を1つ選択、または補足に具体的に入力してください。担当からの候補だけでは実施済みにしません。');
   const seen=new Set();
   for(const a of f.actions){
    if(Object.hasOwn(a,'confirmedService')&&typeof a.confirmedService!=='boolean')errors.push('② 実施サービスの確認内容を確認してください。');
@@ -680,14 +680,14 @@
   }
   return {visit,intervention:f.interventionLevel||'',services:(f.actions||[]).map((a,i)=>({
    ...a,actions:unique(a.actions||[]),reactions:unique(a.reactions||[]),methods:unique(a.methods||[]),source:'actions.'+i,
-   scopeOnly:!(a.actions||[]).length&&!text(a.self)&&!text(a.note)
+   scopeOnly:!(a.actions||[]).length&&!text(a.self)&&!text(a.note)&&!(a.routineSelfs||[]).length&&!(a.routineCustom||[]).length&&!a.routineNote
   })).filter(performed),supportNote:text(f.supportNote),response:text(f.response),after:text(f.after)};
  }
- const needsDetail=a=>performed(a)&&!(a.actions||[]).length&&!text(a.self)&&!text(a.note);
+ const needsDetail=a=>performed(a)&&!(a.actions||[]).length&&!text(a.self)&&!text(a.note)&&!(a.routineSelfs||[]).length&&!(a.routineCustom||[]).length&&!a.routineNote;
  const interventionPrefix={active:'今回は直接介助を中心に、',partial:'今回は必要な部分への支援として、',prompt:'今回は声かけ・促しを中心に、',watch:'今回は見守りを中心に、',minimal:'今回は最小限の支援・確認の範囲で、'};
  function fitsIntervention(a,level){
   if(needsDetail(a))return false;
-  const values=(a.actions||[]).join(' ');
+  const values=[...(a.actions||[]),...(a.routineCustom||[])].join(' ');
   return ({active:/介助|清拭/.test(values),partial:/介助|清拭/.test(values),prompt:/声かけ|声をかけ/.test(values),watch:/見守り/.test(values),minimal:true})[level]||false;
  }
  // Detail changes grammatical attribution, not observations or clinical findings.
@@ -846,11 +846,11 @@
   if(conflict)events=[{start:0,end:raw.length,source:raw,kind:'raw',normal:raw,long:raw,canonical:''}];
   return {raw,events,unknown:events.filter(e=>e.kind==='raw').map(e=>e.source),hasWork:events.some(e=>e.kind==='work'),conflict};
  }
- function composeMemo(memo,mode,service,level='',structure=xs=>xs[0]){
+ function composeMemo(memo,mode,service,level='',structure=xs=>xs[0],voice=s=>s){
   const events=memo.events.filter(e=>!e.represented);if(!events.length)return '';
   const firstWork=events.findIndex(e=>e.kind==='work');
   const values=events.map((e,i)=>{
-   let value=mode==='long'?e.long:e.normal;
+   let value=mode==='long'?e.long:e.normal;if(e.kind!=='raw')value=voice(value);
    if(mode!=='long'&&e.kind==='work'&&e.canonical&&!value.includes('の')&&/を介助しました$/.test(value))value=structure([value,value.replace(/を介助しました$/,'の介助を行いました')]);
    if(mode==='long'&&e.canonical==='起き上がりを介助した')value=structure([value,'職員は本人が起き上がる動作を介助しました']);
    // Attach the declared range only to a compatible, explicitly recorded action.
@@ -869,7 +869,7 @@
    const e=values[i],next=values[i+1];
    // Explicitly recorded medication prompt + confirmation: never infer taking.
    if(service==='服薬介助・確認'&&e.canonical==='服薬の声かけを行った'&&next?.canonical==='服薬したことを確認した'){
-    out.push(sentence(connective(e.value)+'、本人が薬を服用されたことを確認しました'));i++;continue;
+    out.push(sentence(voice(connective(e.value)+'、本人が薬を服用されたことを確認しました')));i++;continue;
    }
    if(mode!=='long'&&next&&((e.kind==='work'&&next.kind==='work')||(['self','patient'].includes(e.kind)&&next.kind==='after'))){
     out.push(sentence(connective(e.value)+'、'+next.value.replace(/^支援後は、本人が/,'支援後は').replace(/^支援後、本人から/,'支援後には')));i++;continue;
@@ -880,8 +880,11 @@
   return (level&&!fitsLevel?sentence(interventionText[level]):'')+out.join('');
  }
  function compose(f,_profile,expressionSeed=0){
-  const errors=validate(f);if(errors.length)return {errors,visit:'',care:''};
-  const plan=evidencePlan(f),mode=f.lengthMode||'normal',variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
+  const R=f.routineCare?(typeof module!=='undefined'?require('./record-routine-core.js'):root.NexiaRoutineCore):null;
+  if(f.routineCare&&!R)return {errors:['普段のケアの処理を再読み込みしてください。'],visit:'',care:''};
+  const routine=R?R.prepare(api,f):null;if(routine?.errors.length)return {errors:routine.errors,visit:'',care:''};
+  const errors=validate(routine?routine.facts:f,{allowUnconfirmed:!!routine?.unknown.length});if(errors.length)return {errors,visit:'',care:''};
+  const plan=evidencePlan(routine?routine.facts:f),mode=f.lengthMode||'normal',variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
   const observation=e=>observations[e.value]?variant.phrase(observations[e.value]):e.value.replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
   const render=xs=>joinClauses(xs,mode==='short'?'short':mode==='normal'&&xs.length>1?variant.pick(['normal','long']):'long');
   const visit=composeVisit(plan,mode,variant,structure,observation);
@@ -889,6 +892,7 @@
   if(plan.services.length===1&&plan.services[0].service==='服薬介助・確認'){
    const a=plan.services[0],confirmed=a.actions.includes('服薬したことを確認した')||a.reactions.includes('本人が自分で服薬した');
    if((confirmed&&memo.events.some(e=>['uncertain','refusal'].includes(e.kind)))||((a.unconfirmed||a.reactions.includes('服薬を拒否した'))&&memo.events.some(e=>e.canonical==='服薬したことを確認した'))){
+    if(routine?.facts.actions.some(x=>x.service==='服薬介助・確認'&&x.routineApplied))return {errors:['普段のケアの服用確認と、当日の拒否・未確認が重なっています。「変更あり」で実際の経過を確認してください。'],visit:'',care:''};
     memo.conflict=true;memo.events=[{start:0,end:memo.raw.length,source:memo.raw,kind:'raw',normal:memo.raw,long:memo.raw,canonical:''}];memo.unknown=[memo.raw];memo.hasWork=false;
    }
   }
@@ -900,16 +904,17 @@
   const scopeOnlyRecord=plan.services.length===1&&plan.services[0].scopeOnly&&!plan.services[0].methods.length;
   // If no selected action supports a more specific relation, retain only the
   // selected overall range. Never infer physical help from an intervention.
-  if(plan.intervention&&target<0&&!scopeOnlyRecord&&!memoReplacesScope)sections.push(sentence(interventionText[plan.intervention]));
+  if(plan.intervention&&target<0&&!scopeOnlyRecord&&!memoReplacesScope&&(!routine||plan.services.length)&&!plan.services.some(a=>a.routineMemoOnly))sections.push(sentence(interventionText[plan.intervention]));
   plan.services.forEach((a,index)=>{
    if(memoReplacesScope){sections.push(composeMemo(memo,mode,a.service,plan.intervention,structure));return;}
-   const composed=supportClauses(a),positive=composed.acts.filter(v=>v!=='服用済みかは確認していません');
-   const own=text(a.self)?selfSentence(a.self):'';
+   if(a.routineMemoOnly){const rm=planMemo(a.routineNote,a.service);sections.push(composeMemo(rm,mode,a.service,rm.hasWork&&target<0&&index===plan.services.findIndex(s=>s.routineMemoOnly)?plan.intervention:'',structure,R.plain));return;}
+   const composed=a.routineCustom?.length?{acts:[...(a.routineWorkOrder||[]),...a.actions.filter(v=>!a.routineWorkOrder.some(i=>i.kind==='action'&&i.value===v)).map(value=>({kind:'action',value}))].flatMap(i=>i.kind==='custom'?[R.customSentence(i.value)]:actionClauses({...a,confirmedService:false,actions:[i.value],reactions:[]})),reactions:a.reactions}:supportClauses(a);const positive=composed.acts.filter(v=>v!=='服用済みかは確認していません');
+   const own=unique([text(a.self)?selfSentence(a.self):'',...(a.routineSelfs||[]).map(selfSentence)]).map(v=>a.routineApplied?R.plain(v):v).map(sentence).join('').replace(/。$/,'');
    const responses=unique(composed.reactions).filter(v=>!(a.service==='服薬介助・確認'&&a.actions.includes('服薬したことを確認した')&&v==='本人が自分で服薬した'));
    const reactions=responses.map(v=>reactionSentences[v]?variant.phrase(reactionSentences[v]):v);
    const lead=(composed.lead||'').split('。').filter(Boolean).map(variant.phrase).map(sentence).join('');
    const prefix=index===target?interventionPrefix[plan.intervention]:'';
-   let work=lead+render(positive.map(variant.phrase).map(v=>mode==='long'?(explicitHelp[v]||v):v));
+   let work=lead+render(positive.map(variant.phrase).map(v=>a.routineApplied?R.plain(v):v).map(v=>mode==='long'?(explicitHelp[v]||v):v));
    if(prefix&&plan.intervention==='watch'&&a.actions.length===1&&/の見守りを行った$/.test(a.actions[0])){
     work=sentence(a.actions[0].replace(/を行った$/,'')+'を中心に、職員が対応しました');
    }else if(prefix)work=prefix+work;
@@ -946,15 +951,17 @@
     body=middle+uncertain+after+note;
    }
    if(mode!=='short'&&!a.scopeOnly&&!body.startsWith('今回の'))body=(mode==='long'?structure([serviceContexts[a.service],serviceStatements[a.service].replace(/を行いました$/,'')+'については、']):serviceContexts[a.service])+body.replace(/^今回は/,'');
+   if(a.routineNote)body+=composeMemo(planMemo(a.routineNote,a.service),mode,a.service,'',structure,R.plain);
    sections.push(body);
   });
   if(plan.supportNote&&!memoReplacesScope)sections.push(composeMemo(memo,mode,plan.services.length===1?plan.services[0].service:null,'',structure));
   if(plan.response&&!plan.services.some(a=>a.reactions.some(r=>r.replace(/^声かけに/,'')===plan.response.replace(/^声かけに/,''))))sections.push(sentence('支援中、'+(reactionSentences[plan.response]||plan.response)));
   if(plan.after&&!(plan.services.length===1&&plan.services[0].after===plan.after))sections.push(sentence(afterSentence(plan.after)));
+  if(routine)for(const service of routine.unknown)sections.push(mode==='long'?service+'について、登録済みの普段のケアを今回も実施したかは未確認です。':service+'の普段のケアは、今回の実施状況を確認していません。');
   const care=INTRO+sections.join('');
   const inputCount=[f.interventionLevel,f.scene,f.condition,f.health,f.statement,f.difference,f.concern,f.supportNote,f.response,f.after].filter(text).length+plan.services.reduce((n,a)=>n+(a.confirmedService===true&&!a.actions.length?1:0)+a.actions.length+a.reactions.length+a.methods.length+[a.self,a.after,a.note].filter(text).length,0);
   return {errors:[],visit,care,inputCount,needsDetail:memoReplacesScope?[]:plan.services.filter(needsDetail).map(a=>a.service),...(plan.supportNote?{memoReview:memo.unknown,memoConflict:memo.conflict,memoEvidence:memo.events.map(({source,start,end,kind,canonical,represented})=>({source,start,end,kind,canonical,represented:!!represented}))}:{})};
  }
 
- const api={planMemo,evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={composeMemo,planMemo,evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);

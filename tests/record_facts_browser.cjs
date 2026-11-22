@@ -22,10 +22,11 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await pg.query("insert into public.care_records(id,organization_id,client_id,created_by,visit_note,care_note) values($1,$2,$3,$4,'保持する過去の観察','保持する過去の支援')",[OLD,ORG,CLIENT,ADMIN]);
  await pg.query('select public.set_facility_editor($1,$2,true,false)',[ORG,EDITOR]);
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261120051058_safe_granular_facility_permissions.sql'),'utf8'));
- async function pageFor(uid,baseline=false,assignment=true){
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261122003150_resident_routine_care.sql'),'utf8'));
+ async function pageFor(uid,baseline=false,assignment=true,activeOrg=ORG){
   const ctx=await browser.newContext({viewport:{width,height:950},isMobile:width<600,hasTouch:width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo',acceptDownloads:true});contexts.push(ctx);
   const user={id:uid,email:'synthetic@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email'},user_metadata:{}},exp=Math.floor(Date.now()/1000)+3600,token='e30.'+Buffer.from(JSON.stringify({sub:uid,role:'authenticated',aud:'authenticated',exp})).toString('base64url')+'.synthetic';
-  await ctx.addInitScript(({user,token,exp,ORG})=>{localStorage.setItem('sb-pagamoaxhqszojxrpxyu-auth-token',JSON.stringify({access_token:token,expires_at:exp,refresh_token:'synthetic',token_type:'bearer',user}));localStorage.setItem('activeOrganizationId',ORG);},{user,token,exp,ORG});
+  await ctx.addInitScript(({user,token,exp,ORG})=>{localStorage.setItem('sb-pagamoaxhqszojxrpxyu-auth-token',JSON.stringify({access_token:token,expires_at:exp,refresh_token:'synthetic',token_type:'bearer',user}));if(!localStorage.getItem('activeOrganizationId'))localStorage.setItem('activeOrganizationId',ORG);},{user,token,exp,ORG:activeOrg});
   await ctx.route('**/*',async route=>{
    const req=route.request(),u=new URL(req.url()),method=req.method();
    if(u.hostname==='127.0.0.1'){
@@ -40,7 +41,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
    const result=await atomic(async()=>{
     await pg.exec('reset role;set role authenticated');await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[uid]);
     try{
-     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});const key=String(p.p_signature),n=legacyCounters.get(key)||0;legacyCounters.set(key,n+1);return {data:n};}if(!['save_record_profile','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
+     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});const key=String(p.p_signature),n=legacyCounters.get(key)||0;legacyCounters.set(key,n+1);return {data:n};}if(!['save_record_profile','save_routine_care','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
       const names=Object.keys(p);const {rows}=await pg.query('select public.'+fn+'('+names.map((k,i)=>k+'=> $'+(i+1)).join(',')+') result',Object.values(p).map(v=>v&&typeof v==='object'?JSON.stringify(v):v));return {data:rows[0].result};}
      const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','organization_feature_permissions','organization_permission_sets','care_record_amendments','clients','client_record_profiles','staff_assignments','client_service_slots','care_records'].includes(table))throw Error('Unexpected table '+table);
      const params=[],where=[];for(const [k,v]of u.searchParams){if(['select','order','limit','offset'].includes(k))continue;if(!/^\w+$/.test(k))throw Error('bad column');const dot=v.indexOf('.'),op=v.slice(0,dot),value=v.slice(dot+1);
@@ -54,11 +55,12 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
     }catch(e){return {error:{message:e.message,code:e.code||'TEST_FAILURE'}};}
    });return route.fulfill({status:result.error?400:200,headers:{...headers,'content-range':'0-0/'+(result.count||0)},body:method==='HEAD'?'':JSON.stringify(result.error||result.data,(k,v)=>['meal_date','effective_date','start_date','end_date','month','service_date'].includes(k)&&typeof v==='string'?v.slice(0,10):v)});
   });
-  const page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>{if(d.type()==='confirm'&&page.cancelNextConfirm){page.cancelNextConfirm=false;return d.dismiss();}return d.type()==='prompt'?d.accept('合成検証の確認'):d.type()==='confirm'?d.accept():d.dismiss();});
+  const page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>{if(d.type()==='confirm'&&page.cancelNextConfirm){page.cancelNextConfirm=false;return d.dismiss();}return d.type()==='prompt'?d.accept('合成検証の確認'):['confirm','beforeunload'].includes(d.type())?d.accept():d.dismiss();});
   await page.goto(`http://127.0.0.1:${server.address().port}/ai-kiroku-app/${assignment?'?from=assignment&assignment='+(typeof assignment==='string'?assignment:ASSIGN):'?app=record'}`);await page.locator('#recordCommitButton').waitFor();await page.waitForFunction(()=>window.__nexiaStaffNameReady===true);if(assignment)await page.waitForFunction(()=>window.__assignmentContextGuardReady===true);await page.waitForLoadState('networkidle');await page.waitForFunction(()=>window.__nexiaStaffNameReady===true);return page;
  }
  const oldRecord=(await pg.query('select to_jsonb(r) x from public.care_records r where id=$1',[OLD])).rows[0].x;
  const shots=async(page,locator,name)=>{assert((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,name+' page overflow');await page.locator(locator).screenshot({path:path.join(out,width+'-'+name+'.png')});};
+ if(process.env.RECORD_ROUTINE_ONLY){await require('./record_routine_browser_part.cjs')({pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,pg,atomic,id,width,out,date});assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);return;}
  if(process.env.RECORD_MEMO_ONLY){await require('./record_memo_browser_part.cjs')({pageFor,STAFF,ADMIN,ORG,CLIENT,pg,atomic,id,width,out,date});assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);return;}
  let before=null;
  if(baselineRoot&&process.env.RECORD_COMPARE_LEGACY){const old=await pageFor(STAFF,true);await old.locator('#visitScene').selectOption('椅子・座椅子に座っていた');await old.locator('#condition').selectOption('笑顔が見られた');await old.locator('#interventionLevel').selectOption('watch');await old.locator('#input').fill('本人は食具を操作した。支援中はうなずいて応じた。');await old.getByRole('button',{name:'AIで記録作成',exact:true}).click();await old.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('未保存'));before={visit:await old.locator('#visitResult').innerText(),care:await old.locator('#careResult').innerText()};await shots(old,'#careResult','before-record');await old.close();}
@@ -89,6 +91,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await require('./record_evidence_browser_part.cjs')({pageFor,STAFF,width,out,pg,atomic,CLIENT,baselineRoot});
  await require('./record_saved_repeat_browser_part.cjs')({pg,atomic,pageFor,STAFF,ORG,ADMIN,id,width,out,baselineRoot});
  await require('./record_memo_browser_part.cjs')({pageFor,STAFF,ADMIN,ORG,CLIENT,pg,atomic,id,width,out,date});
+ await require('./record_routine_browser_part.cjs')({pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,pg,atomic,id,width,out,date});
  assert.equal(variantCalls.filter(c=>!c.baseline).length,0,'new generation never sends profile/signature to variant RPC');assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);
  fs.writeFileSync(path.join(out,width+'.json'),JSON.stringify({width,before,comparisonAfter:{visit:initialVisit,care:generated},after:{visit:await staff.locator('#visitResult').innerText(),care:saved[0].care_note},passed:true,errors,unexpected,actualPinnedHTML:true,isolatedPostgres:true},null,2));console.log('PASS factual record browser',width,'actual pinned HTML, insufficient facts, edits, formal save, assignment, double click, profiles, roles, reload, old records retained');
  }catch(e){for(const c of contexts)for(const p of c.pages()){console.error('FAILPAGE',p.url(),(await p.locator('body').innerText()).slice(-6000));await p.screenshot({path:path.join(out,width+'-failure-'+contexts.indexOf(c)+'.png'),fullPage:true});}throw e;}finally{await Promise.all(contexts.map(c=>c.close()));await pg.close();}

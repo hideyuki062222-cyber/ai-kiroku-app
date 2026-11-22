@@ -38,9 +38,9 @@
  function markDaily(){dailyDirty=true;stash();syncButtons();}
  function syncButtons(){for(const e of q('factActions').querySelectorAll('[data-fact-service]')){const a=readCard(e);e.querySelector('[data-performed]').textContent=C.performed(a)?'実施したサービス':'予定・実施は未確認';for(const b of e.querySelectorAll('[data-preset]')){const p=C.quickChoices[a.service].find(p=>p.id===b.dataset.preset);b.setAttribute('aria-pressed',String(p.actions.length===a.actions.length&&p.actions.every(v=>a.actions.includes(v))&&!!p.unconfirmed===!!a.unconfirmed&&(p.self||'')===(a.self||'')));}}
  }
- function collect(){return {version:1,composerRevision:4,interventionLevel:q('interventionLevel').value,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};}
+ function collect(){const f={version:1,composerRevision:4,interventionLevel:q('interventionLevel').value,lengthMode:q('length').value,date:q('factDate').value,scene:q('visitScene').value,condition:q('condition').value,health:q('health').value,statement:q('factStatement').value,difference:q('factDifference').value,concern:q('factConcern').value,actions:[...q('factActions').querySelectorAll('[data-fact-service]')].map(e=>{const {open,...a}=readCard(e);return a;}),supportNote:q('input').value,response:q('factResponse').value,after:q('factAfter').value};return window.NexiaRoutineUI?window.NexiaRoutineUI.collect(f):f;}
  function resetDaily(){
-  window.__nexiaPreviousExpression=null;quickDetailSignature='';if(q('factQuickDetail')){q('factQuickDetail').hidden=true;q('factQuickDetail').replaceChildren();}
+  window.NexiaRoutineUI?.reset();window.__nexiaPreviousExpression=null;quickDetailSignature='';if(q('factQuickDetail')){q('factQuickDetail').hidden=true;q('factQuickDetail').replaceChildren();}
   for(const id of ['interventionLevel','visitScene','condition','health','input','factStatement','factDifference','factConcern','factResponse','factAfter'])q(id).value='';
   actionState=new Map();document.querySelectorAll('input[name=serviceContent]').forEach(c=>{c.checked=false;c.indeterminate=plannedServices.has(c.value);});dailyProfile=null;q('factActions').replaceChildren();actionRows({read:false});syncButtons();dailyDirty=false;
   q('visitResult').textContent='ここに訪問時の記録文が表示されます。';q('careResult').textContent='ここに支援中の記録文が表示されます。';
@@ -76,9 +76,10 @@
   q('factProfileSave').classList.remove('hidden');q('factProfileSave').hidden=false;q('factProfileSave').disabled=!admin;q('factProfileRole').textContent=admin?'プロフィール編集権限があります。全項目任意です。':'閲覧のみです。編集には利用者情報・プロフィールの全範囲の権限が必要です。';
  }
  async function loadStructured(code){
+  if(window.NexiaRoutineUI?.canSwitch(code,localStorage.getItem('activeOrganizationId'))===false)return;
   if(profileDirty&&editor?.code===code)return;
   if(profileDirty&&!confirm('プロフィールに未保存の入力があります。破棄して切り替えますか？')){q('profileUser').value=editor?.code||'';return;}
-  const ticket=++profileVersion;if(code===q('user').value){dailyProfile=null;refreshMethods();}editor=null;profileDirty=false;q('factProfileStatus').textContent='読み込み中…';profileForm();setProfileRole(false);
+  const ticket=++profileVersion;if(code===q('user').value){dailyProfile=null;refreshMethods();}editor=null;window.NexiaRoutineUI?.onProfile();profileDirty=false;q('factProfileStatus').textContent='読み込み中…';profileForm();setProfileRole(false);
   if(code===q('user').value)q('factReference').textContent='参考情報を確認しています…';
   if(!code){q('factProfileStatus').textContent='利用者を選択してください。';q('factReference').textContent='プロフィールは当日の出来事として自動記載しません。';return;}
   try{
@@ -90,8 +91,9 @@
    for(const [k,id]of Object.entries(legacyFields))q(id).value=legacy[k];profileForm(row?.data);setProfileRole(c.canProfile);
    q('factProfileStatus').textContent=ps.length?'登録済みのプロフィールを読み込みました。':'新しい選択項目は未登録です。以前の登録内容は下に保持しています。';
    q('factOldIntro').textContent=client.care_intro_text||C.INTRO;
-   if(code===q('user').value){dailyProfile={org:c.org,code,clientId:client.id,data:row?.data||{},legacy};refreshMethods();const refs=Object.entries(row?.data||{}).filter(([,v])=>v.choices?.length||v.note).map(([k,v])=>`${C.profileFields[k]?.[0]||k}：${[...(v.choices||[]),v.note].filter(Boolean).join('、')}`);const old=Object.entries(legacy).filter(([,v])=>v).map(([k,v])=>`${legacyLabels[k]}：${v}`);q('factReference').textContent=[...refs,...old].join('\n')||'登録済みプロフィールはありません。当日の事実だけで記録を作成できます。';}
-  }catch(e){if(ticket!==profileVersion)return;q('factProfileStatus').textContent='プロフィールを読み込めませんでした：'+e.message;if(code===q('user').value)q('factReference').textContent='参考情報を読み込めませんでした。当日の事実を確認して入力してください。';}
+   if(code===q('user').value){dailyProfile={org:c.org,code,clientId:client.id,actor:c.actor,row,data:row?.data||{},legacy};refreshMethods();const refs=Object.entries(row?.data||{}).filter(([,v])=>v.choices?.length||v.note).map(([k,v])=>`${C.profileFields[k]?.[0]||k}：${[...(v.choices||[]),v.note].filter(Boolean).join('、')}`);const old=Object.entries(legacy).filter(([,v])=>v).map(([k,v])=>`${legacyLabels[k]}：${v}`);q('factReference').textContent=[...refs,...old].join('\n')||'登録済みプロフィールはありません。当日の事実だけで記録を作成できます。';}
+   window.NexiaRoutineUI?.onProfile();
+  }catch(e){window.NexiaRoutineUI?.onProfile();if(ticket!==profileVersion)return;q('factProfileStatus').textContent='プロフィールを読み込めませんでした：'+e.message;if(code===q('user').value)q('factReference').textContent='参考情報を読み込めませんでした。当日の事実を確認して入力してください。';}
  }
  function mount(){
   window.__nexiaFactsMode=true;
@@ -135,7 +137,7 @@
   window.addEventListener('storage',e=>{if(e.key==='activeOrganizationId'&&e.newValue!==previousOrg){profileDirty=false;editor=null;previousOrg=e.newValue;plannedServices=new Set();document.querySelectorAll('[data-planned-service]').forEach(b=>b.hidden=true);resetDaily();}});
   const oldClear=window.clearAll;window.clearAll=()=>{oldClear();resetDaily();};
   window.shortenCareResult=()=>{q('careResult').textContent=q('careResult').textContent.replace(/\s+/g,' ').trim();q('careResultCount').textContent=q('careResult').textContent.length+'文字';};
-  window.generate=generate;window.NexiaFactUI={collect,context,rephrase(record,rows){
+  window.generate=generate;window.NexiaFactUI={collect,context,profileState:()=>({editor,dailyProfile}),adoptRoutineRow(row,org,client){if(editor?.org===org&&editor.client.id===client)editor.row=row;if(dailyProfile?.org===org&&dailyProfile.clientId===client){dailyProfile.row=row;dailyProfile.data=row.data;}window.NexiaRoutineUI?.onProfile();},rephrase(record,rows){
    const scope=record.factContext,previous=window.__nexiaPreviousExpression;
    const recent=previous?.org===scope.organizationId&&previous?.client===scope.clientId&&previous.actor===scope.actorId?previous.row:null;
    const result=window.NexiaRecordSimilarity.chooseExpression(C,record.dailyFacts,scope,rows,C.nextExpressionSeed(),recent);
@@ -169,11 +171,12 @@
   const f=collect(),result=C.compose(f,undefined,C.nextExpressionSeed());q('factErrors').textContent=result.errors.join('\n');if(result.errors.length){q('factErrors').focus();return;}
   const code=q('user').value,service=q('service').value;if(!code){q('factErrors').textContent='利用者を選択してください。';return;}
   const c=await context(),client=check(await c.db.from('clients').select('id').eq('organization_id',c.org).eq('code',code).eq('is_active',true));if(client.length!==1)throw Error('利用者IDを確認できません。');
+  if(window.NexiaRoutineUI){try{await window.NexiaRoutineUI.verify(f,c,client[0].id);}catch(e){q('factErrors').textContent=e.message;q('factErrors').focus();return;}}
   if(window.assignmentContext?.organizationId&&(window.assignmentContext.organizationId!==c.org||window.assignmentContext.clientId!==client[0].id))throw Error('担当と選択施設が一致しません。');
   if(code!==q('user').value||service!==q('service').value||JSON.stringify(f)!==JSON.stringify(collect()))throw Error('作成中に入力が変更されました。もう一度作成してください。');
   q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;q('visitResultCount').textContent=result.visit.length+'文字';q('careResultCount').textContent=result.care.length+'文字';q('factCompositionStatus').textContent=(result.memoConflict?'服薬確認と未確認・拒否が重なっています。経過を確認できるようメモの原文を残しています。':result.memoReview?.length?'意味を確定できないメモは原文のまま残しています。':'確認した事実から文章を整えました。')+'文章を確認してから正式保存してください。';
   showQuickDetail(f,result.needsDetail||[]);q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
-  const actions=f.actions.filter(C.performed);
+  const actual=window.NexiaRoutineCore&&f.routineCare?NexiaRoutineCore.prepare(C,f).facts:f;const actions=actual.actions.filter(C.performed);
   await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:f.interventionLevel,supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor}});
   window.addHistory(code+' / '+service,'【訪問時】'+result.visit+' 【支援中】'+result.care);
  }
