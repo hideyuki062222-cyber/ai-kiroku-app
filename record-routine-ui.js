@@ -1,7 +1,7 @@
 /* Routine-care settings share the existing profile row, authority and revision. */
 (()=>{
  'use strict';const C=NexiaFactCore,R=NexiaRoutineCore,F=NexiaFactUI,q=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- let scope=null,scopeKey='',day=new Map(),draft=null,dirty=false,saving=false;
+ let scope=null,scopeKey='',dailyIdentity='',day=new Map(),draft=null,dirty=false,saving=false;
  const panel=document.createElement('section');panel.id='routineDaily';q('factServiceChecks').after(panel);
  const settings=document.createElement('details');settings.id='routineSettings';settings.innerHTML='<summary>利用者・サービスごとの普段のケア設定</summary><p>今回実施した記録とは別の設定です。ケア手順と本人が行う部分を登録できます。例：腰に手を添えて起き上がりを介助する。体調・反応・支援後は当日に入力してください。</p><p id="routineSettingScope"></p><label>サービス<select id="routineSettingService">'+Object.keys(C.serviceActions).map(s=>'<option>'+esc(s)+'</option>').join('')+'</select></label><label>ケア項目を追加<select id="routineAddItem"><option value="">項目を選択すると下のメモへ追加します</option></select></label><label>普段のケア手順（1行に1つ）<textarea id="routineSettingNote" maxlength="5000" rows="4" placeholder="例：起き上がりを介助した"></textarea></label><label>既存プロフィールの支援方法を参照<select id="routineSettingRef"><option value="">参照しない</option>'+R.refs.map(k=>'<option value="'+k+'">'+R.refLabels[k]+'</option>').join('')+'</select></label><pre id="routineSettingReference"></pre><p>参照する値はここへ複製せず、既存の保存元を使います。日々の確認で読み取れない内容は参考表示だけにします。</p><div class="routine-actions"><button type="button" id="routineSave">普段のケア設定を保存</button><button type="button" id="routineReload">設定を再読込</button></div><p id="routineSettingStatus" role="status"></p>';
  q('structuredProfile').after(settings);
@@ -35,7 +35,7 @@
   const d=profile().dailyProfile;
   if(d&&d.org===localStorage.getItem('activeOrganizationId')&&d.code===q('user').value){
    const nextKey=d.org+'|'+d.clientId+'|'+d.actor+'|'+(d.row?.revision||0);
-   const identityChanged=!scope||scope.org!==d.org||scope.clientId!==d.clientId||scope.actor!==d.actor;
+   const nextIdentity=d.org+'|'+d.clientId+'|'+d.actor,identityChanged=dailyIdentity!==nextIdentity;dailyIdentity=nextIdentity;
    if(identityChanged)day=new Map();else if(scopeKey!==nextKey)for(const s of day.values()){s.confirmed=false;s.confirmedAt='';s.source=null;if(s.state==='usual')s.state='unconfirmed';}
    scope=d;scopeKey=nextKey;
   }else{scope=null;scopeKey='';}

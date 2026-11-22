@@ -66,7 +66,7 @@
               "services": {
                 "起床介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.733+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -88,7 +88,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:46.686Z",
+                  "confirmedAt": "2026-11-22T01:08:09.354Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -135,7 +135,7 @@
               "services": {
                 "起床介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.733+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -157,7 +157,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:46.686Z",
+                  "confirmedAt": "2026-11-22T01:08:09.354Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -167,7 +167,7 @@
         }
       },
       "saved": {
-        "id": "14036abc-c73a-4542-b6e7-fb1112be33fb",
+        "id": "d03b59ea-ade1-461a-a489-e1d5a6cc95a6",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -193,8 +193,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "",
-          "confirmedAt": "2026-11-22T01:00:46.686Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedAt": "2026-11-22T01:08:09.354Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.733+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -261,7 +261,7 @@
               "services": {
                 "起床介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.733+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -283,7 +283,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:48.840Z",
+                  "confirmedAt": "2026-11-22T01:08:11.554Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "起床の声かけ／本人から返事"
                 }
@@ -330,7 +330,7 @@
               "services": {
                 "起床介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.733+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -352,7 +352,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:48.840Z",
+                  "confirmedAt": "2026-11-22T01:08:11.554Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "起床の声かけ／本人から返事"
                 }
@@ -362,7 +362,7 @@
         }
       },
       "saved": {
-        "id": "8c884ff7-8517-409e-a580-cd6ebe22da46",
+        "id": "04328a2e-116f-4589-9512-4f13f3fe0414",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -388,8 +388,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "起床の声かけ／本人から返事",
-          "confirmedAt": "2026-11-22T01:00:48.840Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedAt": "2026-11-22T01:08:11.554Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.733+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -509,7 +509,7 @@
         }
       },
       "saved": {
-        "id": "22fa6afb-d3ef-4752-9c15-3a17dd7637ac",
+        "id": "bef36083-3a25-4fd1-afb6-2216cbec7405",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -579,7 +579,7 @@
               "services": {
                 "服薬介助・確認": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.832+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -601,7 +601,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:53.078Z",
+                  "confirmedAt": "2026-11-22T01:08:15.814Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -648,7 +648,7 @@
               "services": {
                 "服薬介助・確認": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.832+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -670,7 +670,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:53.078Z",
+                  "confirmedAt": "2026-11-22T01:08:15.814Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -680,7 +680,7 @@
         }
       },
       "saved": {
-        "id": "7b9b9495-05d8-40de-a46c-a5fc38ea28b0",
+        "id": "745e6daf-5964-4ec7-9229-24e12e8a46e4",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -706,8 +706,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "",
-          "confirmedAt": "2026-11-22T01:00:53.078Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedAt": "2026-11-22T01:08:15.814Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.832+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -774,7 +774,7 @@
               "services": {
                 "服薬介助・確認": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.832+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -796,7 +796,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:55.920Z",
+                  "confirmedAt": "2026-11-22T01:08:17.838Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "服薬の声かけ／服用未確認／本人が服薬を拒否"
                 }
@@ -843,7 +843,7 @@
               "services": {
                 "服薬介助・確認": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.832+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -865,7 +865,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:00:55.920Z",
+                  "confirmedAt": "2026-11-22T01:08:17.838Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "服薬の声かけ／服用未確認／本人が服薬を拒否"
                 }
@@ -875,7 +875,7 @@
         }
       },
       "saved": {
-        "id": "c2df45bf-bd7c-4ffb-857c-a35f0d455111",
+        "id": "18a13906-d670-4d87-a77f-fe0704bdf156",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -901,8 +901,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "服薬の声かけ／服用未確認／本人が服薬を拒否",
-          "confirmedAt": "2026-11-22T01:00:55.920Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedAt": "2026-11-22T01:08:17.838Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.832+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -1022,7 +1022,7 @@
         }
       },
       "saved": {
-        "id": "e5d4bb59-d98c-4dc7-aff7-a097b3cb9447",
+        "id": "467d2024-5654-4e4c-9330-ac96a40f2d68",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -1096,7 +1096,7 @@
               "services": {
                 "トイレ介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.931+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1118,7 +1118,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:01.020Z",
+                  "confirmedAt": "2026-11-22T01:08:21.878Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -1165,7 +1165,7 @@
               "services": {
                 "トイレ介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.931+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1187,7 +1187,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:01.020Z",
+                  "confirmedAt": "2026-11-22T01:08:21.878Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -1197,7 +1197,7 @@
         }
       },
       "saved": {
-        "id": "c641c4b4-b469-44a7-beb7-78358083ba9d",
+        "id": "c32b1447-7531-476e-9166-23c9a834418d",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -1223,8 +1223,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "",
-          "confirmedAt": "2026-11-22T01:01:01.020Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedAt": "2026-11-22T01:08:21.878Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.931+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -1295,7 +1295,7 @@
               "services": {
                 "トイレ介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.931+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1317,7 +1317,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:03.528Z",
+                  "confirmedAt": "2026-11-22T01:08:23.937Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望"
                 }
@@ -1364,7 +1364,7 @@
               "services": {
                 "トイレ介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.931+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1386,7 +1386,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:03.528Z",
+                  "confirmedAt": "2026-11-22T01:08:23.937Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望"
                 }
@@ -1396,7 +1396,7 @@
         }
       },
       "saved": {
-        "id": "234e3b38-edaf-45a3-bcfb-4a2408cbe113",
+        "id": "40519447-a0ab-43ab-8bcf-93a39a8462d6",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -1422,8 +1422,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望",
-          "confirmedAt": "2026-11-22T01:01:03.528Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedAt": "2026-11-22T01:08:23.937Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:07.931+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -1547,7 +1547,7 @@
         }
       },
       "saved": {
-        "id": "bc98c1e6-5519-4150-8d28-586ea36e2e9b",
+        "id": "047e2c85-761f-4669-98ac-e3daf8c1a1d9",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -1621,7 +1621,7 @@
               "services": {
                 "入浴介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.071+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1643,7 +1643,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:08.730Z",
+                  "confirmedAt": "2026-11-22T01:08:27.696Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -1690,7 +1690,7 @@
               "services": {
                 "入浴介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.071+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1712,7 +1712,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:08.730Z",
+                  "confirmedAt": "2026-11-22T01:08:27.696Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -1722,7 +1722,7 @@
         }
       },
       "saved": {
-        "id": "97c47b90-4268-45a0-8b59-676a40e0c314",
+        "id": "7dc32a5e-ed13-4a98-b150-27e53e1e12b1",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -1748,8 +1748,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "",
-          "confirmedAt": "2026-11-22T01:01:08.730Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedAt": "2026-11-22T01:08:27.696Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.071+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -1820,7 +1820,7 @@
               "services": {
                 "入浴介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.071+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1842,7 +1842,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:11.628Z",
+                  "confirmedAt": "2026-11-22T01:08:29.653Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った"
                 }
@@ -1889,7 +1889,7 @@
               "services": {
                 "入浴介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.071+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -1911,7 +1911,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:11.628Z",
+                  "confirmedAt": "2026-11-22T01:08:29.653Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った"
                 }
@@ -1921,7 +1921,7 @@
         }
       },
       "saved": {
-        "id": "a6205d75-50ab-403f-ba4e-7abde4f7edee",
+        "id": "ff16fece-0fae-425b-9d01-faf086825c96",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -1947,8 +1947,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った",
-          "confirmedAt": "2026-11-22T01:01:11.628Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedAt": "2026-11-22T01:08:29.653Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.071+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -2072,7 +2072,7 @@
         }
       },
       "saved": {
-        "id": "882d0a4c-215b-4866-b11f-40121df637d1",
+        "id": "7f543e05-db7c-4d2c-8dd8-7d96695c5ba0",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -2142,7 +2142,7 @@
               "services": {
                 "食事介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.162+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -2164,7 +2164,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:16.421Z",
+                  "confirmedAt": "2026-11-22T01:08:33.508Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -2211,7 +2211,7 @@
               "services": {
                 "食事介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.162+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -2233,7 +2233,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "usual",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:16.421Z",
+                  "confirmedAt": "2026-11-22T01:08:33.508Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": ""
                 }
@@ -2243,7 +2243,7 @@
         }
       },
       "saved": {
-        "id": "7e083d0b-c6e8-41f4-9cc1-ec3d6d773a2c",
+        "id": "bc101a4d-3112-414f-82ad-bd56e32e5c40",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -2269,8 +2269,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "",
-          "confirmedAt": "2026-11-22T01:01:16.421Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedAt": "2026-11-22T01:08:33.508Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.162+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -2337,7 +2337,7 @@
               "services": {
                 "食事介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.162+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -2359,7 +2359,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:18.954Z",
+                  "confirmedAt": "2026-11-22T01:08:35.554Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望"
                 }
@@ -2406,7 +2406,7 @@
               "services": {
                 "食事介助": {
                   "profileRevision": 6,
-                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.162+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
                   "items": [
                     {
                       "kind": "action",
@@ -2428,7 +2428,7 @@
                   "actorId": "00000000-0000-4000-8000-000000000012",
                   "state": "changed",
                   "confirmed": true,
-                  "confirmedAt": "2026-11-22T01:01:18.954Z",
+                  "confirmedAt": "2026-11-22T01:08:35.554Z",
                   "confirmedDate": "2026-11-22",
                   "actualNote": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望"
                 }
@@ -2438,7 +2438,7 @@
         }
       },
       "saved": {
-        "id": "5770a498-7638-4093-9e91-6315bb9d755e",
+        "id": "b7f83a1d-e480-41dc-9d49-ae95dbb484e9",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
@@ -2464,8 +2464,8 @@
           "actorId": "00000000-0000-4000-8000-000000000012",
           "confirmed": true,
           "actualNote": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望",
-          "confirmedAt": "2026-11-22T01:01:18.954Z",
-          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedAt": "2026-11-22T01:08:35.554Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:08:08.162+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
           "confirmedDate": "2026-11-22",
           "profileRevision": 6
         }
@@ -2585,7 +2585,7 @@
         }
       },
       "saved": {
-        "id": "43d2d301-24e0-49f8-822e-bdd705475ea3",
+        "id": "0a308da4-31d7-41fa-8e90-cce236c84a98",
         "actor": "00000000-0000-4000-8000-000000000012",
         "historyReload": true,
         "confirmation": {
