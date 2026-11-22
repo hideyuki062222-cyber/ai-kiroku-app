@@ -1,0 +1,39 @@
+/* Reviewed care instructions, not observations or outcomes. No automatic defaults. */
+(function(root){
+ 'use strict';
+ const groups={prepare:'声かけ・準備',work:'身体介助・実施内容',self:'本人が自分でできること',related:'関連して行うケア',method:'介助方法・支援の程度',communication:'コミュニケーション方法',precaution:'配慮事項・注意点',custom:'独自のケア手順'};
+ const extra={"起床介助": [["寝返りを介助する", "起き上がりを介助する", "端座位になる動作を介助する", "立ち上がりを介助する", "ベッドから椅子への移乗を介助する", "履物を準備する", "衣類の乱れを整える"], ["本人が寝返りを行う", "本人がベッドの柵を持つ"], ["更衣を促す", "口腔ケアを促す", "口腔ケア"]], "就寝介助": [["寝具を整える", "ベッドへの移乗を介助する", "横になる動作を介助する", "枕の位置を整える", "掛け物を整える", "手元の物品を準備する"], ["本人が掛け物を整える"], ["更衣を促す", "口腔ケアを促す"]], "トイレ介助": [["トイレへの移動を介助する", "便座への移乗を介助する", "衣類の上げ下げを介助する", "パッドの交換を介助する", "排泄後の清拭を介助する", "排泄中の見守りを行う"], ["本人が衣類を下げる", "本人が衣類を上げる"], ["手洗いを促す", "衣類の乱れを整える"]], "更衣介助": [["衣類を準備する", "衣類を脱ぐ動作を介助する", "右腕から袖を通す", "衣類を着る動作を介助する", "留め具の操作を介助する", "衣類の向きを整える"], ["本人が衣類を選ぶ", "本人が衣類を脱ぐ"], ["整髪を介助する"]], "入浴介助": [["浴室への移動を介助する", "浴槽の出入りを介助する", "背部の洗身を介助する", "下肢の洗身を介助する", "洗髪を介助する", "体を拭く動作を介助する"], ["本人が上半身を洗う", "本人が髪を洗う"], ["着衣を介助する", "整髪を介助する"]], "入浴準備": [["タオルを準備する", "着替えを準備する", "洗身用品を準備する", "浴室の環境を整える", "着替えを手元に置く"], ["本人が着替えを選ぶ"], ["入浴を促す"]], "食事介助": [["食器の位置を整える", "食事姿勢を整える", "食具の操作を介助する", "食物を口元へ運ぶ介助を行う", "食べやすい大きさにする介助を行う", "食事中の見守りを行う"], ["本人が食具を操作する", "本人が食物を口元へ運ぶ"], ["手洗いを促す", "口腔ケアを促す"]], "服薬介助・確認": [["服薬の声かけを行う", "服薬の準備を介助する", "服薬用の水を準備する", "薬を手元に置く", "服薬の状況を確認する"], ["本人が薬を手に取る"], ["服薬後の状態を確認する"]], "口腔ケア": [["歯ブラシを準備する", "歯磨き剤を付ける介助を行う", "歯磨きを介助する", "義歯の洗浄を介助する", "口をすすぐ動作を介助する", "口腔ケア中の見守りを行う"], ["本人が歯ブラシを持つ", "本人が歯を磨く", "本人が口をすすぐ"], ["洗顔を促す"]], "移動介助": [["立ち上がりを介助する", "歩行に付き添う", "歩行器を使う移動に付き添う", "車椅子での移動を介助する", "段差を越える動作を介助する", "椅子への移乗を介助する"], ["本人が立ち上がる", "本人が歩いて移動する"], ["履物を準備する"]], "清容・保清": [["洗顔を介助する", "整髪を介助する", "清拭を行う", "爪の手入れを介助する", "手洗いを介助する", "タオルを手元に渡す"], ["本人が顔を拭く", "本人が髪を整える"], ["衣類の乱れを整える", "口腔ケアを促す"]], "通院等介助": [["受診の持ち物を準備する", "通院に付き添う", "受付の手続きを支援する", "診察室への移動に付き添う", "会計の手続きを支援する"], ["本人が受付で話す"], ["外出用の衣類を準備する"]], "買い物・外出支援": [["外出の持ち物を準備する", "買い物に付き添う", "商品選びの声かけを行う", "商品をかごに入れる介助を行う", "支払いの手続きを支援する"], ["本人が商品を選ぶ"], ["外出用の衣類を準備する"]], "家事援助": [["掃除を行う", "洗濯を行う", "調理を行う", "食器を洗う支援を行う", "ごみをまとめる支援を行う", "洗濯物を干す支援を行う"], ["本人が洗濯物を畳む"], ["物品の整理を支援する"]], "その他": [["本人に声をかける", "本人の見守りを行う", "選択するための物品を並べる", "依頼された物品を手元に渡す"], ["本人が使う物品を選ぶ"], ["次の活動を促す"]]};
+ const endings=[['介助する','介助しました'],['支援する','支援しました'],['を行う','を行いました'],['を整える','を整えました'],['を準備する','を準備しました'],['を置く','を置きました'],['を通す','を通しました'],['を促す','を促しました'],['を確認する','を確認しました'],['をかける','をかけました'],['に渡す','に渡しました'],['を並べる','を並べました'],['に付き添う','に付き添いました']];
+ const selfPast={'本人が寝返りを行う':'寝返りは本人が行いました','本人がベッドの柵を持つ':'本人がベッドの柵を持ちました','本人が掛け物を整える':'掛け物は本人が整えました','本人が衣類を下げる':'衣類は本人が下げました','本人が衣類を上げる':'衣類は本人が上げました','本人が衣類を選ぶ':'衣類は本人が選びました','本人が衣類を脱ぐ':'衣類は本人が脱ぎました','本人が上半身を洗う':'上半身は本人が洗いました','本人が髪を洗う':'髪は本人が洗いました','本人が着替えを選ぶ':'着替えは本人が選びました','本人が食具を操作する':'食具は本人が操作しました','本人が食物を口元へ運ぶ':'食物は本人が口元へ運びました','本人が薬を手に取る':'薬は本人が手に取りました','本人が歯ブラシを持つ':'歯ブラシは本人が持ちました','本人が歯を磨く':'歯は本人が磨きました','本人が口をすすぐ':'口は本人がすすぎました','本人が立ち上がる':'本人が立ち上がりました','本人が歩いて移動する':'本人が歩いて移動しました','本人が顔を拭く':'顔は本人が拭きました','本人が髪を整える':'髪は本人が整えました','本人が受付で話す':'受付では本人が話しました','本人が商品を選ぶ':'商品は本人が選びました','本人が洗濯物を畳む':'洗濯物は本人が畳みました','本人が使う物品を選ぶ':'使う物品は本人が選びました'};
+ function past(v){for(const [end,s]of endings)if(v.endsWith(end))return v.slice(0,-end.length)+s;return null;}
+ function choices(C,service){const out=[];const add=(category,value)=>{if(!out.some(i=>i.value===value))out.push({kind:'step',category,value});};
+  const prompts={'起床介助':'起床','就寝介助':'就寝準備','トイレ介助':'排泄','更衣介助':'更衣','入浴介助':'入浴','入浴準備':'入浴準備','食事介助':'食事','服薬介助・確認':'服薬','口腔ケア':'歯磨き','移動介助':'移動','清容・保清':'洗顔','通院等介助':'通院','買い物・外出支援':'外出','家事援助':'家事','その他':'活動'};
+  add('prepare',prompts[service]+'に向けて声をかける');add('prepare','使用する物品を準備する');
+  for(const value of C.serviceActions[service])add(/声かけ|声をかけ|準備|手元/.test(value)?'prepare':'work',value);
+  for(const value of extra[service][0])add(/声かけ|準備|手元/.test(value)?'prepare':'work',value);
+  for(const value of extra[service][1])add('self',value);
+  for(const value of C.selfChoices[service]||[])add('self','本人：'+value);
+  for(const value of extra[service][2])add('related',value);
+  for(const value of ['腰に手を添えて起き上がりを介助する','本人のペースを待った','手順を一つずつ伝えた'].filter(v=>!v.includes('起き上がり')||service==='起床介助'))add('method',value);
+  for(const value of C.methodChoices.filter(v=>!['本人のペースを待った','手順を一つずつ伝えた'].includes(v)))add('communication',value);
+  for(const value of ['介助する前に本人へ説明する','本人の希望する手順を尊重する'])add('precaution',value);
+  return out;
+ }
+ const aliases={'口腔ケア':'口腔ケアの支援を行いました','更衣促し':'更衣に向けて声をかけました','更衣の促し':'更衣に向けて声をかけました','更衣を促す':'更衣に向けて声をかけました'};
+ function describe(C,R,service,item){
+  if(item.category==='precaution')return {kind:'reference',text:item.value};
+  const known=choices(C,service).find(i=>i.value===item.value);
+  if(item.kind==='raw'&&!known){const parts=item.value.split(/[、,]/).map(s=>s.trim()).filter(Boolean);if(parts.length&&parts.every(s=>aliases[s]))return parts.map(s=>({kind:'work',text:aliases[s]}));return {kind:'reference',text:item.value};}
+  const value=item.value;
+  if(selfPast[value])return {kind:'self',text:selfPast[value]};
+  if(value==='服薬したことを確認した')return {kind:'work',text:'本人が薬を服用したことを確認しました'};
+  if(aliases[value])return {kind:'work',text:aliases[value]};
+  if(value.startsWith('本人：'))return {kind:'self',text:R.plain(C.selfSentence(value.slice(3)))};
+  if(C.methodChoices.includes(value)){const p=value.replace(/待った$/,'待ちました').replace(/話した$/,'話しました').replace(/伝えた$/,'伝えました').replace(/声をかけた$/,'声をかけました');return {kind:'method',text:p};}
+  if(R.safeCustom(value))return {kind:'work',text:R.customSentence(value)};
+  if(known){const text=past(value);if(text)return {kind:known.category==='communication'?'method':'work',text};}
+  const memo=C.planMemo(value,service);if(memo.events.length===1&&memo.events[0].canonical)return {kind:memo.events[0].kind==='self'?'self':'work',text:R.plain(memo.events[0].normal)};
+  return {kind:'reference',text:value};
+ }
+ const api={groups,choices,describe};if(typeof module!=='undefined')module.exports=api;else root.NexiaCareCatalog=api;
+})(globalThis);

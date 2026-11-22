@@ -33,6 +33,8 @@ jobs:
           node --check record-facts-ui.js
           node --check record-routine-core.js
           node --check record-routine-ui.js
+          node --check record-care-catalog.js
+          node --check tests/record_care_final_browser.cjs
           node --check tests/record_routine_browser_part.cjs
           node --check tests/record_quality_browser.cjs
           node --check tests/record_facts_browser.cjs
@@ -80,6 +82,7 @@ jobs:
           node tests/meal_extras_database.cjs
           node tests/record_facts_database.cjs
           node tests/record_routine_database.cjs
+          node tests/record_care_final_database.cjs
           node tests/scoped_permissions_database.cjs
           node tests/scoped_permissions_safety.cjs
           node tests/scoped_staff_management_database.cjs
@@ -111,6 +114,7 @@ jobs:
           node tests/record_nov12_core.cjs
           node tests/record_memo_core.cjs
           node tests/record_routine_core.cjs
+          node tests/record_care_final_core.cjs
           node tests/record_seven_days.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner
@@ -145,5 +149,6 @@ jobs:
           node tests/facility_editor_browser.cjs
           node tests/meal_extras_browser.cjs
           node tests/record_facts_browser.cjs
+          RECORD_FINAL_ONLY=1 node tests/record_facts_browser.cjs
           node tests/scoped_permissions_browser.cjs
           node tests/record_quality_browser.cjs

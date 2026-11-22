@@ -501,12 +501,12 @@
  }
  // An explicit service checkbox confirms only that service, never its usual steps.
  // Scheduled candidates and saved facts without this flag keep their former meaning.
- function performed(a){return a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length||(a.routineSelfs||[]).length||(a.routineCustom||[]).length;}
- function validate(f,{allowUnconfirmed=false}={}){
+ function performed(a){return !!a.routineNarrative||a.confirmedService===true||(a.actions||[]).length||text(a.note)||(a.methods||[]).length||(a.routineSelfs||[]).length||(a.routineCustom||[]).length;}
+ function validate(f,{allowUnconfirmed=false,allowUnobserved=false}={}){
   const errors=[];if(f.interventionLevel&&!Object.hasOwn(interventionLabels,f.interventionLevel))errors.push('今回の支援介入度を確認してください。');let validDate=false;
   try{validDate=/^\d{4}-\d{2}-\d{2}$/.test(f.date||'')&&f.date>='2000-01-01'&&f.date<='2100-12-31'&&new Date(f.date+'T00:00:00Z').toISOString().slice(0,10)===f.date;}catch{}
   if(!validDate)errors.push('記録日を確認してください。');
-  if(![f.scene,f.condition,f.health,f.statement,f.difference,f.concern].some(text))errors.push('① 訪問時に確認した状態・表情・体調などを1つ選択、または入力してください。');
+  if(!allowUnobserved&&![f.scene,f.condition,f.health,f.statement,f.difference,f.concern].some(text))errors.push('① 訪問時に確認した状態・表情・体調などを1つ選択、または入力してください。');
   if([f.scene,f.condition,f.health].some(v=>v==='その他')&&![f.statement,f.concern].some(text))errors.push('①「その他」の具体的な内容を発言・気づき欄へ入力してください。');
   if(!Array.isArray(f.actions)){errors.push('② 当日実施した支援を確認してください。');return errors;}
   if(!allowUnconfirmed&&!f.actions.some(performed)&&!text(f.supportNote))errors.push('② 当日実施した支援を1つ選択、または補足に具体的に入力してください。担当からの候補だけでは実施済みにしません。');
@@ -520,7 +520,7 @@
    if(a.after&&!afterFor(a.service).includes(a.after))errors.push('② 支援後の状態を確認してください。');
    if(!performed(a)&&((a.reactions||[]).length||a.self||a.after))errors.push('② '+a.service+'：本人の反応に加えて、当日実施した支援を選択してください。');
    if(a.service==='服薬介助・確認'){
-    const rs=a.reactions||[],confirmed=a.actions.includes('服薬したことを確認した')||rs.includes('本人が自分で服薬した');
+    const rs=a.reactions||[],confirmed=a.actions.includes('服薬したことを確認した')||a.routineNarrative?.items.some(i=>i.value==='服薬したことを確認した')||rs.includes('本人が自分で服薬した');
     if((rs.includes('服薬を拒否した')&&confirmed)||(a.unconfirmed&&confirmed))errors.push('② 服薬の「確認済み」と「拒否・未確認」が重なっています。選択を確認し、途中の経過は補足にまとめてください。');
     if(a.after&&medicationAfter.includes(a.after)&&!confirmed)errors.push('② 服薬後の状態を記録するには、実際に服薬を確認した内容も選択してください。');
    }
@@ -680,10 +680,10 @@
   }
   return {visit,intervention:f.interventionLevel||'',services:(f.actions||[]).map((a,i)=>({
    ...a,actions:unique(a.actions||[]),reactions:unique(a.reactions||[]),methods:unique(a.methods||[]),source:'actions.'+i,
-   scopeOnly:!(a.actions||[]).length&&!text(a.self)&&!text(a.note)&&!(a.routineSelfs||[]).length&&!(a.routineCustom||[]).length&&!a.routineNote
+   scopeOnly:!(a.actions||[]).length&&!text(a.self)&&!text(a.note)&&!(a.routineSelfs||[]).length&&!(a.routineCustom||[]).length&&!a.routineNote&&!a.routineNarrative
   })).filter(performed),supportNote:text(f.supportNote),response:text(f.response),after:text(f.after)};
  }
- const needsDetail=a=>performed(a)&&!(a.actions||[]).length&&!text(a.self)&&!text(a.note)&&!(a.routineSelfs||[]).length&&!(a.routineCustom||[]).length&&!a.routineNote;
+ const needsDetail=a=>performed(a)&&!(a.actions||[]).length&&!text(a.self)&&!text(a.note)&&!(a.routineSelfs||[]).length&&!(a.routineCustom||[]).length&&!a.routineNote&&!a.routineNarrative;
  const interventionPrefix={active:'今回は直接介助を中心に、',partial:'今回は必要な部分への支援として、',prompt:'今回は声かけ・促しを中心に、',watch:'今回は見守りを中心に、',minimal:'今回は最小限の支援・確認の範囲で、'};
  function fitsIntervention(a,level){
   if(needsDetail(a))return false;
@@ -883,14 +883,14 @@
   const R=f.routineCare?(typeof module!=='undefined'?require('./record-routine-core.js'):root.NexiaRoutineCore):null;
   if(f.routineCare&&!R)return {errors:['普段のケアの処理を再読み込みしてください。'],visit:'',care:''};
   const routine=R?R.prepare(api,f):null;if(routine?.errors.length)return {errors:routine.errors,visit:'',care:''};
-  const errors=validate(routine?routine.facts:f,{allowUnconfirmed:!!routine?.unknown.length});if(errors.length)return {errors,visit:'',care:''};
+  const errors=validate(routine?routine.facts:f,{allowUnconfirmed:!!routine?.unknown.length,allowUnobserved:!!f.routineCare&&Object.values(f.routineCare.services||{}).some(s=>s.settingsVersion===2)});if(errors.length)return {errors,visit:'',care:''};
   const plan=evidencePlan(routine?routine.facts:f),mode=f.lengthMode||'normal',variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
   const observation=e=>observations[e.value]?variant.phrase(observations[e.value]):e.value.replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
   const render=xs=>joinClauses(xs,mode==='short'?'short':mode==='normal'&&xs.length>1?variant.pick(['normal','long']):'long');
-  const visit=composeVisit(plan,mode,variant,structure,observation);
+  const visit=composeVisit(plan,mode,variant,structure,observation)||(routine?'訪問時の状態・様子・体調は未確認です。':'');
   const memo=planMemo(f.supportNote,plan.services.length===1?plan.services[0].service:null);
   if(plan.services.length===1&&plan.services[0].service==='服薬介助・確認'){
-   const a=plan.services[0],confirmed=a.actions.includes('服薬したことを確認した')||a.reactions.includes('本人が自分で服薬した');
+   const a=plan.services[0],confirmed=a.actions.includes('服薬したことを確認した')||a.routineNarrative?.items.some(i=>i.value==='服薬したことを確認した')||a.reactions.includes('本人が自分で服薬した');
    if((confirmed&&memo.events.some(e=>['uncertain','refusal'].includes(e.kind)))||((a.unconfirmed||a.reactions.includes('服薬を拒否した'))&&memo.events.some(e=>e.canonical==='服薬したことを確認した'))){
     if(routine?.facts.actions.some(x=>x.service==='服薬介助・確認'&&x.routineApplied))return {errors:['普段のケアの服用確認と、当日の拒否・未確認が重なっています。「変更あり」で実際の経過を確認してください。'],visit:'',care:''};
     memo.conflict=true;memo.events=[{start:0,end:memo.raw.length,source:memo.raw,kind:'raw',normal:memo.raw,long:memo.raw,canonical:''}];memo.unknown=[memo.raw];memo.hasWork=false;
@@ -904,9 +904,10 @@
   const scopeOnlyRecord=plan.services.length===1&&plan.services[0].scopeOnly&&!plan.services[0].methods.length;
   // If no selected action supports a more specific relation, retain only the
   // selected overall range. Never infer physical help from an intervention.
-  if(plan.intervention&&target<0&&!scopeOnlyRecord&&!memoReplacesScope&&(!routine||plan.services.length)&&!plan.services.some(a=>a.routineMemoOnly))sections.push(sentence(interventionText[plan.intervention]));
+  if(plan.intervention&&target<0&&!scopeOnlyRecord&&!memoReplacesScope&&(!routine||plan.services.length)&&!plan.services.some(a=>a.routineMemoOnly||a.routineNarrative))sections.push(sentence(interventionText[plan.intervention]));
   plan.services.forEach((a,index)=>{
    if(memoReplacesScope){sections.push(composeMemo(memo,mode,a.service,plan.intervention,structure));return;}
+   if(a.routineNarrative){sections.push(R.composeNarrative(api,a,mode,plan.intervention,structure));return;}
    if(a.routineMemoOnly){const rm=planMemo(a.routineNote,a.service);sections.push(composeMemo(rm,mode,a.service,rm.hasWork&&target<0&&index===plan.services.findIndex(s=>s.routineMemoOnly)?plan.intervention:'',structure,R.plain));return;}
    const composed=a.routineCustom?.length?{acts:[...(a.routineWorkOrder||[]),...a.actions.filter(v=>!a.routineWorkOrder.some(i=>i.kind==='action'&&i.value===v)).map(value=>({kind:'action',value}))].flatMap(i=>i.kind==='custom'?[R.customSentence(i.value)]:actionClauses({...a,confirmedService:false,actions:[i.value],reactions:[]})),reactions:a.reactions}:supportClauses(a);const positive=composed.acts.filter(v=>v!=='服用済みかは確認していません');
    const own=unique([text(a.self)?selfSentence(a.self):'',...(a.routineSelfs||[]).map(selfSentence)]).map(v=>a.routineApplied?R.plain(v):v).map(sentence).join('').replace(/。$/,'');
@@ -963,5 +964,5 @@
   return {errors:[],visit,care,inputCount,needsDetail:memoReplacesScope?[]:plan.services.filter(needsDetail).map(a=>a.service),...(plan.supportNote?{memoReview:memo.unknown,memoConflict:memo.conflict,memoEvidence:memo.events.map(({source,start,end,kind,canonical,represented})=>({source,start,end,kind,canonical,represented:!!represented}))}:{})};
  }
 
- const api={composeMemo,planMemo,evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={selfSentence,afterSentence,polite,reactionSentences,composeMemo,planMemo,evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);
