@@ -252,14 +252,10 @@
     const matches=checker.compare({...scope,visitNote:visit,careNote:care},comparison.rows);
     comparison.text=JSON.stringify([visit,care]);
     const notice=document.createElement('section');notice.id='recordSimilarityNotice';notice.setAttribute('aria-live','polite');notice.dataset.matches=String(matches.length);
-    const title=document.createElement('p');title.textContent=matches.length?`過去の記録と文章が一致・類似しています（${matches.length}件）。当日の支援・本人の状態・反応を確認してください。同じ事実であれば、文章を変えずに正式保存できます。`:`閲覧可能な直近${checker.LIMIT}件では、同じ・似た文章は見つかりませんでした。`;
-    notice.append(title);
-    const range=document.createElement('p');range.className='notice';range.textContent=`比較対象：この施設・利用者の閲覧可能な直近${checker.LIMIT}件（今回${comparison.rows.length}件）。必須冒頭文・空白・句読点を除いて比較。意味の正しさを保証する判定ではありません。`;notice.append(range);
-    if(matches.length){
-      const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='比較した過去記録を見る（最大3件）';details.append(summary);
-      for(const r of matches.slice(0,3)){const heading=document.createElement('h3'),text=document.createElement('p');heading.textContent=`${r.service_date||String(r.created_at||'').slice(0,10)||'日付不明'}：${r.kind==='exact'?'文章が一致':'似た文章'}`;text.textContent='① '+(r.visit_note||'')+'\n② '+(r.care_note||'');details.append(heading,text);}
-      notice.append(details);
-    }
+    const title=document.createElement('p');title.textContent=matches.length?'過去の記録と似ていますが、今回の内容が正しければ、そのまま保存できます。':'過去記録との比較が完了しました。';notice.append(title);
+    const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='比較の詳細（任意）';details.append(summary);
+    const range=document.createElement('p');range.textContent=`同じ施設・利用者の閲覧可能な直近${checker.LIMIT}件まで（今回${comparison.rows.length}件）。必須冒頭文・句読点・空白を除いて比較します。`;details.append(range);
+    for(const r of matches.slice(0,3)){const p=document.createElement('p');p.textContent=(r.kind==='exact'?'文章が一致':'文章が類似')+'：'+(r.service_date||String(r.created_at||'').slice(0,10)||'日付不明')+'\n① '+r.visit_note+'\n② '+r.care_note;details.append(p);}notice.append(details);
     q('recordSaveStatus').before(notice);
     q('recordCommitButton').textContent=matches.length?'当日の事実として正式保存':'この内容を正式保存';
   }
@@ -291,7 +287,7 @@
     if(window.__nexiaFactsMode){
       if(!comparison||comparison.record!==pendingRecord)return setStatus('過去記録との比較が完了していません。「AIで記録作成」を押して再確認してください。','error');
       if(localStorage.getItem('activeOrganizationId')!==pendingRecord.factContext.organizationId)return setStatus('施設が変更されています。記録を作り直してください。','error');
-      if(comparison.text!==JSON.stringify([pendingRecord.visitNote,pendingRecord.careNote])){renderComparison();if(q('recordSimilarityNotice')?.dataset.matches!=='0')return setStatus('編集した文章の類似状況を更新しました。当日の事実と確認してから正式保存してください。','warn');}
+      if(comparison.text!==JSON.stringify([pendingRecord.visitNote,pendingRecord.careNote]))renderComparison();
     }
     const savingRecord=pendingRecord,savingSignature=formSignature(),savingVisit=pendingRecord.visitNote,savingCare=pendingRecord.careNote;
     saveBusy=true;const btn=ensureSaveUi();if(btn)btn.disabled=true;setGenerateDisabled(true);

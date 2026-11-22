@@ -23,6 +23,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await pg.query('select public.set_facility_editor($1,$2,true,false)',[ORG,EDITOR]);
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261120051058_safe_granular_facility_permissions.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261122003150_resident_routine_care.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261122042834_routine_care_flexible_settings.sql'),'utf8'));
  async function pageFor(uid,baseline=false,assignment=true,activeOrg=ORG){
   const ctx=await browser.newContext({viewport:{width,height:950},isMobile:width<600,hasTouch:width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo',acceptDownloads:true});contexts.push(ctx);
   const user={id:uid,email:'synthetic@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email'},user_metadata:{}},exp=Math.floor(Date.now()/1000)+3600,token='e30.'+Buffer.from(JSON.stringify({sub:uid,role:'authenticated',aud:'authenticated',exp})).toString('base64url')+'.synthetic';
@@ -41,7 +42,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
    const result=await atomic(async()=>{
     await pg.exec('reset role;set role authenticated');await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[uid]);
     try{
-     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});const key=String(p.p_signature),n=legacyCounters.get(key)||0;legacyCounters.set(key,n+1);return {data:n};}if(!['save_record_profile','save_routine_care','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
+     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(fn==='next_variant_seed'){variantCalls.push({baseline});const key=String(p.p_signature),n=legacyCounters.get(key)||0;legacyCounters.set(key,n+1);return {data:n};}if(!['save_record_profile','save_routine_care','save_routine_care_v2','list_organization_staff'].includes(fn))throw Error('Unexpected RPC '+fn);
       const names=Object.keys(p);const {rows}=await pg.query('select public.'+fn+'('+names.map((k,i)=>k+'=> $'+(i+1)).join(',')+') result',Object.values(p).map(v=>v&&typeof v==='object'?JSON.stringify(v):v));return {data:rows[0].result};}
      const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','organization_feature_permissions','organization_permission_sets','care_record_amendments','clients','client_record_profiles','staff_assignments','client_service_slots','care_records'].includes(table))throw Error('Unexpected table '+table);
      const params=[],where=[];for(const [k,v]of u.searchParams){if(['select','order','limit','offset'].includes(k))continue;if(!/^\w+$/.test(k))throw Error('bad column');const dot=v.indexOf('.'),op=v.slice(0,dot),value=v.slice(dot+1);
@@ -60,6 +61,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  }
  const oldRecord=(await pg.query('select to_jsonb(r) x from public.care_records r where id=$1',[OLD])).rows[0].x;
  const shots=async(page,locator,name)=>{assert((await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,name+' page overflow');await page.locator(locator).screenshot({path:path.join(out,width+'-'+name+'.png')});};
+ if(process.env.RECORD_FINAL_ONLY){await require('./record_care_final_browser.cjs')({pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,pg,atomic,id,width,out,date});assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);return;}
  if(process.env.RECORD_ROUTINE_ONLY){await require('./record_routine_browser_part.cjs')({pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,pg,atomic,id,width,out,date});assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);return;}
  if(process.env.RECORD_MEMO_ONLY){await require('./record_memo_browser_part.cjs')({pageFor,STAFF,ADMIN,ORG,CLIENT,pg,atomic,id,width,out,date});assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);return;}
  let before=null;
