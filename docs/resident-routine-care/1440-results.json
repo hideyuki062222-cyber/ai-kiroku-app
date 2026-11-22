@@ -1,0 +1,2605 @@
+{
+  "passed": true,
+  "width": 1440,
+  "realHTML": true,
+  "realSDK": true,
+  "isolatedPostgres": true,
+  "productionTouched": false,
+  "results": [
+    {
+      "service": "起床介助",
+      "state": "usual",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "起床の声かけを行った"
+        },
+        {
+          "kind": "custom",
+          "value": "腰に手を添えて起き上がりを介助する"
+        },
+        {
+          "kind": "action",
+          "value": "端座位になる動作を介助した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "本人から返事／支援後は椅子で過ごす",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床時は、直接介助を中心に、起床の声かけを行い、腰に手を添えて起き上がりを介助しました。端座位になる動作を介助しました。ゆっくり話しました。本人から返事があり、支援後は椅子で過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から返事／支援後は椅子で過ごす",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "起床介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "起床の声かけを行った"
+                    },
+                    {
+                      "kind": "custom",
+                      "value": "腰に手を添えて起き上がりを介助する"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "端座位になる動作を介助した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:46.686Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床の支援については、本人に伝える際は、ゆっくり話しました。今回は直接介助を中心に、起床の声かけを行いました。腰に手を添えて起き上がりを介助しました。端座位になる動作は、職員が介助しました。本人から返事がありました。支援後は、本人が椅子で過ごされました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から返事／支援後は椅子で過ごす",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "起床介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "起床の声かけを行った"
+                    },
+                    {
+                      "kind": "custom",
+                      "value": "腰に手を添えて起き上がりを介助する"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "端座位になる動作を介助した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:46.686Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "14036abc-c73a-4542-b6e7-fb1112be33fb",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "起床の声かけを行った"
+            },
+            {
+              "kind": "custom",
+              "value": "腰に手を添えて起き上がりを介助する"
+            },
+            {
+              "kind": "action",
+              "value": "端座位になる動作を介助した"
+            },
+            {
+              "kind": "method",
+              "value": "ゆっくり話した"
+            }
+          ],
+          "state": "usual",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "",
+          "confirmedAt": "2026-11-22T01:00:46.686Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 2
+    },
+    {
+      "service": "起床介助",
+      "state": "changed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "起床の声かけを行った"
+        },
+        {
+          "kind": "custom",
+          "value": "腰に手を添えて起き上がりを介助する"
+        },
+        {
+          "kind": "action",
+          "value": "端座位になる動作を介助した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "",
+      "actualChange": "起床の声かけ／本人から返事",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。声かけ・促しを中心に、起床に向けて声をかけました。本人から返事がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "起床介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "起床の声かけを行った"
+                    },
+                    {
+                      "kind": "custom",
+                      "value": "腰に手を添えて起き上がりを介助する"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "端座位になる動作を介助した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:48.840Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "起床の声かけ／本人から返事"
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。声かけ・促しを中心に、職員から起床に向けて声をかけました。本人から返事がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "起床介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "起床の声かけを行った"
+                    },
+                    {
+                      "kind": "custom",
+                      "value": "腰に手を添えて起き上がりを介助する"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "端座位になる動作を介助した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:48.840Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "起床の声かけ／本人から返事"
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "8c884ff7-8517-409e-a580-cd6ebe22da46",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "起床の声かけを行った"
+            },
+            {
+              "kind": "custom",
+              "value": "腰に手を添えて起き上がりを介助する"
+            },
+            {
+              "kind": "action",
+              "value": "端座位になる動作を介助した"
+            },
+            {
+              "kind": "method",
+              "value": "ゆっくり話した"
+            }
+          ],
+          "state": "changed",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "起床の声かけ／本人から返事",
+          "confirmedAt": "2026-11-22T01:00:48.840Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"起床の声かけを行った\"},{\"kind\":\"custom\",\"value\":\"腰に手を添えて起き上がりを介助する\"},{\"kind\":\"action\",\"value\":\"端座位になる動作を介助した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.066+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 4
+    },
+    {
+      "service": "起床介助",
+      "state": "unconfirmed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "起床の声かけを行った"
+        },
+        {
+          "kind": "custom",
+          "value": "腰に手を添えて起き上がりを介助する"
+        },
+        {
+          "kind": "action",
+          "value": "端座位になる動作を介助した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床介助の普段のケアは、今回の実施状況を確認していません。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "起床介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見られました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。起床介助について、登録済みの普段のケアを今回も実施したかは未確認です。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "active",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "起床介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "起床介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "22fa6afb-d3ef-4752-9c15-3a17dd7637ac",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "state": "unconfirmed",
+          "confirmed": false
+        }
+      },
+      "routineStateActions": 0
+    },
+    {
+      "service": "服薬介助・確認",
+      "state": "usual",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "服薬の声かけを行った"
+        },
+        {
+          "kind": "action",
+          "value": "服薬の準備を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "服薬したことを確認した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "本人がうなずいた／服薬後変化なし",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬の支援では、声かけ・促しを中心に、服薬の準備を介助して声をかけ、本人が薬を服用したことを確認しました。ゆっくり話しました。本人のうなずきが見られ、服薬後、特に変化は見られませんでした。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人がうなずいた／服薬後変化なし",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "服薬介助・確認": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "服薬の声かけを行った"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬の準備を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬したことを確認した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:53.078Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見られました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に関する支援については、本人に対しては、ゆっくり話しました。今回は声かけ・促しを中心に、職員は服薬の準備を介助して声をかけ、本人が薬を服用したことを確認しました。本人のうなずきが見られました。服薬後、特に変化は見られませんでした。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人がうなずいた／服薬後変化なし",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "服薬介助・確認": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "服薬の声かけを行った"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬の準備を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬したことを確認した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:53.078Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "7b9b9495-05d8-40de-a46c-a5fc38ea28b0",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "服薬の声かけを行った"
+            },
+            {
+              "kind": "action",
+              "value": "服薬の準備を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "服薬したことを確認した"
+            },
+            {
+              "kind": "method",
+              "value": "ゆっくり話した"
+            }
+          ],
+          "state": "usual",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "",
+          "confirmedAt": "2026-11-22T01:00:53.078Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 2
+    },
+    {
+      "service": "服薬介助・確認",
+      "state": "changed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "服薬の声かけを行った"
+        },
+        {
+          "kind": "action",
+          "value": "服薬の準備を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "服薬したことを確認した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "",
+      "actualChange": "服薬の声かけ／服用未確認／本人が服薬を拒否",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬に向けた声かけを中心に行いました。服用済みかは確認していません。本人は服薬を拒否しました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "服薬介助・確認": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "服薬の声かけを行った"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬の準備を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬したことを確認した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:55.920Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "服薬の声かけ／服用未確認／本人が服薬を拒否"
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見受けられました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。職員から本人への服薬の声かけを中心に対応しました。服用済みかは確認していません。本人は服薬を拒否しました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "服薬介助・確認": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "服薬の声かけを行った"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬の準備を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "服薬したことを確認した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:00:55.920Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "服薬の声かけ／服用未確認／本人が服薬を拒否"
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "c2df45bf-bd7c-4ffb-857c-a35f0d455111",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "服薬の声かけを行った"
+            },
+            {
+              "kind": "action",
+              "value": "服薬の準備を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "服薬したことを確認した"
+            },
+            {
+              "kind": "method",
+              "value": "ゆっくり話した"
+            }
+          ],
+          "state": "changed",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "服薬の声かけ／服用未確認／本人が服薬を拒否",
+          "confirmedAt": "2026-11-22T01:00:55.920Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"服薬の声かけを行った\"},{\"kind\":\"action\",\"value\":\"服薬の準備を介助した\"},{\"kind\":\"action\",\"value\":\"服薬したことを確認した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.164+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 4
+    },
+    {
+      "service": "服薬介助・確認",
+      "state": "unconfirmed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "服薬の声かけを行った"
+        },
+        {
+          "kind": "action",
+          "value": "服薬の準備を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "服薬したことを確認した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬介助・確認の普段のケアは、今回の実施状況を確認していません。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "服薬介助・確認": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。服薬介助・確認について、登録済みの普段のケアを今回も実施したかは未確認です。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "prompt",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "服薬介助・確認",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "服薬介助・確認": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "e5d4bb59-d98c-4dc7-aff7-a097b3cb9447",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "state": "unconfirmed",
+          "confirmed": false
+        }
+      },
+      "routineStateActions": 0
+    },
+    {
+      "service": "トイレ介助",
+      "state": "usual",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "トイレへの移動を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "パッドの交換を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "排泄後の清拭を介助した"
+        },
+        {
+          "kind": "self",
+          "value": "衣類を下げた"
+        }
+      ],
+      "profileReference": "",
+      "dayNote": "本人から排泄希望／支援後はベッドで休む",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄の支援では、衣類を下げる動作は本人が行いました。今回は必要な部分への支援として、トイレへの移動とパッドの交換と排泄後の清拭を介助しました。本人から排泄の希望があり、支援後はベッドで休まれました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から排泄希望／支援後はベッドで休む",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "トイレ介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "トイレへの移動を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "パッドの交換を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "排泄後の清拭を介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "衣類を下げた"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:01.020Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄の支援では、衣類を下げる動作は本人が行いました。今回は必要な部分への支援として、職員はトイレへの移動とパッドの交換と排泄後の清拭の介助を行いました。本人から排泄の希望がありました。支援後は、本人がベッドで休まれました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から排泄希望／支援後はベッドで休む",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "トイレ介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "トイレへの移動を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "パッドの交換を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "排泄後の清拭を介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "衣類を下げた"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:01.020Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "c641c4b4-b469-44a7-beb7-78358083ba9d",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "トイレへの移動を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "パッドの交換を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "排泄後の清拭を介助した"
+            },
+            {
+              "kind": "self",
+              "value": "衣類を下げた"
+            }
+          ],
+          "state": "usual",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "",
+          "confirmedAt": "2026-11-22T01:01:01.020Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 2
+    },
+    {
+      "service": "トイレ介助",
+      "state": "changed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "トイレへの移動を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "パッドの交換を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "排泄後の清拭を介助した"
+        },
+        {
+          "kind": "self",
+          "value": "衣類を下げた"
+        }
+      ],
+      "profileReference": "",
+      "dayNote": "",
+      "actualChange": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄の支援では、衣類を下げる動作は本人が行いました。排泄中の見守りを中心に、職員が対応しました。本人から排泄の希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "トイレ介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "トイレへの移動を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "パッドの交換を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "排泄後の清拭を介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "衣類を下げた"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:03.528Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望"
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見られました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。排泄に関する支援については、衣類を下げる動作は本人が行いました。排泄中の見守りを中心に、職員が対応しました。本人から排泄の希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "トイレ介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "トイレへの移動を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "パッドの交換を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "排泄後の清拭を介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "衣類を下げた"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:03.528Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望"
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "234e3b38-edaf-45a3-bcfb-4a2408cbe113",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "トイレへの移動を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "パッドの交換を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "排泄後の清拭を介助した"
+            },
+            {
+              "kind": "self",
+              "value": "衣類を下げた"
+            }
+          ],
+          "state": "changed",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "排泄中の見守りを行った\n本人：衣類を下げた\n本人から排泄希望",
+          "confirmedAt": "2026-11-22T01:01:03.528Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"トイレへの移動を介助した\"},{\"kind\":\"action\",\"value\":\"パッドの交換を介助した\"},{\"kind\":\"action\",\"value\":\"排泄後の清拭を介助した\"},{\"kind\":\"self\",\"value\":\"衣類を下げた\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.246+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 4
+    },
+    {
+      "service": "トイレ介助",
+      "state": "unconfirmed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "トイレへの移動を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "パッドの交換を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "排泄後の清拭を介助した"
+        },
+        {
+          "kind": "self",
+          "value": "衣類を下げた"
+        }
+      ],
+      "profileReference": "",
+      "dayNote": "",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。トイレ介助の普段のケアは、今回の実施状況を確認していません。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "トイレ介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見られました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。トイレ介助について、登録済みの普段のケアを今回も実施したかは未確認です。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "トイレ介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "トイレ介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "bc98c1e6-5519-4150-8d28-586ea36e2e9b",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "state": "unconfirmed",
+          "confirmed": false
+        }
+      },
+      "routineStateActions": 0
+    },
+    {
+      "service": "入浴介助",
+      "state": "usual",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "背部の洗身を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "浴槽の出入りを介助した"
+        },
+        {
+          "kind": "self",
+          "value": "上半身を洗った"
+        },
+        {
+          "kind": "method",
+          "value": "本人のペースを待った"
+        }
+      ],
+      "profileReference": "",
+      "dayNote": "本人から湯温の希望／支援後本人が休憩希望",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援では、上半身は本人が自分で洗いました。今回は必要な部分への支援として、背部の洗身と浴槽の出入りを介助しました。本人のペースに合わせて待ちました。本人から湯の温度について希望があり、支援後には休憩したいとの希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から湯温の希望／支援後本人が休憩希望",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "入浴介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "背部の洗身を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "浴槽の出入りを介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "上半身を洗った"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "本人のペースを待った"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:08.730Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問した際、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見られました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援では、上半身は本人が自分で洗いました。今回は必要な部分への支援として、職員は背部の洗身と浴槽の出入りの介助を行いました。支援中は本人のペースに合わせて待ちました。本人から湯の温度について希望がありました。支援後、本人から休憩したいとの希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から湯温の希望／支援後本人が休憩希望",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "入浴介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "背部の洗身を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "浴槽の出入りを介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "上半身を洗った"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "本人のペースを待った"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:08.730Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "97c47b90-4268-45a0-8b59-676a40e0c314",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "背部の洗身を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "浴槽の出入りを介助した"
+            },
+            {
+              "kind": "self",
+              "value": "上半身を洗った"
+            },
+            {
+              "kind": "method",
+              "value": "本人のペースを待った"
+            }
+          ],
+          "state": "usual",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "",
+          "confirmedAt": "2026-11-22T01:01:08.730Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 2
+    },
+    {
+      "service": "入浴介助",
+      "state": "changed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "背部の洗身を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "浴槽の出入りを介助した"
+        },
+        {
+          "kind": "self",
+          "value": "上半身を洗った"
+        },
+        {
+          "kind": "method",
+          "value": "本人のペースを待った"
+        }
+      ],
+      "profileReference": "",
+      "dayNote": "",
+      "actualChange": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援では、上半身は本人が自分で洗いました。洗髪は本人が行いました。入浴中の見守りを中心に、職員が対応しました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "入浴介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "背部の洗身を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "浴槽の出入りを介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "上半身を洗った"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "本人のペースを待った"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:11.628Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った"
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見られました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴の支援については、上半身は本人が自分で洗いました。洗髪は本人が行いました。入浴中の見守りを中心に、職員が対応しました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "入浴介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "背部の洗身を介助した"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "浴槽の出入りを介助した"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "上半身を洗った"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "本人のペースを待った"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:11.628Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った"
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "a6205d75-50ab-403f-ba4e-7abde4f7edee",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "背部の洗身を介助した"
+            },
+            {
+              "kind": "action",
+              "value": "浴槽の出入りを介助した"
+            },
+            {
+              "kind": "self",
+              "value": "上半身を洗った"
+            },
+            {
+              "kind": "method",
+              "value": "本人のペースを待った"
+            }
+          ],
+          "state": "changed",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "入浴中の見守りを行った\n本人：上半身を洗った\n本人：髪を洗った",
+          "confirmedAt": "2026-11-22T01:01:11.628Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"背部の洗身を介助した\"},{\"kind\":\"action\",\"value\":\"浴槽の出入りを介助した\"},{\"kind\":\"self\",\"value\":\"上半身を洗った\"},{\"kind\":\"method\",\"value\":\"本人のペースを待った\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.387+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"\"},\"reference\":\"\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 4
+    },
+    {
+      "service": "入浴介助",
+      "state": "unconfirmed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "背部の洗身を介助した"
+        },
+        {
+          "kind": "action",
+          "value": "浴槽の出入りを介助した"
+        },
+        {
+          "kind": "self",
+          "value": "上半身を洗った"
+        },
+        {
+          "kind": "method",
+          "value": "本人のペースを待った"
+        }
+      ],
+      "profileReference": "",
+      "dayNote": "",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴介助の普段のケアは、今回の実施状況を確認していません。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "入浴介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見受けられました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。入浴介助について、登録済みの普段のケアを今回も実施したかは未確認です。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "入浴介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "入浴介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "882d0a4c-215b-4866-b11f-40121df637d1",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "state": "unconfirmed",
+          "confirmed": false
+        }
+      },
+      "routineStateActions": 0
+    },
+    {
+      "service": "食事介助",
+      "state": "usual",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "食事の際に声をかけた"
+        },
+        {
+          "kind": "action",
+          "value": "食事中の見守りを行った"
+        },
+        {
+          "kind": "self",
+          "value": "食具を操作した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "本人から食べる量の希望／支援後本人が満腹と発言",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援では、食具の操作は本人が行いました。今回は見守りを中心に、食事の際に声をかけ、食事中の見守りを行いました。ゆっくり話しました。本人から食べる量について希望があり、支援後には満腹との発言がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から食べる量の希望／支援後本人が満腹と発言",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "食事介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "食事の際に声をかけた"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "食事中の見守りを行った"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "食具を操作した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:16.421Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見られました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事の支援では、食具の操作は本人が行いました。今回は見守りを中心に、職員は食事の際に声かけを行いました。食事中の見守りを実施しました。本人に伝える際は、ゆっくり話しました。本人から食べる量について希望がありました。支援後、本人から満腹との発言がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "本人から食べる量の希望／支援後本人が満腹と発言",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "食事介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "食事の際に声をかけた"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "食事中の見守りを行った"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "食具を操作した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "usual",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:16.421Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": ""
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "7e083d0b-c6e8-41f4-9cc1-ec3d6d773a2c",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "食事の際に声をかけた"
+            },
+            {
+              "kind": "action",
+              "value": "食事中の見守りを行った"
+            },
+            {
+              "kind": "self",
+              "value": "食具を操作した"
+            },
+            {
+              "kind": "method",
+              "value": "ゆっくり話した"
+            }
+          ],
+          "state": "usual",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "",
+          "confirmedAt": "2026-11-22T01:01:16.421Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 2
+    },
+    {
+      "service": "食事介助",
+      "state": "changed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "食事の際に声をかけた"
+        },
+        {
+          "kind": "action",
+          "value": "食事中の見守りを行った"
+        },
+        {
+          "kind": "self",
+          "value": "食具を操作した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "",
+      "actualChange": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。必要な部分への支援として、食物を口元へ運ぶ介助を行いました。本人から食べる量について希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "食事介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "食事の際に声をかけた"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "食事中の見守りを行った"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "食具を操作した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:18.954Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望"
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位で休まれていました。本人の表情には笑顔が見受けられました。体調については、良好な状態でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。必要な部分への支援として、食物を口元へ運ぶ際は、職員が介助を行いました。本人から食べる量について希望がありました。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "partial",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "食事介助": {
+                  "profileRevision": 6,
+                  "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+                  "items": [
+                    {
+                      "kind": "action",
+                      "value": "食事の際に声をかけた"
+                    },
+                    {
+                      "kind": "action",
+                      "value": "食事中の見守りを行った"
+                    },
+                    {
+                      "kind": "self",
+                      "value": "食具を操作した"
+                    },
+                    {
+                      "kind": "method",
+                      "value": "ゆっくり話した"
+                    }
+                  ],
+                  "actorId": "00000000-0000-4000-8000-000000000012",
+                  "state": "changed",
+                  "confirmed": true,
+                  "confirmedAt": "2026-11-22T01:01:18.954Z",
+                  "confirmedDate": "2026-11-22",
+                  "actualNote": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望"
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "5770a498-7638-4093-9e91-6315bb9d755e",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "items": [
+            {
+              "kind": "action",
+              "value": "食事の際に声をかけた"
+            },
+            {
+              "kind": "action",
+              "value": "食事中の見守りを行った"
+            },
+            {
+              "kind": "self",
+              "value": "食具を操作した"
+            },
+            {
+              "kind": "method",
+              "value": "ゆっくり話した"
+            }
+          ],
+          "state": "changed",
+          "actorId": "00000000-0000-4000-8000-000000000012",
+          "confirmed": true,
+          "actualNote": "食物を口元へ運ぶ介助を行った／本人から食べる量の希望",
+          "confirmedAt": "2026-11-22T01:01:18.954Z",
+          "fingerprint": "{\"entry\":{\"items\":[{\"kind\":\"action\",\"value\":\"食事の際に声をかけた\"},{\"kind\":\"action\",\"value\":\"食事中の見守りを行った\"},{\"kind\":\"self\",\"value\":\"食具を操作した\"}],\"version\":1,\"updated_at\":\"2026-11-22T01:00:45.483+00:00\",\"updated_by\":\"00000000-0000-4000-8000-000000000011\",\"profile_ref\":\"communication\"},\"reference\":\"ゆっくり話す\"}",
+          "confirmedDate": "2026-11-22",
+          "profileRevision": 6
+        }
+      },
+      "routineStateActions": 4
+    },
+    {
+      "service": "食事介助",
+      "state": "unconfirmed",
+      "definition": [
+        {
+          "kind": "action",
+          "value": "食事の際に声をかけた"
+        },
+        {
+          "kind": "action",
+          "value": "食事中の見守りを行った"
+        },
+        {
+          "kind": "self",
+          "value": "食具を操作した"
+        }
+      ],
+      "profileReference": "communication",
+      "dayNote": "",
+      "actualChange": "",
+      "modes": {
+        "normal": {
+          "visit": "訪問した際は、ベッド上で側臥位で休まれており、笑顔が見られました。体調は良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事介助の普段のケアは、今回の実施状況を確認していません。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "normal",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "食事介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        },
+        "long": {
+          "visit": "訪問時、本人はベッド上で側臥位にて休まれていました。本人の表情には笑顔が見られました。体調については、良好でした。",
+          "care": "指示内容確認しました。前回のサービス記録確認しました。食事介助について、登録済みの普段のケアを今回も実施したかは未確認です。",
+          "facts": {
+            "version": 1,
+            "composerRevision": 4,
+            "interventionLevel": "watch",
+            "lengthMode": "long",
+            "date": "2026-11-22",
+            "scene": "ベッド上で側臥位で休んでいた",
+            "condition": "笑顔が見られた",
+            "health": "体調良好",
+            "statement": "",
+            "difference": "",
+            "concern": "",
+            "actions": [
+              {
+                "service": "食事介助",
+                "confirmedService": true,
+                "actions": [],
+                "reactions": [],
+                "methods": [],
+                "unconfirmed": false,
+                "note": "",
+                "self": "",
+                "after": ""
+              }
+            ],
+            "supportNote": "",
+            "response": "",
+            "after": "",
+            "routineCare": {
+              "version": 1,
+              "organizationId": "00000000-0000-4000-8000-000000000001",
+              "clientId": "00000000-0000-4000-8000-000000000021",
+              "actorId": "00000000-0000-4000-8000-000000000012",
+              "services": {
+                "食事介助": {
+                  "state": "unconfirmed",
+                  "confirmed": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "saved": {
+        "id": "43d2d301-24e0-49f8-822e-bdd705475ea3",
+        "actor": "00000000-0000-4000-8000-000000000012",
+        "historyReload": true,
+        "confirmation": {
+          "state": "unconfirmed",
+          "confirmed": false
+        }
+      },
+      "routineStateActions": 0
+    }
+  ],
+  "settingsSharedBetweenStaff": true,
+  "oldProfileDataRetained": true,
+  "serverDeniesUnauthorized": true,
+  "revocation": true,
+  "staleSettingsBlockGeneration": true,
+  "facilitySwitchIsolation": true
+}
