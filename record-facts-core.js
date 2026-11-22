@@ -778,6 +778,7 @@
   add(['返事あり'],'observation','返事がありました');
   add(['うなずきあり'],'observation','うなずきが見られました');
   add(['本人うなずく','本人がうなずいた'],'patient','本人のうなずきが見られました');
+  for(const subject of ['休憩','飲水','水分','食事','入浴','更衣'])add(['本人から'+subject+'の希望','本人から'+subject+'の希望あり','本人から'+subject+'希望'],'patient','本人から'+subject+'の希望がありました');
   add(['本人から痛みの訴え'],'caution','本人から痛みの訴えがありました');
   add(['痛みの訴えあり'],'caution','痛みの訴えがありました');
   add(['支援後に椅子で過ごす','支援後は椅子で過ごす','支援後は椅子で過ごした'],'after','支援後は、本人が椅子で過ごされました');
@@ -928,7 +929,7 @@
      sentence(range+'、職員は本人が起き上がる動作を介助しました')]);
    }
    const uncertain=a.service==='服薬介助・確認'&&a.unconfirmed?'服用済みかは確認していません。':'';
-   const after=sentence(afterSentence(a.after)),note=sentence(a.note);
+   const after=sentence(afterSentence(a.after)),note=composeMemo(planMemo(a.note,a.service),mode,a.service,'',structure);
    let body;
    if(a.scopeOnly&&!a.methods.length){
     body=work;if(plan.intervention&&scopeOnlyRecord){const scope={active:'直接介助を中心に',partial:'必要な部分への介助として',prompt:'声かけ・促しを中心に',watch:'見守りを中心に',minimal:'最小限の支援・確認を中心に'}[plan.intervention];const caption=serviceStatements[a.service].replace(/を行いました$/,'');body=sentence(structure([caption+'は、'+scope+'行いました',caption+'では、'+interventionText[plan.intervention].replace(/^今回は/,'').replace(/支援しました$/,'対応しました'),scope+'、'+serviceStatements[a.service]]));}body+=render(reactions)+uncertain+after+note;
@@ -964,5 +965,5 @@
   return {errors:[],visit,care,inputCount,needsDetail:memoReplacesScope?[]:plan.services.filter(needsDetail).map(a=>a.service),...(plan.supportNote?{memoReview:memo.unknown,memoConflict:memo.conflict,memoEvidence:memo.events.map(({source,start,end,kind,canonical,represented})=>({source,start,end,kind,canonical,represented:!!represented}))}:{})};
  }
 
- const api={selfSentence,afterSentence,polite,reactionSentences,composeMemo,planMemo,evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
+ const api={serviceStatements,selfSentence,afterSentence,polite,reactionSentences,composeMemo,planMemo,evidencePlan,needsDetail,INTRO,interventionLabels,supportExtras,afterFor,serviceActions,profileFields,quickChoices,reactions,selfChoices,afterChoices,medicationAfter,methodChoices,suggestions,performed,validate,compose,nextExpressionSeed,sentence};if(typeof module!=='undefined')module.exports=api;else root.NexiaFactCore=api;
 })(globalThis);

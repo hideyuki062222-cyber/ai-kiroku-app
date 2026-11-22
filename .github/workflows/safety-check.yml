@@ -115,6 +115,7 @@ jobs:
           node tests/record_memo_core.cjs
           node tests/record_routine_core.cjs
           node tests/record_care_final_core.cjs
+          node tests/record_care_polish_core.cjs
           node tests/record_seven_days.cjs
           node tests/attendance_dom.cjs
       - name: Install test runner

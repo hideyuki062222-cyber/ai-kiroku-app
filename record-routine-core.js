@@ -112,7 +112,11 @@
     else if(/を介助しました$/.test(text)){const target=text.replace(/を介助しました$/,'');text=choose(['職員は'+text,target+'の介助は職員が行いました',target+'は職員が介助しました']);}
     else if(!workerNamed)text='職員は'+text;
     workerNamed=true;
-   }else if(mode==='normal'&&isWork&&facts[i+1]?.kind==='work'&&/しました$/.test(text)){text=connect(text)+'、'+plain(facts[++i].text);}
+   }else if(mode==='normal'&&isWork){
+    const rephrase=value=>choose([...new Set([value,value.replace(/^(洗身|洗髪|移乗|起き上がり|着衣|更衣|脱衣|清拭)を介助しました$/,'$1の介助を行いました'),value.replace(/を行いました$/,'を実施しました')])]);
+    text=rephrase(text);
+    if(facts[i+1]?.kind==='work'&&/しました$|行いました$/.test(text)){const next=rephrase(plain(facts[++i].text));text=choose([connect(text)+'、'+next,text+'。'+next]);}
+   }
    else if(isWork)text=choose([text,text.replace(/を介助しました$/,'の介助を行いました').replace(/を行いました$/,'を実施しました')]);
    if(e.kind==='self')workerNamed=false;
    out.push(sentence(text));
@@ -125,8 +129,11 @@
   for(const reaction of a.reactions||[])body+=sentence(plain(C.reactionSentences[reaction]||reaction));
   if(a.after)body+=sentence(plain(C.afterSentence(a.after)));
   if(a.routineNarrative.note){const memo=C.planMemo(a.routineNarrative.note,a.service);body+=C.composeMemo(memo,mode,a.service,!facts.length&&memo.hasWork?level:'',choose,plain);}
-  if(refs.length)body+='手順の参考情報（原文）：'+sentence([...new Set(refs.map(e=>e.text))].join('／'));
-  if(a.note)body+=sentence(a.note);
+  if(a.note)body+=C.composeMemo(C.planMemo(a.note,a.service),mode,a.service,'',choose,plain);
+  // Preserve reference text in the setting/snapshot and reference panel only.
+  // A service checkbox plus usual confirmation supports the generic service,
+  // but never turns an uninterpretable instruction into a specific action.
+  if(!body&&refs.length)body=C.serviceStatements[a.service];
   return (body?a.service+'では、':'')+body;
  }
  function plain(value){
