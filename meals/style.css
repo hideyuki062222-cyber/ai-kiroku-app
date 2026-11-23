@@ -39,6 +39,11 @@
 .kitchen{border-top:1px solid var(--line);padding-top:10px}.kitchen h3{margin:0 0 8px}.kitchen h3 small{font-size:.8em;color:var(--green)}.kitchen-qty{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.kitchen-qty>div{background:var(--mint);border-radius:8px;padding:8px;font-size:13px}.kitchen-qty strong,.kitchen-qty small{display:block;overflow-wrap:anywhere}.kitchen-qty strong{font-size:clamp(15px,3vw,21px)}.kitchen details{font-size:13px;margin:4px 0}
 /* Extra serving controls retain readable labels and large touch targets. */
 .extra-control{margin-top:10px;max-width:410px}.extra-control summary{min-height:44px;cursor:pointer;padding:10px;background:#edf5f2;border-radius:8px;font-weight:700}.extra-control form{padding:12px;border:1px solid #c9ddd4;border-radius:8px;white-space:normal}.extra-control label{display:block;margin:12px 0}.extra-control input{min-height:44px;width:100%;font-size:16px}.extra-control button{min-height:44px;font-size:16px}.refill-stepper{display:flex;align-items:center;gap:8px}.refill-stepper button{min-width:48px}.refill-stepper input{min-width:60px;max-width:100px;text-align:center}.band-table input{width:100%;min-width:70px;min-height:44px;font-size:16px}.band-table td{padding:6px}#extraPriceForm button{min-height:44px}#extraPriceForm input[type=checkbox]{width:22px;height:22px}.today-table td{vertical-align:top}
+.extra-control fieldset{border:0;margin:0;padding:0;min-inline-size:0}
+.extra-confirmation{width:calc(100% - 28px);max-width:430px;max-height:calc(100% - 28px);margin:auto;padding:18px;border:1px solid var(--line);border-radius:14px;color:var(--ink)}
+.extra-confirmation::backdrop{background:rgb(22 40 31 / .45)}
+.extra-confirmation [data-confirm-later]{margin-top:10px}
+.meal-rice-review{display:block;margin-top:4px;font-size:13px;padding-inline:9px}
 @media(max-width:600px){.extra-control{max-width:100%}.extra-control form{padding:8px}.band-table th,.band-table td{font-size:14px}.band-table input{min-width:60px}}
 @media print{#billAction,#extraPriceForm{display:none!important}#print table{font-size:10px}}
 @media(max-width:700px){

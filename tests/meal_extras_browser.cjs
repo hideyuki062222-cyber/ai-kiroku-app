@@ -58,14 +58,38 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  // Explicit synthetic gap resolution for UI validation, not a production recommendation.
  await band(201,249,25);await f.locator('[type=submit]').click();await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('新しい履歴'));assert((await admin.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,'settings page fits viewport');await admin.locator('#extraPriceForm').screenshot({path:path.join(out,width+'-settings.png')});
  const staff=await pageFor(STAFF);await staff.locator('[data-status]').first().selectOption('served');await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('提供済みを保存'));
- await staff.locator('.extra-control summary').click();let form=staff.locator('[data-extra]');await form.locator('[data-copy-rice]').click();for(let i=0;i<2;i++){await form.locator('[data-step=rice][data-delta="1"]').click();await form.locator('[data-step=soup][data-delta="1"]').click();}
+ const riceDialog=staff.getByRole('dialog',{name:'今回の白米量を確認'});
+ await riceDialog.waitFor();
+ const readExtra=meal=>atomic(async()=>{
+  await pg.exec('reset role');
+  return (await pg.query('select actual_rice,state,rice_amount,rice_refill_amount,soup_refill_amount from public.meal_entry_extras where client_id=$1 and meal=$2 and meal_date=$3',[CLIENT,meal,date])).rows[0];
+ });
+ assert.deepEqual(await readExtra('morning'),{actual_rice:null,state:'needs_review',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
+ await riceDialog.locator('[data-confirm-rice]').click();
+ await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('追加料金 50円を集計に反映'));
+ await riceDialog.waitFor({state:'hidden'});
+ assert.deepEqual(await readExtra('morning'),{actual_rice:250,state:'ready',rice_amount:50,rice_refill_amount:0,soup_refill_amount:0});
+ await staff.locator('.extra-control summary').click();
+ let form=staff.locator('[data-extra]');
+ for(let i=0;i<2;i++){await form.locator('[data-step=rice][data-delta="1"]').click();await form.locator('[data-step=soup][data-delta="1"]').click();}
  staff.cancelNextConfirm=true;await staff.locator('button[data-meal=lunch]').click();assert.equal(await form.locator('[name=rice]').inputValue(),'2','cancelled meal switch preserves unsaved counts');assert.equal(await staff.evaluate(()=>S.meal),'morning');
- assert((await form.locator('[data-preview]').innerText()).includes('210円'));await form.locator('[type=submit]').click();await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('実提供量・おかわりを保存'));
+ assert((await form.locator('[data-preview]').innerText()).includes('210円'));await form.locator('[type=submit]').click();await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('追加料金 210円を集計に反映'));
  await staff.reload();await staff.locator('#app').waitFor({state:'visible'});await staff.waitForFunction(()=>window.__nexiaStaffNameReady===true);await staff.locator('.extra-control summary').click();form=staff.locator('[data-extra]');assert.equal(await form.locator('[name=rice]').inputValue(),'2');assert.equal(await form.locator('[name=grams]').inputValue(),'250');assert((await staff.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,'serving page fits viewport');assert((await form.evaluate(e=>e.scrollWidth-e.clientWidth))<=1,'counter form fits viewport');await staff.locator('.today-table').screenshot({path:path.join(out,width+'-serving.png')});
  const second=await pageFor(STAFF);assert((await second.locator('.extra-control summary').innerText()).includes('210円'));await second.close();
  await staff.locator('[data-tab=bill]').click();assert((await staff.locator('.tablewrap').first().innerText()).includes('540円'));assert((await staff.locator('.tablewrap').first().innerText()).includes('210円'));assert.equal(await staff.locator('#billAction').count(),0);
  const dlPromise=staff.waitForEvent('download');await staff.locator('#csv').click();const dl=await dlPromise;await dl.saveAs(path.join(out,width+'.csv'));const csv=fs.readFileSync(path.join(out,width+'.csv'),'utf8');assert(csv.includes('白米おかわり（円）')&&csv.includes('540')&&csv.includes('210'));
  await staff.locator('#printBill').click();await staff.pdf({path:path.join(out,width+'.pdf'),format:'A4',landscape:true});await staff.screenshot({path:path.join(out,width+'-bill.png'),fullPage:true});
+ await staff.locator('[data-tab=month]').click();
+ const lunch=staff.locator(`[data-status][data-date="${date}"][data-meal="lunch"]`);
+ await lunch.selectOption('served');await riceDialog.waitFor();
+ await riceDialog.locator('[data-confirm-later]').click();await riceDialog.waitFor({state:'hidden'});
+ assert.equal((await readExtra('lunch')).state,'needs_review','dismissing does not charge configured grams');
+ await staff.locator(`[data-confirm-meal][data-date="${date}"][data-meal="lunch"]`).click();
+ await riceDialog.locator('[name=grams]').fill('200');
+ assert((await riceDialog.locator('[data-preview]').innerText()).includes('＝ 0円'));
+ await riceDialog.getByRole('button',{name:'白米量・追加料金を確定'}).click();
+ await riceDialog.waitFor({state:'hidden'});
+ assert.deepEqual(await readExtra('lunch'),{actual_rice:200,state:'ready',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
  await staff.locator('[data-tab=settings]').click();assert.equal(await staff.locator('#extraPriceForm').count(),0);
  const editor=await pageFor(EDITOR);await editor.locator('[data-tab=settings]').click();assert.equal(await editor.locator('#extraPriceForm').count(),0);
  const denied=await editor.evaluate(async({ORG})=>{const {error}=await db.rpc('save_meal_extra_price',{p_org:ORG,p_expected:null,p_date:new Date().toISOString().slice(0,10),p_enabled:true,p_free:200,p_bands:[],p_rice:1,p_soup:1});return error?.message;},{ORG});assert(denied.includes('permission_denied'));
