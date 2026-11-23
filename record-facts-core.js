@@ -698,6 +698,13 @@
   '不安そうな様子が見られた':'本人には不安そうな様子が見られました'
  };
  const shortScenes={'ベッド上で側臥位で休んでいた':'ベッド上で側臥位で休息中でした','ベッド上で仰臥位で休んでいた':'ベッド上で仰臥位で休息中でした','ベッド上で仰臥位で寝ていた':'ベッド上で仰臥位で入眠中でした','ベッドで休んでいた':'ベッドで休息中でした'};
+ const visitPhrases={
+  '笑顔が見られた':['本人に笑顔が見られました','本人の表情に笑顔が見られました'],
+  '体調に変化なし':['体調の変化は見られませんでした'],
+  '痛みの訴えがあった':['本人から痛みの訴えがありました','本人は痛みを訴えられました'],
+  '痛みの訴えなし':['本人から痛みの訴えはありませんでした'],
+  '食欲あり':['食欲が見られました']
+ };
  const serviceContexts={'起床介助':'起床時は、','就寝介助':'就寝の支援では、','食事介助':'食事の支援では、','トイレ介助':'排泄の支援では、','入浴介助':'入浴の支援では、','入浴準備':'入浴準備では、','服薬介助・確認':'服薬の支援では、','口腔ケア':'口腔ケアでは、','更衣介助':'更衣の支援では、','清容・保清':'清容・保清では、','移動介助':'移動の支援では、','買い物・外出支援':'買い物・外出では、','通院等介助':'通院等の支援では、','家事援助':'家事援助では、','その他':'今回の支援では、'};
  const longMethods={
   '短い言葉で声をかけた':'本人への声かけには、短い言葉を用いました',
@@ -709,11 +716,30 @@
  };
  // Separate observation, utterance and comparison instead of appending one
  // stock sentence per checkbox. No relation of cause/time is inferred.
- function composeVisit(plan,mode,variant,structure,observation){
+ function composeVisit(plan,mode,variant,structure,observation,monthly){
   const seen=plan.visit.filter(e=>['scene','condition','health'].includes(e.kind));
   const scene=seen.find(e=>e.kind==='scene'),condition=seen.find(e=>e.kind==='condition'),health=seen.find(e=>e.kind==='health');
   const clauses=[];
-  if(mode==='short'){
+  if(monthly&&seen.length){
+   // All selected observations were made at the visit. Their presentation
+   // order can vary without implying any sequence or cause.
+   const orders=[seen];
+   if(seen.length>1)orders.push([...seen].reverse());
+   if(seen.length===3)orders.push([condition,scene,health],[scene,health,condition],[health,scene,condition],[condition,health,scene]);
+   const parts=structure(orders).map(e=>{
+    if(mode==='short'&&shortScenes[e.value])return shortScenes[e.value];
+    const value=observation(e);
+    if(mode==='long'&&e.kind==='scene')return '本人は'+value;
+    return structure([value,...(visitPhrases[e.value]||[])]);
+   });
+   const intro=structure(['訪問時、','訪問した際は、','訪問時には、']);
+   const separate=xs=>xs.map(sentence).join('');
+   const combine=xs=>xs.slice(0,-1).some(s=>connective(s)===s)?separate(xs):joinClauses(xs,'short');
+   const layouts=mode==='short'?[combine(parts)]:[separate(parts)];
+   if(mode==='normal'||parts.length===2&&mode==='long')layouts.push(combine(parts));
+   if(parts.length===3)layouts.push(combine(parts.slice(0,2))+sentence(parts[2]),sentence(parts[0])+combine(parts.slice(1)));
+   clauses.push(intro+structure(layouts));
+  }else if(mode==='short'){
    if(seen.length)clauses.push('訪問時、'+joinClauses(seen.map(e=>shortScenes[e.value]||observation(e)),'short'));
   }else{
    // Normal connects posture and expression; long states the resident's
@@ -880,7 +906,7 @@
   const fitsLevel=level&&firstWork>=0&&({active:/介助/.test(events[firstWork].canonical),partial:/介助/.test(events[firstWork].canonical),prompt:/声かけ|声をかけ/.test(events[firstWork].canonical),watch:/見守り/.test(events[firstWork].canonical),minimal:true})[level];
   return (level&&!fitsLevel?sentence(interventionText[level]):'')+out.join('');
  }
- function compose(f,_profile,expressionSeed=0){
+ function compose(f,_profile,expressionSeed=0,monthly=false){
   const R=f.routineCare?(typeof module!=='undefined'?require('./record-routine-core.js'):root.NexiaRoutineCore):null;
   if(f.routineCare&&!R)return {errors:['普段のケアの処理を再読み込みしてください。'],visit:'',care:''};
   const routine=R?R.prepare(api,f):null;if(routine?.errors.length)return {errors:routine.errors,visit:'',care:''};
@@ -888,7 +914,7 @@
   const plan=evidencePlan(routine?routine.facts:f),mode=f.lengthMode||'normal',variant=expressionPicker(expressionSeed),structure=structurePicker(expressionSeed);
   const observation=e=>observations[e.value]?variant.phrase(observations[e.value]):e.value.replace(/ていた$/,'ておられました').replace(/だった$/,'でした').replace(/があった$/,'がありました');
   const render=xs=>joinClauses(xs,mode==='short'?'short':mode==='normal'&&xs.length>1?variant.pick(['normal','long']):'long');
-  const visit=composeVisit(plan,mode,variant,structure,observation)||(routine?'訪問時の状態・様子・体調は未確認です。':'');
+  const visit=composeVisit(plan,mode,variant,monthly?structurePicker(expressionSeed):structure,observation,monthly)||(routine?'訪問時の状態・様子・体調は未確認です。':'');
   const memo=planMemo(f.supportNote,plan.services.length===1?plan.services[0].service:null);
   if(plan.services.length===1&&plan.services[0].service==='服薬介助・確認'){
    const a=plan.services[0],confirmed=a.actions.includes('服薬したことを確認した')||a.routineNarrative?.items.some(i=>i.value==='服薬したことを確認した')||a.reactions.includes('本人が自分で服薬した');
@@ -908,7 +934,7 @@
   if(plan.intervention&&target<0&&!scopeOnlyRecord&&!memoReplacesScope&&(!routine||plan.services.length)&&!plan.services.some(a=>a.routineMemoOnly||a.routineNarrative))sections.push(sentence(interventionText[plan.intervention]));
   plan.services.forEach((a,index)=>{
    if(memoReplacesScope){sections.push(composeMemo(memo,mode,a.service,plan.intervention,structure));return;}
-   if(a.routineNarrative){sections.push(R.composeNarrative(api,a,mode,plan.intervention,structure));return;}
+   if(a.routineNarrative){sections.push(R.composeNarrative(api,a,mode,plan.intervention,structure,monthly));return;}
    if(a.routineMemoOnly){const rm=planMemo(a.routineNote,a.service);sections.push(composeMemo(rm,mode,a.service,rm.hasWork&&target<0&&index===plan.services.findIndex(s=>s.routineMemoOnly)?plan.intervention:'',structure,R.plain));return;}
    const composed=a.routineCustom?.length?{acts:[...(a.routineWorkOrder||[]),...a.actions.filter(v=>!a.routineWorkOrder.some(i=>i.kind==='action'&&i.value===v)).map(value=>({kind:'action',value}))].flatMap(i=>i.kind==='custom'?[R.customSentence(i.value)]:actionClauses({...a,confirmedService:false,actions:[i.value],reactions:[]})),reactions:a.reactions}:supportClauses(a);const positive=composed.acts.filter(v=>v!=='服用済みかは確認していません');
    const own=unique([text(a.self)?selfSentence(a.self):'',...(a.routineSelfs||[]).map(selfSentence)]).map(v=>a.routineApplied?R.plain(v):v).map(sentence).join('').replace(/。$/,'');

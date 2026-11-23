@@ -144,7 +144,7 @@
    if(result.errors.length)return;
    q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;
    for(const id of ['visitResult','careResult'])q(id+'Count').textContent=q(id).textContent.length+'文字';
-   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,expressionRevision:3,...(record.dailyFacts.supportNote?{memoComposerRevision:1}:{})};
+   record.dailyFacts={...record.dailyFacts,expressionSeed:result.expressionSeed,visitExpressionSeed:result.visitExpressionSeed,expressionRevision:4,...(record.dailyFacts.supportNote?{memoComposerRevision:1}:{})};
    q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
    window.__nexiaPreviousExpression={actor:scope.actorId,org:scope.organizationId,client:scope.clientId,row:{organization_id:scope.organizationId,client_id:scope.clientId,visit_note:result.visit,care_note:result.care}};
   },signature:()=>JSON.stringify({org:localStorage.getItem('activeOrganizationId'),facts:collect()})};
@@ -177,7 +177,7 @@
   q('visitResult').textContent=result.visit;q('careResult').textContent=result.care;q('visitResultCount').textContent=result.visit.length+'文字';q('careResultCount').textContent=result.care.length+'文字';q('factCompositionStatus').textContent=(result.memoConflict?'服薬確認と未確認・拒否が重なっています。経過を確認できるようメモの原文を残しています。':result.memoReview?.length?'意味を確定できないメモは原文のまま残しています。':'確認した事実から文章を整えました。')+'文章を確認してから正式保存してください。';
   showQuickDetail(f,result.needsDetail||[]);q('factQuickDetail').dataset.visit=result.visit;q('factQuickDetail').dataset.care=result.care;
   const actual=window.NexiaRoutineCore&&f.routineCare?NexiaRoutineCore.prepare(C,f).facts:f;const actions=actual.actions.filter(C.performed);
-  await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:f.interventionLevel,supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor}});
+  await window.cloudSaveRecord({userCode:code,serviceType:service,visitScene:f.scene,condition:f.condition,health:f.health,lengthMode:f.lengthMode,services:actions.map(a=>a.service),careInput:f.supportNote,interventionLevel:f.interventionLevel,supportMethodSnapshot:'',visitNote:result.visit,careNote:result.care,dailyFacts:f,serviceDate:f.date,factContext:{organizationId:c.org,clientId:client[0].id,actorId:c.actor,recordDate:f.date}});
   window.addHistory(code+' / '+service,'【訪問時】'+result.visit+' 【支援中】'+result.care);
  }
  mount();

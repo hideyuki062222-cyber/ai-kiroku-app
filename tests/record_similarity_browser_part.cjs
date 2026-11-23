@@ -17,7 +17,14 @@ module.exports=async function({pg,atomic,pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,C
  await page.locator('#recordCommitButton').click();await page.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('正式にクラウド保存'));
  // This fixture now exhausts safe expressions deliberately. A single old row
  // must no longer force an exact repeat while unused renderings are available.
- const exhausted=await page.evaluate(()=>{const C=NexiaFactCore,S=NexiaRecordSimilarity,f=NexiaFactUI.collect(),seen=new Set(),rows=[];for(let n=0;n<256;n++){const r=C.compose(f,undefined,n),k=JSON.stringify([S.normalize(r.visit),S.normalize(r.care)]);if(!seen.has(k)){seen.add(k);rows.push(r);}}return rows;});
+ const exhausted=await page.evaluate(()=>{
+  const C=NexiaFactCore,S=NexiaRecordSimilarity,f=NexiaFactUI.collect(),visits=new Map(),cares=new Map();
+  for(let n=0;n<512;n++){
+   const r=C.compose(f,undefined,n,true);
+   visits.set(S.normalize(r.visit),r.visit);cares.set(S.normalize(r.care),r.care);
+  }
+  return [...visits.values()].flatMap(visit=>[...cares.values()].map(care=>({visit,care})));
+ });
  await atomic(async()=>{await pg.exec('reset role');for(let n=0;n<exhausted.length;n++)await pg.query('insert into public.care_records(id,organization_id,client_id,created_by,visit_note,care_note) values($1,$2,$3,$4,$5,$6)',[id(800000+n),ORG,CLIENT2,ADMIN,exhausted[n].visit,exhausted[n].care]);});
  await generate();assert(Number(await page.locator('#recordSimilarityNotice').getAttribute('data-matches'))>0);assert.equal(await page.locator('#recordCommitButton').innerText(),'当日の事実として正式保存');
  await page.locator('#recordSimilarityNotice summary').click();assert((await page.locator('#recordSimilarityNotice').innerText()).includes('文章が一致'));
@@ -52,6 +59,22 @@ module.exports=async function({pg,atomic,pageFor,STAFF,ADMIN,EDITOR,ORG,CLIENT,C
  const expanded=await support.locator('#careResult').innerText();assert(expanded.includes('水を準備'));assert(expanded.includes('薬を受け取られ'));assert(expanded.includes('飲水を希望する発言'));assert(!expanded.includes('服用されたことを'));assert.equal(await support.locator('[data-fact-service]').count(),1);
  await support.locator('#careResult').screenshot({path:path.join(out,width+'-optional-support.png')});
  await support.locator('[data-action][value="服薬に使う水を準備した"]').uncheck();await support.getByRole('button',{name:'AIで記録作成',exact:true}).click();await support.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('未保存'));assert(!(await support.locator('#careResult').innerText()).includes('水を準備'),'unchecked facts do not return during automatic variation');
+ // Include records beyond the former cap, dated records, and legacy timestamps.
+ const end=await support.locator('#factDate').inputValue();
+ const day=offset=>new Date(Date.parse(end)-(offset*86400000)).toISOString().slice(0,10);
+ await atomic(async()=>{
+  await pg.exec('reset role');
+  await pg.query("insert into public.care_records(organization_id,client_id,created_by,service_date,visit_note,care_note) select $1,$2,$3,$4::date,'monthly sample '||n,'synthetic care' from generate_series(1,305) n",[ORG,CLIENT2,ADMIN,day(2)]);
+  await pg.query("insert into public.care_records(organization_id,client_id,created_by,service_date,created_at,visit_note,care_note) values ($1,$2,$3,$4,$7,'window edge','synthetic care'),($1,$2,$3,$5,$7,'outside window','synthetic care'),($1,$2,$3,null,$6,'legacy edge','synthetic care')",[ORG,CLIENT2,ADMIN,day(31),day(32),day(31)+'T00:00:00+09:00',day(0)+'T00:00:00+09:00']);
+ });
+ const month=await page.evaluate(async scope=>{
+  const db=supabase.createClient(AI_KIROKU_CONFIG.supabaseUrl,AI_KIROKU_CONFIG.supabasePublishableKey);
+  const history=await NexiaRecordSimilarity.load(db,scope);
+  return {range:history.range,notes:history.rows.map(row=>row.visit_note)};
+ },{organizationId:ORG,clientId:CLIENT2,actorId:STAFF,recordDate:end});
+ assert.deepEqual(month.range,{start:day(31),end});
+ assert.equal(month.notes.filter(note=>note.startsWith('monthly sample ')).length,305);
+ assert(month.notes.includes('window edge')&&month.notes.includes('legacy edge')&&!month.notes.includes('outside window'));
  assert(requests.every(r=>r.organization_id&&r.client_id),'history comparisons always scope facility and resident IDs');
  fs.writeFileSync(path.join(out,width+'-similarity.json'),JSON.stringify({passed:true,width,realPinnedHTML:true,isolatedPostgres:true,explicitSelfShortcut:true,sameFactsSave:true,additionalSimilarityClicks:0,nearMatchAfterEditing:true,readFailureBlocksSave:true,staleComparisonBlocksSave:true,crossFacilityDenied:true,differentResidentExcluded:true,allThreeRoles:true,scopeFilters:requests.map(r=>({organization_id:r.organization_id,client_id:r.client_id,limit:r.limit}))},null,2));
  console.log('PASS record similarity browser',width,'inline exact/near warning, one-click save, optional facts, edits, read failures, stale responses, RLS, all roles');

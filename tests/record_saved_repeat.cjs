@@ -39,3 +39,34 @@ for(const level of Object.keys(C.interventionLabels))for(let seed=0;seed<128;see
  const out=C.compose({...minimal,interventionLevel:level},undefined,seed);assert.deepEqual(out.errors,[]);assert.deepEqual(out.needsDetail,['起床介助']);assert(!/起き上が|返事|うなず|服用|転倒|発熱|支援後/.test(out.care));checks++;
 }
 console.log('PASS saved-repeat selection',checks,'cases; original bug reproduced; unseen saved pair first; 32 distinct/128 probes; scoped history; exhaustion retains true facts',JSON.stringify(proof));
+
+const {facts:usualFacts}=require('./fixtures/record_care_final_cases.cjs');
+const meal='食事介助';
+const mealSteps=['食事の配膳を行う','本人が食物を口元へ運ぶ','食事中の見守りを行った'];
+const mealChoices=require('../record-care-catalog').choices(C,meal);
+const mealPlan=mealSteps.map(value=>mealChoices.find(item=>item.value===value)||{kind:'custom',value});
+for(const mode of ['short','normal','long']){
+ const input={...usualFacts(meal,mealPlan,'usual',mode),scene:'ベッド上で仰臥位で休んでいた',interventionLevel:''};
+ const history=[];
+ for(let day=0;day<32;day++){
+  const date=new Date(Date.UTC(2026,10,1+day)).toISOString().slice(0,10);
+  const dayScope={...input.routineCare,recordDate:date};
+  const output=S.chooseExpression(C,input,dayScope,history,day,history[0]);
+  for(const fact of [/ベッド上で仰臥位/,/休[ま息]/,/笑顔/,/良好/])assert.match(output.visit,fact);
+  for(const fact of [/配膳/,/本人[^。]*口元|口元[^。]*本人/,/見守/])assert.match(output.care,fact);
+  assert.doesNotMatch(output.visit,/配膳|見守り|入眠|発熱/);
+  assert.doesNotMatch(output.care,/完食|むせ|転倒|支援後/);
+  assert(!history.some(r=>S.normalize(r.visit_note)===S.normalize(output.visit)),mode+' ① repeats within 31 days');
+  assert(!history.some(r=>S.normalize(r.care_note)===S.normalize(output.care)),mode+' ② repeats within 31 days');
+  history.unshift({organization_id:dayScope.organizationId,client_id:dayScope.clientId,service_date:date,visit_note:output.visit,care_note:output.care});
+ }
+ const emptyVisit={...input,scene:'',condition:'',health:''};
+ const output=S.chooseExpression(C,emptyVisit,{...input.routineCare,recordDate:input.date},history,1);
+ assert.equal(output.visit,'訪問時の状態・様子・体調は未確認です。');
+}
+const monthly={...scope,recordDate:'2026-11-30'};
+const few=S.chooseExpression(constant,{},monthly,[row(first)],0,row(first));
+assert.equal(few.visit,first.visit);
+assert.equal(few.care,first.care);
+assert.equal(few.selection.selectedExact,true);
+console.log('PASS monthly wording, 32 consecutive days without a repeated visit or care section in three length modes, and fact-preserving fallback');
