@@ -1,7 +1,7 @@
 /* Advisory text comparison only. Uses the signed-in client's SELECT/RLS; never writes. */
 (function(root){
  'use strict';
- const INTRO='指示内容確認しました。前回のサービス記録確認しました。',LIMIT=300;
+ const INTRO='指示内容確認しました。前回のサービス記録確認しました。',LIMIT=300,MONTH_DAYS=31,PAGE_SIZE=200;
  const normalize=v=>String(v||'').normalize('NFKC').replace(/[\s\p{P}\p{S}]/gu,'').replace(/^指示内容確認しました前回のサービス記録確認しました/,'');
  function dice(a,b){
   a=normalize(a);b=normalize(b);if(!a||!b)return 0;if(a===b)return 1;if(a.length<2||b.length<2)return 0;
@@ -14,16 +14,44 @@
   return rows.flatMap(r=>{
    if(r.organization_id!==current.organizationId||r.client_id!==current.clientId)return [];
    const exact=v===normalize(r.visit_note)&&c===normalize(r.care_note),care=dice(current.careNote,r.care_note),visit=dice(current.visitNote,r.visit_note);
-   if(!exact&&!(care>=0.82&&(care*0.75+visit*0.25)>=0.8))return [];
+   const sectionMatch=current.recordDate&&((v&&v===normalize(r.visit_note))||c===normalize(r.care_note));
+   if(!exact&&!sectionMatch&&!(care>=0.82&&(care*0.75+visit*0.25)>=0.8))return [];
    return [{...r,kind:exact?'exact':'similar',score:exact?1:care*0.75+visit*0.25}];
   }).sort((a,b)=>(b.kind==='exact')-(a.kind==='exact')||b.score-a.score||String(b.created_at||'').localeCompare(String(a.created_at||'')));
  }
+ function dateOffset(date,days){
+  const value=new Date(date+'T00:00:00Z');
+  value.setUTCDate(value.getUTCDate()+days);
+  return value.toISOString().slice(0,10);
+ }
+ const recordDay=row=>row.service_date||new Date(Date.parse(row.created_at)+9*3600000).toISOString().slice(0,10);
  async function load(db,scope){
   if(!scope?.organizationId||!scope.clientId||!scope.actorId)throw Error('記録の参照範囲を確認できません。');
   const auth=await db.auth.getUser();if(auth.error||auth.data?.user?.id!==scope.actorId)throw Error('ログイン職員が変更されています。');
-  const result=await db.from('care_records').select('id,organization_id,client_id,service_date,created_at,visit_note,care_note').eq('organization_id',scope.organizationId).eq('client_id',scope.clientId).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(LIMIT);
-  if(result.error)throw Error('過去記録を読み込めません。');
-  const rows=(result.data||[]).filter(r=>r.organization_id===scope.organizationId&&r.client_id===scope.clientId).map(r=>({...r}));
+  const query=()=>db.from('care_records').select('id,organization_id,client_id,service_date,created_at,visit_note,care_note').eq('organization_id',scope.organizationId).eq('client_id',scope.clientId);
+  const fetchRows=async request=>{
+   const result=await request;if(result.error)throw Error('過去記録を読み込めません。');
+   return result.data||[];
+  };
+  let data,range;
+  if(scope.recordDate){
+   const end=scope.recordDate,start=dateOffset(end,-MONTH_DAYS),next=dateOffset(end,1);
+   range={start,end};
+   const pages=async(makeQuery)=>{
+    const records=[];
+    for(let offset=0;;offset+=PAGE_SIZE){
+     const page=await fetchRows(makeQuery().order('created_at',{ascending:false}).order('id',{ascending:false}).range(offset,offset+PAGE_SIZE-1));
+     records.push(...page);
+     if(page.length<PAGE_SIZE)return records;
+    }
+   };
+   const [dated,legacy]=await Promise.all([
+    pages(()=>query().gte('service_date',start).lte('service_date',end)),
+    pages(()=>query().is('service_date',null).gte('created_at',start+'T00:00:00+09:00').lt('created_at',next+'T00:00:00+09:00'))
+   ]);
+   data=[...dated,...legacy].sort((a,b)=>recordDay(b).localeCompare(recordDay(a))||b.created_at.localeCompare(a.created_at)||b.id.localeCompare(a.id));
+  }else data=await fetchRows(query().order('created_at',{ascending:false}).order('id',{ascending:false}).limit(LIMIT));
+  const rows=data.filter(r=>r.organization_id===scope.organizationId&&r.client_id===scope.clientId).map(r=>({...r}));
   for(let offset=0;offset<rows.length;offset+=100){
    const batch=rows.slice(offset,offset+100),seen=new Set();
    for(let page=0;;page++){
@@ -34,14 +62,69 @@
     if((amendments.data||[]).length<500||seen.size===batch.length)break;
    }
   }
-  return {rows,limit:LIMIT,atLimit:rows.length===LIMIT};
+  return range?{rows,range}:{rows,limit:LIMIT,atLimit:rows.length===LIMIT};
  }
  // Keep at most 32 distinct, fact-preserving pairs. Different seeds can render
  // the same words; probes therefore have a separate hard limit (no network).
  const MAX_CANDIDATES=32,MAX_PROBES=128;
  const pairKey=(v,c)=>JSON.stringify([v,c]);
+ const compareRank=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return a[i]-b[i];return 0;};
+ function chooseMonthly(core,f,visible,seed,previous){
+  const original=core.compose(f,undefined,seed,true);
+  if(original.errors.length)return original;
+  const visitOptions=new Map(),careOptions=new Map(),savedPairs=new Set();
+  const sections=(field,choices)=>{
+   const counts=new Map();
+   for(const row of visible){
+    const value=normalize(row[field]);
+    counts.set(value,(counts.get(value)||0)+1);
+   }
+   return {choices,counts,recent:normalize(previous?.[field]||visible[0]?.[field]),examples:[...counts.keys()].slice(0,7)};
+  };
+  const visit=sections('visit_note',visitOptions),care=sections('care_note',careOptions);
+  for(const row of visible)savedPairs.add(pairKey(normalize(row.visit_note),normalize(row.care_note)));
+  const probes=512;
+  for(let i=0;i<probes;i++){
+   const candidateSeed=i?(seed+i*131071)%1048576:seed;
+   const result=i?core.compose(f,undefined,candidateSeed,true):original;
+   for(const [options,text] of [[visitOptions,result.visit],[careOptions,result.care]]){
+    const key=normalize(text);
+    if(!options.has(key))options.set(key,{key,text,seed:candidateSeed});
+   }
+  }
+  const rankSection=section=>[...section.choices.values()].map(option=>{
+   const count=section.counts.get(option.key)||0;
+   const similarities=section.examples.map(text=>dice(option.key,text));
+   const rank=[Number(count>0),Number(option.key===section.recent),count,dice(option.key,section.recent),Math.max(0,...similarities)];
+   return {...option,rank};
+  }).sort((a,b)=>compareRank(a.rank,b.rank));
+  const visits=rankSection(visit),cares=rankSection(care);
+  let [v]=visits,[c]=cares;
+  const pairExists=(a,b)=>savedPairs.has(pairKey(a.key,b.key));
+  if(pairExists(v,c)){
+   // The sections may each have appeared before. Prefer a new combination
+   // when the safest available wording for both was already used together.
+   const alternateVisit=visits.find(option=>!pairExists(option,c));
+   const alternateCare=cares.find(option=>!pairExists(v,option));
+   if(alternateCare&&(!alternateVisit||compareRank(alternateCare.rank,alternateVisit.rank)<=0))c=alternateCare;
+   else if(alternateVisit)v=alternateVisit;
+   else for(const nextVisit of visits){
+    const nextCare=cares.find(option=>!pairExists(nextVisit,option));
+    if(nextCare){v=nextVisit;c=nextCare;break;}
+   }
+  }
+  const usedCombinations=[...savedPairs].filter(key=>{
+   const [savedVisit,savedCare]=JSON.parse(key);
+   return visitOptions.has(savedVisit)&&careOptions.has(savedCare);
+  }).length;
+  return {...original,visit:v.text,care:c.text,expressionSeed:c.seed,visitExpressionSeed:v.seed,
+   selection:{visitCandidateCount:visits.length,careCandidateCount:cares.length,probeCount:probes,
+    unseenPairCount:visits.length*cares.length-usedCombinations,selectedExact:pairExists(v,c)}};
+ }
  function chooseExpression(core,f,scope,rows,seed,previous=null){
   const visible=rows.filter(r=>r.organization_id===scope.organizationId&&r.client_id===scope.clientId);
+  const scopedPrevious=previous?.organization_id===scope.organizationId&&previous?.client_id===scope.clientId?previous:null;
+  if(scope.recordDate)return chooseMonthly(core,f,visible,seed,scopedPrevious);
   const original=core.compose(f,undefined,seed);if(original.errors.length)return original;
   const counts=()=>new Map(),pairs=counts(),visits=counts(),cares=counts();
   const add=(m,k)=>m.set(k,(m.get(k)||0)+1);
@@ -64,7 +147,6 @@
    // within the probe budget rather than declaring those first 32 exhausted.
    if(candidates.length===MAX_CANDIDATES&&candidates.some(c=>!pairs.has(c.key)))break;
   }
-  const compareRank=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return a[i]-b[i];return 0;};
   let best=null,bestRank=null,bestSimilarity=Infinity;
   for(const candidate of candidates){
    const fullCount=pairs.get(candidate.key)||0;

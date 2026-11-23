@@ -254,7 +254,11 @@
     const notice=document.createElement('section');notice.id='recordSimilarityNotice';notice.setAttribute('aria-live','polite');notice.dataset.matches=String(matches.length);
     const title=document.createElement('p');title.textContent=matches.length?'過去の記録と似ていますが、今回の内容が正しければ、そのまま保存できます。':'過去記録との比較が完了しました。';notice.append(title);
     const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='比較の詳細（任意）';details.append(summary);
-    const range=document.createElement('p');range.textContent=`同じ施設・利用者の閲覧可能な直近${checker.LIMIT}件まで（今回${comparison.rows.length}件）。必須冒頭文・句読点・空白を除いて比較します。`;details.append(range);
+    const range=document.createElement('p');
+    range.textContent=comparison.range
+      ?`同じ施設・利用者の ${comparison.range.start}〜${comparison.range.end} の閲覧可能な記録（${comparison.rows.length}件）を①・②それぞれ照合しました。`
+      :`同じ施設・利用者の閲覧可能な直近${checker.LIMIT}件まで（今回${comparison.rows.length}件）。`;
+    details.append(range);
     for(const r of matches.slice(0,3)){const p=document.createElement('p');p.textContent=(r.kind==='exact'?'文章が一致':'文章が類似')+'：'+(r.service_date||String(r.created_at||'').slice(0,10)||'日付不明')+'\n① '+r.visit_note+'\n② '+r.care_note;details.append(p);}notice.append(details);
     q('recordSaveStatus').before(notice);
     q('recordCommitButton').textContent=matches.length?'当日の事実として正式保存':'この内容を正式保存';
@@ -271,7 +275,7 @@
     if(c.org!==scope.organizationId||c.actor!==scope.actorId)throw Error('作成時と現在の施設・ログイン職員が一致しません。作り直してください。');
     const history=await checker.load(c.db,scope);verify();
     if(q('visitResult')?.textContent===generatedVisit&&q('careResult')?.textContent===generatedCare)window.NexiaFactUI.rephrase?.(record,history.rows);
-    syncPendingText();comparison={record,rows:history.rows,text:''};renderComparison();
+    syncPendingText();comparison={record,rows:history.rows,range:history.range,text:''};renderComparison();
   }
   async function commitPendingRecord(){
     if(saveBusy||!pendingRecord)return;

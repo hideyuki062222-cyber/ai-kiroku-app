@@ -31,9 +31,9 @@ module.exports=async function({pg,atomic,pageFor,STAFF,ORG,ADMIN,id,width,out,ba
    if(result.selection?.unseenPairCount)assert(!result.exact,'no saved full duplicate if an unused candidate exists');
    const countBefore=(await read()).length;
    await page.locator('#recordCommitButton').click();await page.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('正式にクラウド保存'));
-   const persisted=await read();assert.equal(persisted.length,countBefore+1);const saved=persisted.find(r=>r.visit_note===result.visit&&r.care_note===result.care&&r.daily_facts?.expressionRevision===(before?2:3));assert(saved,'the actual selected text and revision were saved through SDK/RLS');assert.equal(saved.created_by,STAFF);assert.equal(saved.intervention_level,'active');assert.deepEqual(saved.daily_facts.actions,fixed.actions);
+   const persisted=await read();assert.equal(persisted.length,countBefore+1);const saved=persisted.find(r=>r.visit_note===result.visit&&r.care_note===result.care&&r.daily_facts?.expressionRevision===(before?2:4));assert(saved,'the actual selected text and revision were saved through SDK/RLS');assert.equal(saved.created_by,STAFF);assert.equal(saved.intervention_level,'active');assert.deepEqual(saved.daily_facts.actions,fixed.actions);
    runs.push({number:n,...result});
-   if(n===1&&situation==='details-normal'){
+   if(n===1&&before&&situation==='details-normal'){
     // Reproduce the ranking defect using the real preceding draft. The existing
     // synthetic history contains every original candidate except one which
     // shares a section with that draft. No input or saved record is rewritten.

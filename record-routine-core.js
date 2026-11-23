@@ -96,7 +96,7 @@
   if(item.kind==='method')return K.describe(C,api,service,{...item,kind:'step'});
   return K.describe(C,api,service,item);
  }
- function composeNarrative(C,a,mode,level,choose){
+ function composeNarrative(C,a,mode,level,choose,monthly=false){
   const original=a.routineNarrative.items,detail=original.find(i=>i.value==='腰に手を添えて起き上がりを介助する');
   const reduced=original.some(i=>i.value==='服薬したことを確認した')?original.filter(i=>i.value!=='服薬の状況を確認する'):original;
   const ordered=detail&&original.some(i=>i.value==='起き上がりを介助した')?reduced.filter(i=>i!==detail).map(i=>i.value==='起き上がりを介助した'?detail:i):reduced;
@@ -107,9 +107,11 @@
   const phrase=e=>choose(catalog().phraseChoices(plain(e.text),e.kind));
   const nameWorker=text=>{
    const lead=/^(食事中|排泄中|更衣中|口腔ケア中|入浴中|入浴前|就寝前|歯磨き後)(の(?=見守りを)|に|、)(.+)$/.exec(text);
-   if(!lead)return '職員は'+text;
+   if(!lead)return monthly?choose(['職員は'+text,'職員が'+text]):'職員は'+text;
    const [,time,particle,work]=lead;
-   return choose(['職員は'+text,time+(particle==='に'?'に、':'は、')+'職員が'+work]);
+   const options=['職員は'+text,time+(particle==='に'?'に、':'は、')+'職員が'+work];
+   if(monthly)options.push('職員が'+text);
+   return choose(options);
   };
   const out=[];let workerNamed=false;
   for(let i=0;i<facts.length;i++){
@@ -143,7 +145,9 @@
   // A service checkbox plus usual confirmation supports the generic service,
   // but never turns an uninterpretable instruction into a specific action.
   if(!body&&refs.length)body=C.serviceStatements[a.service];
-  return (body?a.service+'では、':'')+body;
+  if(!body)return '';
+  const heading=a.service+'では、';
+  return (monthly&&facts.length?choose([heading,a.service+'の際は、',a.service+'については、']):heading)+body;
  }
  function plain(value){
   if(/[「」『』"]/.test(value))return value;
