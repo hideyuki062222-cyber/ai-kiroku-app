@@ -10,9 +10,12 @@ function extraSummary(r){
  return `追加料金 ${sum.toLocaleString()}円 ／ 白米量・おかわり`;
 }
 function canConfirmExtra(d){return !latestBill()?.is_final&&(d>=today()||admin());}
+function needsRiceConfirmation(r){
+ return r?.status==='served'&&r.extra?.state==='needs_review'&&MealExtras.calculate(r.extra.tariff,r.rice_grams).rice_amount>0;
+}
 function extraForm(r,confirming=false){
  const x=r.extra,editable=canConfirmExtra(r.meal_date);
- const riceShortcut=editable&&x.actual_rice===null&&Number.isInteger(r.rice_grams)
+ const riceShortcut=editable&&x.actual_rice===null&&needsRiceConfirmation(r)
   ?`<button type="button" data-confirm-rice="${r.rice_grams}">設定どおり（${r.rice_grams}g）で確定</button>`:'';
  const refills=[['rice','白米',x.rice_refills],['soup','みそ汁',x.soup_refills]].map(([key,label,count])=>
   `<label>${label}のおかわり回数<div class="refill-stepper"><button type="button" data-step="${key}" data-delta="-1" aria-label="${label}のおかわりを減らす">−</button><input name="${key}" type="number" min="0" max="100" step="1" value="${count}" required><button type="button" data-step="${key}" data-delta="1" aria-label="${label}のおかわりを増やす">＋</button></div></label>`).join('');
@@ -32,20 +35,21 @@ function extraControl(id,d,m){
  return `<details class="extra-control"><summary>${extraSummary(r)}</summary>${extraForm(r)}</details>`;
 }
 function openExtraConfirmation(r){
+ const review=r.extra.state==='needs_review';
  const dialog=document.createElement('dialog');
  dialog.className='extra-control extra-confirmation';
  dialog.setAttribute('aria-labelledby','extraConfirmationTitle');
- dialog.innerHTML=`<h2 id="extraConfirmationTitle">今回の白米量を確認</h2>
+ dialog.innerHTML=`<h2 id="extraConfirmationTitle">${review?'今回の白米量を確認':'白米量・おかわりを入力'}</h2>
   <p>${esc(name(person(r.client_id)))} ／ ${r.meal_date} ${C.labels[r.meal]}</p>
-  <p>食べた量を確認してから確定してください。登録済みの料金区分で追加額を計算します。</p>
-  ${extraForm(r,true)}<button type="button" data-confirm-later>あとで確認</button>`;
+  ${review?'<p>食べた量を確認してから確定してください。登録済みの料金区分で追加額を計算します。</p>':''}
+  ${extraForm(r,review)}<button type="button" data-confirm-later>${review?'あとで確認':'閉じる'}</button>`;
  $('view').append(dialog);
  dialog.querySelector('[data-confirm-later]').onclick=()=>dialog.close();
  dialog.addEventListener('cancel',e=>{if(S.busy)e.preventDefault();});
  dialog.addEventListener('close',()=>{
   dialog.remove();
   S.dirty=!!document.querySelector('#view form[data-dirty="true"]');
-  if(!saved)msg('提供済みを保存しました。白米量が未確認のため、追加料金は要確認です。');
+  if(!saved&&review)msg('提供済みを保存しました。白米量が未確認のため、追加料金は要確認です。');
  });
  let saved=false;
  bindExtraForm(dialog.querySelector('form'),()=>{
@@ -68,8 +72,10 @@ function bindExtraForm(f,onSaved){
  const grams=()=>f.elements.grams.value===''?null:Number(f.elements.grams.value);
  const shortcut=f.querySelector('[data-confirm-rice]');
  const preview=()=>{
-  const a=MealExtras.calculate(x.tariff,grams(),Number(f.elements.rice.value),Number(f.elements.soup.value));
-  if(shortcut)shortcut.hidden=grams()!==null&&grams()!==Number(shortcut.dataset.confirmRice);
+  const g=grams();
+  const zeroDefault=g===null&&x.state==='ready'&&x.actual_rice===null;
+  const a=MealExtras.calculate(x.tariff,zeroDefault?r.rice_grams:g,Number(f.elements.rice.value),Number(f.elements.soup.value));
+  if(shortcut)shortcut.hidden=g!==null&&g!==Number(shortcut.dataset.confirmRice);
   f.querySelector('[data-preview]').textContent=a.state==='needs_review'
    ?'白米量が未確認か、料金区分が未設定です。追加料金は要確認になります。'
    :`白米量 ${a.rice_amount}円 ＋ 白米おかわり ${a.rice_refill_amount}円 ＋ みそ汁 ${a.soup_refill_amount}円 ＝ ${a.total}円${a.state==='disabled'?'（料金機能は無効）':''}`;

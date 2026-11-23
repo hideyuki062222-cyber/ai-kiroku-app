@@ -16,9 +16,10 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await pg.query('insert into public.organizations(id,name,join_code,created_by) values($1,\'合成検証施設\',\'SYNTHETIC\',$2)',[ORG,ADMIN]);
  for(const [uid,role]of [[ADMIN,'admin'],[STAFF,'staff'],[EDITOR,'staff']])await pg.query('insert into public.organization_members(organization_id,user_id,role,staff_name) values($1,$2,$3,\'合成職員\')',[ORG,uid,role]);
  await pg.query('insert into public.clients(id,organization_id,code,room_number,display_name) values($1,$2,\'test\',\'101\',\'合成利用者\')',[CLIENT,ORG]);
- await pg.query('insert into public.meal_profiles(organization_id,client_id,start_date,rice_morning,rice_lunch,rice_evening) values($1,$2,$3,250,250,250)',[ORG,CLIENT,date]);
+ await pg.query('insert into public.meal_profiles(organization_id,client_id,start_date,rice_morning,rice_lunch,rice_evening) values($1,$2,$3,250,249,250)',[ORG,CLIENT,date]);
  await pg.query("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,(date_trunc('month',current_date)-interval '1 month')::date,'morning','served')",[ORG,CLIENT]);
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261119123222_meal_extra_charges.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261123110200_meal_rice_confirmation_only_when_charged.sql'),'utf8'));
  async function pageFor(uid){
   const ctx=await browser.newContext({viewport:{width,height:950},isMobile:width<600,hasTouch:width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo',acceptDownloads:true});contexts.push(ctx);
   const user={id:uid,email:'synthetic@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email'},user_metadata:{}},exp=Math.floor(Date.now()/1000)+3600,token='e30.'+Buffer.from(JSON.stringify({sub:uid,role:'authenticated',aud:'authenticated',exp})).toString('base64url')+'.synthetic';
@@ -56,7 +57,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  async function band(from,to,amount){await admin.locator('#addExtraBand').click();const row=admin.locator('#extraBands tr').last();await row.locator('[data-band=from]').fill(String(from));if(to!==null)await row.locator('[data-band=to]').fill(String(to));await row.locator('[data-band=amount]').fill(String(amount));}
  await band(250,299,50);await band(300,null,100);await f.locator('[type=submit]').click();await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('201〜249g'));assert.equal((await pg.query('select count(*)::int n from public.meal_extra_prices')).rows[0].n,0);await f.screenshot({path:path.join(out,width+'-gap.png')});
  // Explicit synthetic gap resolution for UI validation, not a production recommendation.
- await band(201,249,25);await f.locator('[type=submit]').click();await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('新しい履歴'));assert((await admin.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,'settings page fits viewport');await admin.locator('#extraPriceForm').screenshot({path:path.join(out,width+'-settings.png')});
+ await band(201,249,0);await f.locator('[type=submit]').click();await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('新しい履歴'));assert((await admin.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,'settings page fits viewport');await admin.locator('#extraPriceForm').screenshot({path:path.join(out,width+'-settings.png')});
  const staff=await pageFor(STAFF);await staff.locator('[data-status]').first().selectOption('served');await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('提供済みを保存'));
  const riceDialog=staff.getByRole('dialog',{name:'今回の白米量を確認'});
  await riceDialog.waitFor();
@@ -81,15 +82,25 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await staff.locator('#printBill').click();await staff.pdf({path:path.join(out,width+'.pdf'),format:'A4',landscape:true});await staff.screenshot({path:path.join(out,width+'-bill.png'),fullPage:true});
  await staff.locator('[data-tab=month]').click();
  const lunch=staff.locator(`[data-status][data-date="${date}"][data-meal="lunch"]`);
- await lunch.selectOption('served');await riceDialog.waitFor();
- await riceDialog.locator('[data-confirm-later]').click();await riceDialog.waitFor({state:'hidden'});
- assert.equal((await readExtra('lunch')).state,'needs_review','dismissing does not charge configured grams');
+ await lunch.selectOption('served');await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('昼食：提供済みを保存'));
+ assert.equal(await staff.getByRole('dialog').count(),0,'a zero-yen band above the free limit also skips confirmation');
+ assert.deepEqual(await readExtra('lunch'),{actual_rice:null,state:'ready',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
  await staff.locator(`[data-confirm-meal="lunch"][data-date="${date}"]`).click();
+ const changedDialog=staff.getByRole('dialog',{name:'白米量・おかわりを入力'});
+ await changedDialog.locator('[name=grams]').fill('300');
+ await changedDialog.getByRole('button',{name:'白米量・追加料金を確定'}).click();
+ await changedDialog.waitFor({state:'hidden'});
+ assert.deepEqual(await readExtra('lunch'),{actual_rice:300,state:'ready',rice_amount:100,rice_refill_amount:0,soup_refill_amount:0});
+ const evening=staff.locator(`[data-status][data-date="${date}"][data-meal="evening"]`);
+ await evening.selectOption('served');await riceDialog.waitFor();
+ await riceDialog.locator('[data-confirm-later]').click();await riceDialog.waitFor({state:'hidden'});
+ assert.equal((await readExtra('evening')).state,'needs_review','dismissing does not charge configured grams');
+ await staff.locator(`[data-confirm-meal="evening"][data-date="${date}"]`).click();
  await riceDialog.locator('[name=grams]').fill('200');
  assert((await riceDialog.locator('[data-preview]').innerText()).includes('＝ 0円'));
  await riceDialog.getByRole('button',{name:'白米量・追加料金を確定'}).click();
  await riceDialog.waitFor({state:'hidden'});
- assert.deepEqual(await readExtra('lunch'),{actual_rice:200,state:'ready',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
+ assert.deepEqual(await readExtra('evening'),{actual_rice:200,state:'ready',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
  await staff.locator('[data-tab=settings]').click();assert.equal(await staff.locator('#extraPriceForm').count(),0);
  const editor=await pageFor(EDITOR);await editor.locator('[data-tab=settings]').click();assert.equal(await editor.locator('#extraPriceForm').count(),0);
  const denied=await editor.evaluate(async({ORG})=>{const {error}=await db.rpc('save_meal_extra_price',{p_org:ORG,p_expected:null,p_date:new Date().toISOString().slice(0,10),p_enabled:true,p_free:200,p_bands:[],p_rice:1,p_soup:1});return error?.message;},{ORG});assert(denied.includes('permission_denied'));
