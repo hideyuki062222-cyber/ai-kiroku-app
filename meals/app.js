@@ -72,8 +72,10 @@ function renderToday(){
 }
 function monthMealCell(id,d,m){
  const r=entry(id,d,m);
- const review=r?.status==='served'&&r.extra?.state==='needs_review';
- const action=review&&canConfirmExtra(d)?`<button type="button" class="meal-rice-review" data-confirm-meal="${m}" data-client="${id}" data-date="${d}">白米量を確認</button>`:review?'<small>白米量は要確認</small>':'';
+ const hasExtras=r?.status==='served'&&r.extra?.tariff?.enabled;
+ const review=hasExtras&&r.extra.state==='needs_review';
+ const label=review?'白米量を確認':'量の変更・おかわり';
+ const action=hasExtras&&canConfirmExtra(d)?`<button type="button" class="meal-rice-review" data-confirm-meal="${m}" data-client="${id}" data-date="${d}">${label}</button>`:review?'<small>白米量は要確認</small>':'';
  return `<td>${picker(id,d,m)}${action}</td>`;
 }
 function renderMonth(){const c=person(S.selected),p=profile(S.selected);return `<section class="panel"><div class="split"><div><h2>${esc(S.month)} 月間予定表</h2><p>通常の曜日・朝昼晩をまとめて予定登録し、外出や外泊の日を欠食に変更します。</p></div><button id="fillAll" class="primary">この月の全員の予定を登録</button></div><div class="row"><label>利用者${selectPeople('selected',S.selected)}</label>${p?'<button id="fillOne">この人の予定を登録</button>':''}</div><p class="muted">未来の食事は「提供予定」「欠食」のみ登録できます。「提供済み」は当日以降に選べます。一括登録は空欄だけを埋めます。提供済み・欠食・登録済み予定は変更しません。設定変更後の登録済み予定は、個別に変更してください。</p></section>`+(!c||!p?empty():`<div class="tablewrap"><table><thead><tr><th>日付</th><th>朝食</th><th>昼食</th><th>夕食</th></tr></thead><tbody>${C.days(S.month).map(d=>`<tr><td>${Number(d.slice(-2))}日（${'日月火水木金土'[new Date(d+'T12:00:00Z').getUTCDay()]}）</td>${C.meals.map(m=>monthMealCell(c.id,d,m)).join('')}</tr>`).join('')}</tbody></table></div>`);}
@@ -103,7 +105,7 @@ async function saveStatus(el){
   await load();
   msg(`${name(person(id))} ${d} ${C.labels[m]}：${statusLabel[status]}を保存しました。`);
   const saved=entry(id,d,m);
-  if(saved?.status==='served'&&saved.extra?.state==='needs_review'&&canConfirmExtra(d))openExtraConfirmation(saved);
+  if(needsRiceConfirmation(saved)&&canConfirmExtra(d))openExtraConfirmation(saved);
  }catch(e){render();throw e;}
 }
 async function fill(one){const n=S.profiles.filter(p=>person(p.client_id)?.is_active).length;if(!n)throw Error('先に利用者の食事設定を登録してください。');if(!confirm(`${S.org.name} / ${S.month}\n${one?name(person(S.selected)):'食事設定済みの利用者全員'}の空欄に予定を登録します。提供済み・欠食は残します。`))return;const count=check(await db.rpc('meal_fill_month',{p_org:S.org.id,p_month:S.month+'-01',p_client:one?S.selected:null}));await load();msg(`${count}食分の予定を登録しました。`);}

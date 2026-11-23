@@ -15,7 +15,7 @@ try{
  await q("select set_config('request.jwt.claim.sub',$1,false)",[AD]);
  for(const org of [A,B])await q('insert into public.organizations(id,name,join_code,created_by) values($1,$2,$3,$4)',[org,'施設'+org,org,AD]);
  for(const [o,u,r]of [[A,AD,'admin'],[A,ST,'staff'],[A,ED,'staff'],[B,OB,'admin']])await q('insert into public.organization_members(organization_id,user_id,role,staff_name) values($1,$2,$3,$4)',[o,u,r,'合成職員']);
- for(const [c,o]of [[CA,A],[CB,B]]){await q("select set_config('request.jwt.claim.sub',$1,false)",[o===B?OB:AD]);await q('insert into public.clients(id,organization_id,code,room_number,display_name) values($1,$2,$3,$3,$3)',[c,o,c]);await q('insert into public.meal_profiles(organization_id,client_id,start_date,morning,lunch,evening) values($1,$2,current_date,true,true,true)',[o,c]);}
+ for(const [c,o]of [[CA,A],[CB,B]]){await q("select set_config('request.jwt.claim.sub',$1,false)",[o===B?OB:AD]);await q('insert into public.clients(id,organization_id,code,room_number,display_name) values($1,$2,$3,$3,$3)',[c,o,c]);await q('insert into public.meal_profiles(organization_id,client_id,start_date,morning,lunch,evening,rice_morning,rice_lunch,rice_evening) values($1,$2,current_date,true,true,true,250,250,200)',[o,c]);}
  await q("select set_config('request.jwt.claim.sub',$1,false)",[AD]);
  ({d:today,p:past}=(await q("select current_date::text d,(date_trunc('month',current_date)-interval '1 month')::date::text p"))[0]);
  await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,$3,'morning','served')",[A,CA,past]);
@@ -31,10 +31,22 @@ try{
  await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,current_date,'morning','planned')",[A,CA]);eq(await get(),undefined,'planned never snapshots or bills extras');
  await q("update public.meal_entries set status='served' where organization_id=$1 and client_id=$2 and meal_date=current_date",[A,CA]);
  eq((await get()).state,'needs_review');eq((await get()).actual_rice,null,'profile grams do not prove actual grams');
+ const existingExtra=await get();
+ await owner();
+ await db.exec(fs.readFileSync('supabase/migrations/20261123110200_meal_rice_confirmation_only_when_charged.sql','utf8'));
+ eq(await get(),existingExtra,'existing extra entries are not rewritten');
+ await as(ST);
+ await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,current_date,'evening','served')",[A,CA]);
+ const free=async()=>{const x=await get(CA,'evening');return [x.state,x.actual_rice,x.rice_amount,x.rice_refill_amount,x.soup_refill_amount];};
+ eq(await free(),['ready',null,0,0,0],'no confirmation and no invented weight for a free portion');
+ await save(null,1,1,CA,'evening');eq(await free(),['ready',null,0,50,30],'paid refills work without a confirmed free first portion');
+ await save(250,1,1,CA,'evening');eq(await free(),['ready',250,50,50,30],'an exception can still be charged');
+ await save(null,1,1,CA,'evening');eq(await free(),['needs_review',null,0,0,0],'deleting a measurement is treated as unknown');
+ await deny(()=>q("select private.meal_rice_surcharge('{}'::jsonb,200)"),/permission denied/);
  for(const [grams,amount]of [[0,0],[200,0],[250,50],[300,100]]){await save(grams);eq((await get()).rice_amount,amount,'grams '+grams);}
  await save(250,2,2);let x=await get();eq([x.rice_amount,x.rice_refill_amount,x.soup_refill_amount],[50,100,60],'distinct components: no double-counting');
  await deny(()=>q("select public.save_meal_extra($1,$2,current_date,'morning',null,null,250,2,2,'')",[A,CA]),/conflict/);
- const stale=x.revision,e=(await q('select revision from public.meal_entries where client_id=$1 and meal_date=current_date',[CA]))[0].revision;
+ const stale=x.revision,e=(await q("select revision from public.meal_entries where client_id=$1 and meal_date=current_date and meal='morning'",[CA]))[0].revision;
  await save(250,1,1);await deny(()=>q('select public.save_meal_extra($1,$2,current_date,$3,$4,$5,250,2,2,\'\')',[A,CA,'morning',stale,e]),/extra_conflict/);
  await deny(()=>q('update public.meal_entry_extras set rice_amount=999 where client_id=$1',[CA]),/permission denied/);
  await deny(()=>q('select * from private.meal_extra_history'),/permission denied/);
