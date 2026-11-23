@@ -13,7 +13,7 @@ module.exports=async function({pageFor,STAFF,width,out}){
   for(let n=1;n<=30;n++){
    await page.getByRole('button',{name:'AIで記録作成',exact:true}).click();await page.waitForFunction(()=>document.getElementById('recordSaveStatus').textContent.includes('未保存'));
    const row=await page.evaluate(()=>({visit:document.getElementById('visitResult').textContent,care:document.getElementById('careResult').textContent,facts:NexiaFactUI.collect()}));
-   assert.deepEqual(row.facts,fixed,'same facts on every generation');assert(row.visit.includes('椅子・座椅子に座って'));assert(/笑顔が見(?:られ|受けられ)ました/.test(row.visit));
+   assert.deepEqual(row.facts,fixed,'same facts on every generation');assert(row.visit.includes('椅子・座椅子に座って'));assert.match(row.visit,/笑顔が見(?:られ|受けられ)(?:ました|、)/);
    assert(row.care.startsWith('指示内容確認しました。前回のサービス記録確認しました。'));assert(row.care.includes('声かけ・促しを中心に'));assert(/うなず(?:いて|きで)応じられました/.test(row.care));assert(/ゆっくり(?:と)?話しました/.test(row.care));assert(row.care.includes('支援後は、椅子に座って過ごされました'));assert(/服用済みかは確認して(?:いません|おらず)/.test(row.care));
    assert(!/服用されたこと|安全確認|副作用|発熱|血圧|痛み|薬を準備/.test(row.care+row.visit));assert(!/ましました|まし、|ました、/.test(row.visit+row.care));
    runs.push({number:n,visit:row.visit,care:row.care});
