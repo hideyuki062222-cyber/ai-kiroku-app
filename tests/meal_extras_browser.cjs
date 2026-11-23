@@ -84,7 +84,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await lunch.selectOption('served');await riceDialog.waitFor();
  await riceDialog.locator('[data-confirm-later]').click();await riceDialog.waitFor({state:'hidden'});
  assert.equal((await readExtra('lunch')).state,'needs_review','dismissing does not charge configured grams');
- await staff.locator(`[data-confirm-meal][data-date="${date}"][data-meal="lunch"]`).click();
+ await staff.locator(`[data-confirm-meal="lunch"][data-date="${date}"]`).click();
  await riceDialog.locator('[name=grams]').fill('200');
  assert((await riceDialog.locator('[data-preview]').innerText()).includes('＝ 0円'));
  await riceDialog.getByRole('button',{name:'白米量・追加料金を確定'}).click();

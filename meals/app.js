@@ -73,7 +73,7 @@ function renderToday(){
 function monthMealCell(id,d,m){
  const r=entry(id,d,m);
  const review=r?.status==='served'&&r.extra?.state==='needs_review';
- const action=review&&canConfirmExtra(d)?`<button type="button" class="meal-rice-review" data-confirm-meal data-client="${id}" data-date="${d}" data-meal="${m}">白米量を確認</button>`:review?'<small>白米量は要確認</small>':'';
+ const action=review&&canConfirmExtra(d)?`<button type="button" class="meal-rice-review" data-confirm-meal="${m}" data-client="${id}" data-date="${d}">白米量を確認</button>`:review?'<small>白米量は要確認</small>':'';
  return `<td>${picker(id,d,m)}${action}</td>`;
 }
 function renderMonth(){const c=person(S.selected),p=profile(S.selected);return `<section class="panel"><div class="split"><div><h2>${esc(S.month)} 月間予定表</h2><p>通常の曜日・朝昼晩をまとめて予定登録し、外出や外泊の日を欠食に変更します。</p></div><button id="fillAll" class="primary">この月の全員の予定を登録</button></div><div class="row"><label>利用者${selectPeople('selected',S.selected)}</label>${p?'<button id="fillOne">この人の予定を登録</button>':''}</div><p class="muted">未来の食事は「提供予定」「欠食」のみ登録できます。「提供済み」は当日以降に選べます。一括登録は空欄だけを埋めます。提供済み・欠食・登録済み予定は変更しません。設定変更後の登録済み予定は、個別に変更してください。</p></section>`+(!c||!p?empty():`<div class="tablewrap"><table><thead><tr><th>日付</th><th>朝食</th><th>昼食</th><th>夕食</th></tr></thead><tbody>${C.days(S.month).map(d=>`<tr><td>${Number(d.slice(-2))}日（${'日月火水木金土'[new Date(d+'T12:00:00Z').getUTCDay()]}）</td>${C.meals.map(m=>monthMealCell(c.id,d,m)).join('')}</tr>`).join('')}</tbody></table></div>`);}
@@ -112,7 +112,7 @@ function csv(){const rows=[['施設','月','利用者','朝食数','朝食代合
 function bindView(){
  document.querySelectorAll('[data-status]').forEach(el=>el.onchange=()=>{if(!canLeave()){el.value=entry(el.dataset.client,el.dataset.date,el.dataset.meal)?.status||'';return;}run(()=>saveStatus(el));});
  document.querySelectorAll('[data-confirm-meal]').forEach(b=>b.onclick=()=>{
-  if(!S.busy&&canLeave())openExtraConfirmation(entry(b.dataset.client,b.dataset.date,b.dataset.meal));
+  if(!S.busy&&canLeave())openExtraConfirmation(entry(b.dataset.client,b.dataset.date,b.dataset.confirmMeal));
  });
  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(!canLeave())return;S.tab=b.dataset.go;render();});
  document.querySelectorAll('[data-meal]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>{if(!canLeave())return;S.meal=b.dataset.meal;render();};});
