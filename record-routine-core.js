@@ -104,20 +104,29 @@
   const sentence=C.sentence,connect=s=>s.replace(/しました$/,'し').replace(/ました$/,'').replace(/でした$/,'で');
   const shortMethod=facts.findIndex(e=>e.kind==='method'&&e.text==='短い言葉で声をかけました'),prompt=facts.findIndex(e=>e.kind==='work'&&/に向けて声をかけました$/.test(e.text));
   if(shortMethod>=0&&prompt>=0){facts[prompt]={...facts[prompt],text:facts[prompt].text.replace('声をかけました','、短い言葉で声をかけました')};facts.splice(shortMethod,1);}
+  const phrase=e=>choose(catalog().phraseChoices(plain(e.text),e.kind));
+  const nameWorker=text=>{
+   const lead=/^(食事中|排泄中|更衣中|口腔ケア中|入浴中|入浴前|就寝前|歯磨き後)(の(?=見守りを)|に|、)(.+)$/.exec(text);
+   if(!lead)return '職員は'+text;
+   const [,time,particle,work]=lead;
+   return choose(['職員は'+text,time+(particle==='に'?'に、':'は、')+'職員が'+work]);
+  };
   const out=[];let workerNamed=false;
   for(let i=0;i<facts.length;i++){
-   const e=facts[i];let text=plain(e.text);const isWork=e.kind==='work';
+   const e=facts[i],isWork=e.kind==='work';
+   let text=phrase(e);
    if(mode==='long'&&isWork){
     if(text==='腰に手を添えて起き上がりを介助しました')text=choose(['職員は腰に手を添えて起き上がりを介助しました','本人が起き上がる動作を、職員が腰に手を添えて介助しました','腰に手を添え、職員は本人が起き上がる動作を介助しました']);
     else if(/を介助しました$/.test(text)){const target=text.replace(/を介助しました$/,'');text=choose(['職員は'+text,target+'の介助は職員が行いました',target+'は職員が介助しました']);}
-    else if(!workerNamed)text='職員は'+text;
+    else if(!workerNamed)text=nameWorker(text);
     workerNamed=true;
    }else if(mode==='normal'&&isWork){
-    const rephrase=value=>choose([...new Set([value,value.replace(/^(洗身|洗髪|移乗|起き上がり|着衣|更衣|脱衣|清拭)を介助しました$/,'$1の介助を行いました'),value.replace(/を行いました$/,'を実施しました')])]);
-    text=rephrase(text);
-    if(facts[i+1]?.kind==='work'&&/しました$|行いました$/.test(text)){const next=rephrase(plain(facts[++i].text));text=choose([connect(text)+'、'+next,text+'。'+next]);}
+    if(facts[i-1]?.kind==='self')text=nameWorker(text);
+    if(facts[i+1]?.kind==='work'&&/しました$/.test(text)){
+     const next=phrase(facts[++i]);text=choose([connect(text)+'、'+next,text+'。'+next]);
+    }
    }
-   else if(isWork)text=choose([text,text.replace(/を介助しました$/,'の介助を行いました').replace(/を行いました$/,'を実施しました')]);
+   else if(isWork&&facts[i-1]?.kind==='self')text=nameWorker(text);
    if(e.kind==='self')workerNamed=false;
    out.push(sentence(text));
   }
