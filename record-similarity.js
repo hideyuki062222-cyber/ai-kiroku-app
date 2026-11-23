@@ -71,7 +71,8 @@
    // Saved full matches must never win merely because an unused rendering shares
    // a visit/care section with the preceding draft. Section and recent-draft
    // preferences only apply AFTER avoidance of a saved full match.
-   const rank=[Number(fullCount>0),Number(cares.has(candidate.c)),Number(visits.has(candidate.v)),recent?(candidate.c===recent.c?2:0)+(candidate.v===recent.v?1:0):0,fullCount];
+   const careCount=cares.get(candidate.c)||0,visitCount=visits.get(candidate.v)||0;
+   const rank=[Number(fullCount>0),Number(careCount>0),Number(candidate.c===recent?.c),Number(visitCount>0),Number(candidate.v===recent?.v),careCount,fullCount];
    const order=bestRank?compareRank(rank,bestRank):-1;if(order>0)continue;
    const similarity=history.reduce((max,r)=>{
     const care=dice(candidate.c,r.c),weighted=0.75*care+0.25*dice(candidate.v,r.v);

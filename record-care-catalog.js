@@ -20,12 +20,58 @@
   return out;
  }
  const aliases={'口腔ケア':'口腔ケアの支援を行いました','更衣促し':'更衣に向けて声をかけました','更衣の促し':'更衣に向けて声をかけました','更衣を促す':'更衣に向けて声をかけました'};
+ // Previously saved custom lines with an explicit resident action.
+ const selfCustom={
+  '本人が着替えを行う':'着替えは本人が行いました',
+  '本人がパジャマへの更衣を行う':'パジャマへの着替えは本人が行いました',
+  '本人が体を洗う':'体は本人が洗いました',
+  '本人が洗顔を行う':'洗顔は本人が行いました',
+  '本人が身だしなみを整える':'身だしなみは本人が整えました',
+  '本人が袋から薬を取り出す動作を行う':'本人が袋から薬を取り出しました'
+ };
+ // Equivalent wording for a confirmed step. Each option retains its actor and
+ // object, and none introduces an observation, result, or degree of assistance.
+ const alternatives={
+  '食事の配膳を行いました':['食事を配膳しました','配膳を行いました'],
+  '食事中の見守りを行いました':['食事中に見守りました','食事中の様子を見守りました'],
+  '食物は本人が口元へ運びました':['本人が食べ物を口元へ運びました','食べ物を口元へ運ぶ動作は本人が行いました'],
+  '食具は本人が操作しました':['本人が食具を操作しました','食具の操作は本人が行いました'],
+  'トイレへの誘導を行いました':['トイレへ誘導しました','トイレまでの誘導を行いました'],
+  '排泄中の見守りを行いました':['排泄中に見守りました','排泄中の様子を見守りました'],
+  '浴室までの移動の見守りを行いました':['浴室までの移動を見守りました','浴室へ向かう様子を見守りました'],
+  '入浴前の湯温の確認を行いました':['入浴前に湯温を確認しました','湯温を入浴前に確認しました'],
+  '入浴中に声をかけて安否の確認を行いました':['入浴中に声をかけて安否を確認しました','入浴中の安否を声かけで確認しました'],
+  '入浴中の見守りを行いました':['入浴中に見守りました','入浴中の様子を見守りました'],
+  '髪は本人が洗いました':['本人が髪を洗いました','洗髪は本人が行いました'],
+  '体は本人が洗いました':['本人が体を洗いました','洗身は本人が行いました'],
+  '着替えは本人が行いました':['本人が着替えました','更衣の動作は本人が行いました'],
+  'パジャマへの着替えは本人が行いました':['本人がパジャマに着替えました','パジャマに着替える動作は本人が行いました'],
+  '更衣中の見守りを行いました':['更衣中に見守りました','更衣中の様子を見守りました'],
+  '薬の手渡しを行いました':['薬を手渡しました','本人に薬を手渡しました'],
+  '本人が薬を服用したことを確認しました':['本人の服用を確認しました','本人が薬を服用したことを確かめました'],
+  '歯ブラシの手渡しを行いました':['歯ブラシを手渡しました','本人に歯ブラシを手渡しました'],
+  '歯は本人が磨きました':['本人が歯を磨きました','歯磨きは本人が行いました'],
+  '口腔ケア中の見守りを行いました':['口腔ケア中に見守りました','口腔ケア中の様子を見守りました'],
+  '本人のペースを待ちました':['本人のペースに合わせて待ちました'],
+  'ゆっくり話しました':['ゆっくりと話しました','本人にゆっくり話しました']
+ };
+ function phraseChoices(text,kind){
+  if(Object.hasOwn(alternatives,text))return [text,...alternatives[text]];
+  if(kind!=='work')return [text];
+  const prompt=text.match(/^(起床|就寝準備|排泄|更衣|入浴|入浴準備|食事|服薬|歯磨き|移動|洗顔|通院|外出|家事|活動)に向けて声をかけました$/);
+  if(prompt)return [text,prompt[1]+'を促す声かけを行いました',prompt[1]+'に向けた声かけをしました'];
+  const rewritten=text
+   .replace(/^(洗身|洗髪|移乗|起き上がり|着衣|更衣|脱衣|清拭)を介助しました$/,'$1の介助を行いました')
+   .replace(/の確認を行いました$/,'を確認しました');
+  return [...new Set([text,rewritten,text.replace(/を行いました$/,'を実施しました')])];
+ }
  function describe(C,R,service,item){
   if(item.category==='precaution')return {kind:'reference',text:item.value};
   const known=choices(C,service).find(i=>i.value===item.value);
   if(item.kind==='raw'&&!known){const parts=item.value.split(/[、,]/).map(s=>s.trim()).filter(Boolean);if(parts.length&&parts.every(s=>aliases[s]))return parts.map(s=>({kind:'work',text:aliases[s]}));return {kind:'reference',text:item.value};}
   const value=item.value;
   if(selfPast[value])return {kind:'self',text:selfPast[value]};
+  if(item.kind==='custom'&&Object.hasOwn(selfCustom,value))return {kind:'self',text:selfCustom[value]};
   if(value==='服薬したことを確認した')return {kind:'work',text:'本人が薬を服用したことを確認しました'};
   if(aliases[value])return {kind:'work',text:aliases[value]};
   if(value.startsWith('本人：'))return {kind:'self',text:R.plain(C.selfSentence(value.slice(3)))};
@@ -35,5 +81,5 @@
   const memo=C.planMemo(value,service);if(memo.events.length===1&&memo.events[0].canonical)return {kind:memo.events[0].kind==='self'?'self':'work',text:R.plain(memo.events[0].normal)};
   return {kind:'reference',text:value};
  }
- const api={groups,choices,describe};if(typeof module!=='undefined')module.exports=api;else root.NexiaCareCatalog=api;
+ const api={groups,choices,describe,phraseChoices};if(typeof module!=='undefined')module.exports=api;else root.NexiaCareCatalog=api;
 })(globalThis);

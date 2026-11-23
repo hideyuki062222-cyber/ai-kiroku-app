@@ -215,7 +215,7 @@ function applyAssignmentContext(){
   h=h.replace('<select id="user"', '<a href="#history" style="display:block;padding:12px 0;font-weight:700">利用者ごとの記録を確認 ↓</a><select id="user"');
   h=h.replace('作成履歴（クラウド共有）','利用者ごとの保存済み記録');
   h=h.replace('</head>','<script src="./dashboard-return.js?v=20261021-1"><\/script></head>');
-  h=h.replace('</head>','<script src="./record-similarity.js?v=20261122-care-polish-1"><\/script><script src="./record-history.js?v=20261121-intervention-1"><\/script></head>');
+  h=h.replace('</head>','<script src="./record-similarity.js?v=20261123-care-wording-1"><\/script><script src="./record-history.js?v=20261121-intervention-1"><\/script></head>');
   h=h.replace('※この試作品はブラウザ内で動くデモです。実際のAI APIには接続していません。\n      実運用では個人情報・利用者情報の取り扱い、安全管理、出力内容の確認が必要です。','当日確認した事実だけを記録文にします。作成後に編集し、内容を確認してから正式保存してください。');
   // Replace the actual pinned generator before the formal-save wrapper captures it.
   const generationStart=h.indexOf('async function generate(){');
@@ -224,7 +224,7 @@ function applyAssignmentContext(){
   h=h.slice(0,generationStart)+'async function generate(){throw new Error("事実入力画面を読み込めませんでした。再読み込みしてください。");}\n'+h.slice(generationEnd);
   h=h.replace('    const payload = {','    if(record.factContext && (record.factContext.organizationId!==membership.organization_id || record.factContext.clientId!==row.id || record.factContext.actorId!==session.user.id))throw new Error("作成時の施設・利用者・職員が一致しません。作り直してください。");\n    const payload = {');
   h=h.replace('</head>','<link rel="stylesheet" href="./record-routine.css?v=20261122-care-polish-1"><link rel="stylesheet" href="./record-facts.css?v=20261122-care-polish-1"></head>');
-  h=h.replace('</body>','<script src="./facility-permissions.js?v=20261120-scoped-quality-1"><\/script><script src="./record-facts-core.js?v=20261122-care-polish-1"><\/script><script src="./record-care-catalog.js?v=20261122-care-polish-1"><\/script><script src="./record-routine-core.js?v=20261122-care-polish-1"><\/script><script src="./record-facts-ui.js?v=20261122-care-polish-1"><\/script><script src="./record-routine-ui.js?v=20261122-care-polish-1"><\/script><script src="./common-nav.js?v=20261121-variants-1"><\/script></body>');
+  h=h.replace('</body>','<script src="./facility-permissions.js?v=20261120-scoped-quality-1"><\/script><script src="./record-facts-core.js?v=20261122-care-polish-1"><\/script><script src="./record-care-catalog.js?v=20261123-care-wording-1"><\/script><script src="./record-routine-core.js?v=20261123-care-wording-1"><\/script><script src="./record-facts-ui.js?v=20261122-care-polish-1"><\/script><script src="./record-routine-ui.js?v=20261122-care-polish-1"><\/script><script src="./common-nav.js?v=20261121-variants-1"><\/script></body>');
   document.open();
   document.write(h);
   document.close();

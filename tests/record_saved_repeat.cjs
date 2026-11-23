@@ -14,6 +14,11 @@ for(const previous of pool){for(const unused of pool){
 }if(proof)break;}
 const beyond=S.chooseExpression(C,f,scope,pool.map(row),0,row(pool[0]));assert(beyond.selection.probeCount>32);assert(!beyond.selection.selectedExact,'search beyond an already saved initial cohort within the probe budget');
 assert(proof,'counterexample is an actual output of the original 32-candidate algorithm');
+const priorCare={visit:'以前の様子',care:C.INTRO+'食事を配膳しました。'};
+const differentCare={visit:'再訪時の様子',care:C.INTRO+'配膳を行いました。'};
+const careHistory=[priorCare,{...differentCare,visit:'別の日の様子'},{visit:differentCare.visit,care:C.INTRO+'見守りました。'}].map(row);
+const carePriority={compose:(_facts,_profile,seed)=>({...((seed%2)?differentCare:{...priorCare,visit:'初回の様子'}),errors:[]})};
+assert.equal(S.chooseExpression(carePriority,{},scope,careHistory,0,row(priorCare)).care,differentCare.care,'when both supporting texts were used before, vary the previous draft’s care even if its visit phrase was used before');
 let checks=1;
 for(const mode of ['short','normal','long'])for(const facts of [minimal,detailed(cases[0])]){
  let prior=null;const history=[];for(let n=0;n<30;n++){
