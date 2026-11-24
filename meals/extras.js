@@ -10,7 +10,7 @@ function extraSummary(r){
  return `追加料金 ${sum.toLocaleString()}円 ／ 白米量・おかわり`;
 }
 function canConfirmExtra(d){return !latestBill()?.is_final&&(d>=today()||admin());}
-function usesConfiguredRice(r){return r.extra?.state==='ready'&&r.extra.actual_rice===null;}
+function usesConfiguredRice(r){return (!r.serving_kind||r.serving_kind==='regular')&&r.extra?.state==='ready'&&r.extra.actual_rice===null;}
 function extraForm(r,confirming=false){
  const x=r.extra,editable=canConfirmExtra(r.meal_date);
  const riceShortcut=editable&&x.actual_rice===null&&MealExtras.calculate(x.tariff,r.rice_grams).rice_amount>0
@@ -28,7 +28,7 @@ function extraForm(r,confirming=false){
   ${r.meal_date<today()&&!admin()?'<p>過去日の訂正は管理者が理由を記録して行います。</p>':''}</form>`;
 }
 function extraControl(id,d,m){
- const r=entry(id,d,m);if(r?.status!=='served')return '';
+ const r=entry(id,d,m);if(r?.status!=='served'||r.serving_kind&&r.serving_kind!=='regular')return '';
  if(!r.extra)return '<small>導入前の提供記録：追加料金対象外</small>';
  return `<details class="extra-control"><summary>${extraSummary(r)}</summary>${extraForm(r)}</details>`;
 }

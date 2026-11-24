@@ -24,6 +24,6 @@
   const a=hits[0].amount,b=rice*p.rice_refill_price,c=soup*p.soup_refill_price;
   return {rice_amount:a,rice_refill_amount:b,soup_refill_amount:c,total:a+b+c,state:'ready'};
  }
- const amounts=r=>r.status==='served'&&r.extra?.state==='ready'?{rice:r.extra.rice_amount,riceRefill:r.extra.rice_refill_amount,soupRefill:r.extra.soup_refill_amount}:{rice:0,riceRefill:0,soupRefill:0};
+ const amounts=r=>r.status==='served'&&(!r.serving_kind||r.serving_kind==='regular')&&r.extra?.state==='ready'?{rice:r.extra.rice_amount,riceRefill:r.extra.rice_refill_amount,soupRefill:r.extra.soup_refill_amount}:{rice:0,riceRefill:0,soupRefill:0};
  const api={validate,calculate,amounts};if(typeof module!=='undefined')module.exports=api;else root.MealExtras=api;
 })(globalThis);

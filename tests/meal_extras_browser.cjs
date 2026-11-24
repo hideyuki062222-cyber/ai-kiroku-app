@@ -3,13 +3,14 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright'),{PGlite}=require(process.env.PGLITE_PATH||'@electric-sql/pglite');
 const root=path.resolve(__dirname,'..'),assets=process.env.NEXIA_BROWSER_ASSETS||'/workspace/work/handoff-room-assets',out=process.env.MEAL_EXTRA_OUTPUT||path.join(assets,'meal-extra-results');fs.mkdirSync(out,{recursive:true});
-const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,[ORG,ADMIN,STAFF,EDITOR,CLIENT]=[1,11,12,13,21].map(id);
+const id=n=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`,[ORG,ADMIN,STAFF,EDITOR,CLIENT,SINGLE]=[1,11,12,13,21,22].map(id);
 const date=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const server=http.createServer((req,res)=>{let file=path.join(root,new URL(req.url,'http://local').pathname.replace(/^\/ai-kiroku-app\//,''));try{if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');res.setHeader('content-type',file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.css')?'text/css':'text/javascript');res.end(fs.readFileSync(file));}catch{res.writeHead(404).end();}});
 async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpected=[],contexts=[];let chain=Promise.resolve();
  const atomic=fn=>{const p=chain.then(fn);chain=p.catch(()=>{});return p;};
  try{
  await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/facility_editor_schema.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/scoped_permissions_schema.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261115235721_facility_editor_permissions.sql'),'utf8'));
  await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[ADMIN]);
  for(const uid of [ADMIN,STAFF,EDITOR])await pg.query('insert into auth.users values($1,$2)',[uid,uid+'@example.invalid']);
@@ -21,6 +22,9 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261119123222_meal_extra_charges.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261123110200_meal_rice_confirmation_only_when_charged.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261124032400_meal_rice_charge_on_served.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261119134048_record_facts_profiles.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261120051058_safe_granular_facility_permissions.sql'),'utf8'));
+ await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261124073400_meal_single_items.sql'),'utf8'));
  async function pageFor(uid){
   const ctx=await browser.newContext({viewport:{width,height:950},isMobile:width<600,hasTouch:width<600,locale:'ja-JP',timezoneId:'Asia/Tokyo',acceptDownloads:true});contexts.push(ctx);
   const user={id:uid,email:'synthetic@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{provider:'email'},user_metadata:{}},exp=Math.floor(Date.now()/1000)+3600,token='e30.'+Buffer.from(JSON.stringify({sub:uid,role:'authenticated',aud:'authenticated',exp})).toString('base64url')+'.synthetic';
@@ -36,9 +40,9 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
    const result=await atomic(async()=>{
     await pg.exec('reset role;set role authenticated');await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[uid]);
     try{
-     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(!['save_meal_extra_price','save_meal_extra','meal_bill_action','meal_set_status'].includes(fn))throw Error('Unexpected RPC '+fn);
+     if(u.pathname.includes('/rpc/')){const fn=u.pathname.split('/').at(-1),p=JSON.parse(req.postData()||'{}');if(!['save_meal_extra_price','save_meal_extra','meal_bill_action','meal_set_status','meal_amend_serving'].includes(fn))throw Error('Unexpected RPC '+fn);
       const names=Object.keys(p);const {rows}=await pg.query('select public.'+fn+'('+names.map((k,i)=>k+'=> $'+(i+1)).join(',')+') result',Object.values(p).map(v=>v&&typeof v==='object'?JSON.stringify(v):v));return {data:rows[0].result};}
-     const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','clients','meal_profiles','meal_prices','meal_entries','meal_extra_prices','meal_entry_extras','meal_bill_versions'].includes(table))throw Error('Unexpected table '+table);
+     const table=u.pathname.split('/').at(-1);if(!['organizations','organization_members','organization_facility_editors','organization_feature_permissions','clients','meal_profiles','meal_prices','meal_entries','meal_extra_prices','meal_entry_extras','meal_bill_versions'].includes(table))throw Error('Unexpected table '+table);
      const params=[],where=[];for(const [k,v]of u.searchParams){if(['select','order','limit','offset'].includes(k))continue;if(!/^\w+$/.test(k))throw Error('bad column');const dot=v.indexOf('.'),op=v.slice(0,dot),value=v.slice(dot+1);
       if(op==='in'){const ps=value.slice(1,-1).split(',');where.push(k+' in ('+ps.map(p=>{params.push(p);return '$'+params.length;}).join(',')+')');}else{const cmp={eq:'=',gte:'>=',lte:'<=',is:'is'}[op];if(!cmp)throw Error('Unexpected filter '+op);params.push(value);where.push(k+cmp+'$'+params.length);}}
      let sql='select * from public.'+table;
@@ -120,6 +124,55 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  const oldVersion=(await pg.query('select id from public.meal_bill_versions where version=1')).rows[0].id;
  await admin.locator('#billVersion').selectOption(oldVersion);assert((await admin.locator('.tablewrap').first().innerText()).includes('330円'));
  await admin.locator('#printBill').click();assert((await admin.locator('#print').innerText()).includes('確定 第1版'));
+ // Save an ordinary daily preference and serve it with no second confirmation.
+ await atomic(async()=>{
+  await pg.exec('reset role');
+  await pg.query("select set_config('request.jwt.claim.sub',$1,false)",[ADMIN]);
+  await pg.query("insert into public.clients(id,organization_id,code,room_number,display_name) values($1,$2,'single','102','単品の架空利用者')",[SINGLE,ORG]);
+ });
+ await admin.locator('#month').fill(date.slice(0,7));
+ await admin.locator('[data-tab=settings]').click();
+ await admin.locator('#selected').selectOption(SINGLE);
+ const profileForm=admin.locator('#profileForm');
+ await profileForm.locator('[name=morning_kind]').selectOption('miso_soup');
+ await profileForm.locator('[name=lunch_kind]').selectOption('rice_ball');
+ await profileForm.locator('[name=lunch_quantity]').fill('2');
+ await profileForm.locator('[type=submit]').click();
+ await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('食事設定を保存'));
+ const singlePage=await pageFor(STAFF);
+ const status=singlePage.locator(`[data-status][data-client="${SINGLE}"]`);
+ assert((await singlePage.locator('.today-table').innerText()).includes('みそ汁のみ・1杯'));
+ await status.selectOption('served');
+ await singlePage.waitForFunction(()=>document.getElementById('notice').textContent.includes('50円を計上'));
+ assert.equal(await singlePage.getByRole('dialog').count(),0);
+ await singlePage.locator('button[data-meal=lunch]').click();
+ assert((await singlePage.locator('.today-table').innerText()).includes('おにぎりのみ・2個'));
+ await status.selectOption('served');
+ await singlePage.waitForFunction(()=>document.getElementById('notice').textContent.includes('200円を計上'));
+ const singleRead=async()=>atomic(async()=>{
+  await pg.exec('reset role');
+  return (await pg.query("select serving_kind,serving_quantity,unit_price from public.meal_entries where client_id=$1 and meal_date=$2 order by meal desc",[SINGLE,date])).rows;
+ });
+ const billed=await singleRead();
+ assert.deepEqual(billed.map(r=>r.unit_price),[50,200]);
+ const pricing=admin.locator('#priceForm');
+ await pricing.locator('[name=miso_soup]').fill('70');
+ await pricing.locator('[name=rice_ball]').fill('120');
+ await pricing.locator('[type=submit]').click();
+ await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('料金を登録しました'));
+ assert.deepEqual(await singleRead(),billed,'new rates preserve saved items and prices');
+ const edit=singlePage.locator(`[data-edit-serving="lunch"][data-client="${SINGLE}"]`);
+ await edit.click();
+ const servingDialog=singlePage.getByRole('dialog',{name:'提供内容を変更'});
+ await servingDialog.locator('[name=quantity]').fill('3');
+ await servingDialog.getByRole('button',{name:'保存',exact:true}).click();
+ await servingDialog.waitFor({state:'hidden'});
+ await singlePage.waitForFunction(()=>document.getElementById('notice').textContent.includes('おにぎりのみ・3個'));
+ assert.deepEqual((await singleRead()).map(r=>r.unit_price),[50,300]);
+ await singlePage.locator('[data-tab=bill]').click();
+ await singlePage.locator('#billPerson').selectOption(SINGLE);
+ assert((await singlePage.locator('.tablewrap').first().innerText()).includes('350円'),'bill includes singles at saved prices');
+ assert((await singlePage.locator('.tablewrap').last().innerText()).includes('おにぎりのみ・3個'));
  assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);console.log('PASS browser + real isolated DB',width,'PC/mobile pricing, gap detection, serving, counts, reload, second device, billing, CSV/PDF, staff/editor API denial');
  fs.writeFileSync(path.join(out,width+'.json'),JSON.stringify({width,errors,unexpected,realIsolatedDatabase:true,passed:true},null,2));
  }catch(e){for(const c of contexts)for(const p of c.pages()){console.error('FAILPAGE',await p.locator('body').innerText());await p.screenshot({path:path.join(out,width+'-failure.png'),fullPage:true});}throw e;}finally{await Promise.all(contexts.map(c=>c.close()));await pg.close();}
