@@ -9,6 +9,7 @@ const server=http.createServer((req,res)=>{let file=path.join(root,new URL(req.u
 async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpected=[],contexts=[];let chain=Promise.resolve();
  const atomic=fn=>{const p=chain.then(fn);chain=p.catch(()=>{});return p;};
  try{
+ await pg.exec("set time zone 'Asia/Tokyo'");
  await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/facility_editor_schema.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'tests/fixtures/scoped_permissions_schema.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261115235721_facility_editor_permissions.sql'),'utf8'));
@@ -23,6 +24,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261123110200_meal_rice_confirmation_only_when_charged.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261124032400_meal_rice_charge_on_served.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261119134048_record_facts_profiles.sql'),'utf8'));
+ await pg.query('select public.set_facility_editor($1,$2,true,false)',[ORG,EDITOR]);
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261120051058_safe_granular_facility_permissions.sql'),'utf8'));
  await pg.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261124073400_meal_single_items.sql'),'utf8'));
  async function pageFor(uid){
@@ -114,7 +116,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  assert.deepEqual(await readExtra('evening'),{actual_rice:200,state:'ready',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
  await staff.locator('[data-tab=settings]').click();assert.equal(await staff.locator('#extraPriceForm').count(),0);
  const editor=await pageFor(EDITOR);await editor.locator('[data-tab=settings]').click();assert.equal(await editor.locator('#extraPriceForm').count(),0);
- const denied=await editor.evaluate(async({ORG})=>{const {error}=await db.rpc('save_meal_extra_price',{p_org:ORG,p_expected:null,p_date:new Date().toISOString().slice(0,10),p_enabled:true,p_free:200,p_bands:[],p_rice:1,p_soup:1});return error?.message;},{ORG});assert(denied.includes('permission_denied'));
+ const denied=await editor.evaluate(async({ORG,date})=>{const {error}=await db.rpc('save_meal_extra_price',{p_org:ORG,p_expected:null,p_date:date,p_enabled:true,p_free:200,p_bands:[],p_rice:1,p_soup:1});return error?.message;},{ORG,date});assert.equal(denied,'facility_edit_required');
  // Close a historical month, reopen with a reason, then display its original frozen version.
  const past=(await pg.query("select (date_trunc('month',current_date)-interval '1 month')::date::text d")).rows[0].d;
  await admin.locator('#month').fill(past.slice(0,7));await admin.locator('[data-tab=bill]').click();
@@ -131,6 +133,7 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
   await pg.query("insert into public.clients(id,organization_id,code,room_number,display_name) values($1,$2,'single','102','単品の架空利用者')",[SINGLE,ORG]);
  });
  await admin.locator('#month').fill(date.slice(0,7));
+ await admin.waitForFunction(month=>S.month===month&&S.ready,date.slice(0,7));
  await admin.locator('[data-tab=settings]').click();
  await admin.locator('#selected').selectOption(SINGLE);
  const profileForm=admin.locator('#profileForm');

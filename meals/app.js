@@ -58,7 +58,7 @@ function kindOptions(selected){return Object.entries(C.kinds).map(([k,label])=>`
 function servingEditButton(id,d,m){
  const r=entry(id,d,m);
  const p=profile(id);
- if(!p||r?.status==='absent'||!r&&(!person(id)?.is_active||!C.expected(p,d,m)))return '';
+ if(!p||latestBill()?.is_final||r?.status==='absent'||!r&&(!person(id)?.is_active||!C.expected(p,d,m)))return '';
  if(r?.served_once&&(r.status!=='served'||d<today()&&!admin()))return '';
  return `<button type="button" class="meal-item-edit" data-edit-serving="${m}" data-client="${id}" data-date="${d}">提供内容を変更</button>`;
 }
