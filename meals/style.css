@@ -54,3 +54,10 @@
  .today-table .extra-control{grid-column:1/-1;grid-row:3;margin:8px 0 0;text-align:left;width:100%}
  .today-table td:nth-child(4){grid-row:4}.extra-control form{text-align:left}.refill-stepper input{flex:1;min-width:0;max-width:none}
 }
+
+.meal-item-edit{display:block;margin-top:4px;padding-inline:8px;font-size:12px}
+.meal-profile-slot{display:grid;align-content:start;gap:8px;padding:10px;border:1px solid var(--line);border-radius:8px;min-width:0}
+.meal-profile-slot>label:first-child{display:flex;align-items:center;gap:8px}
+.meal-profile-slot input[type="checkbox"]{width:20px;height:20px}
+.meal-profile-slot select,.extra-confirmation select{width:100%;min-width:0;min-height:44px;font-size:16px}
+.meal-profile-slot [hidden],.extra-confirmation [hidden]{display:none}
