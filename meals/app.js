@@ -104,8 +104,6 @@ async function saveStatus(el){
   }
   await load();
   msg(`${name(person(id))} ${d} ${C.labels[m]}：${statusLabel[status]}を保存しました。`);
-  const saved=entry(id,d,m);
-  if(needsRiceConfirmation(saved)&&canConfirmExtra(d))openExtraConfirmation(saved);
  }catch(e){render();throw e;}
 }
 async function fill(one){const n=S.profiles.filter(p=>person(p.client_id)?.is_active).length;if(!n)throw Error('先に利用者の食事設定を登録してください。');if(!confirm(`${S.org.name} / ${S.month}\n${one?name(person(S.selected)):'食事設定済みの利用者全員'}の空欄に予定を登録します。提供済み・欠食は残します。`))return;const count=check(await db.rpc('meal_fill_month',{p_org:S.org.id,p_month:S.month+'-01',p_client:one?S.selected:null}));await load();msg(`${count}食分の予定を登録しました。`);}
