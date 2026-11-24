@@ -60,18 +60,19 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await band(201,249,0);await f.locator('[type=submit]').click();await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('新しい履歴'));assert((await admin.evaluate(()=>document.documentElement.scrollWidth-innerWidth))<=1,'settings page fits viewport');await admin.locator('#extraPriceForm').screenshot({path:path.join(out,width+'-settings.png')});
  const staff=await pageFor(STAFF);await staff.locator('[data-status]').first().selectOption('served');await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('提供済みを保存'));
  const riceDialog=staff.getByRole('dialog',{name:'今回の白米量を確認'});
- await riceDialog.waitFor();
+ assert.equal(await staff.getByRole('dialog').count(),0,'a paid portion saves as served without opening a dialog');
+ assert.equal(await staff.locator('[data-status]').first().inputValue(),'served');
+ assert.equal(await staff.locator('.extra-control').getAttribute('open'),null,'rice details stay collapsed');
  const readExtra=meal=>atomic(async()=>{
   await pg.exec('reset role');
   return (await pg.query('select actual_rice,state,rice_amount,rice_refill_amount,soup_refill_amount from public.meal_entry_extras where client_id=$1 and meal=$2 and meal_date=$3',[CLIENT,meal,date])).rows[0];
  });
  assert.deepEqual(await readExtra('morning'),{actual_rice:null,state:'needs_review',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
- await riceDialog.locator('[data-confirm-rice]').click();
- await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('追加料金 50円を集計に反映'));
- await riceDialog.waitFor({state:'hidden'});
- assert.deepEqual(await readExtra('morning'),{actual_rice:250,state:'ready',rice_amount:50,rice_refill_amount:0,soup_refill_amount:0});
  await staff.locator('.extra-control summary').click();
  let form=staff.locator('[data-extra]');
+ await form.locator('[data-confirm-rice]').click();
+ await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('追加料金 50円を集計に反映'));
+ assert.deepEqual(await readExtra('morning'),{actual_rice:250,state:'ready',rice_amount:50,rice_refill_amount:0,soup_refill_amount:0});
  for(let i=0;i<2;i++){await form.locator('[data-step=rice][data-delta="1"]').click();await form.locator('[data-step=soup][data-delta="1"]').click();}
  staff.cancelNextConfirm=true;await staff.locator('button[data-meal=lunch]').click();assert.equal(await form.locator('[name=rice]').inputValue(),'2','cancelled meal switch preserves unsaved counts');assert.equal(await staff.evaluate(()=>S.meal),'morning');
  assert((await form.locator('[data-preview]').innerText()).includes('210円'));await form.locator('[type=submit]').click();await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('追加料金 210円を集計に反映'));
@@ -92,9 +93,10 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await changedDialog.waitFor({state:'hidden'});
  assert.deepEqual(await readExtra('lunch'),{actual_rice:300,state:'ready',rice_amount:100,rice_refill_amount:0,soup_refill_amount:0});
  const evening=staff.locator(`[data-status][data-date="${date}"][data-meal="evening"]`);
- await evening.selectOption('served');await riceDialog.waitFor();
- await riceDialog.locator('[data-confirm-later]').click();await riceDialog.waitFor({state:'hidden'});
- assert.equal((await readExtra('evening')).state,'needs_review','dismissing does not charge configured grams');
+ await evening.selectOption('served');await staff.waitForFunction(()=>document.getElementById('notice').textContent.includes('夕食：提供済みを保存'));
+ assert.equal(await staff.getByRole('dialog').count(),0,'paid portions also save immediately from the calendar');
+ assert.equal(await evening.inputValue(),'served');
+ assert.deepEqual(await readExtra('evening'),{actual_rice:null,state:'needs_review',rice_amount:0,rice_refill_amount:0,soup_refill_amount:0});
  await staff.locator(`[data-confirm-meal="evening"][data-date="${date}"]`).click();
  await riceDialog.locator('[name=grams]').fill('200');
  assert((await riceDialog.locator('[data-preview]').innerText()).includes('＝ 0円'));
