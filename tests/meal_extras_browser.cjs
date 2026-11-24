@@ -143,6 +143,15 @@ async function scenario(browser,width){const pg=new PGlite(),errors=[],unexpecte
  await profileForm.locator('[type=submit]').click();
  await admin.waitForFunction(()=>document.getElementById('notice').textContent.includes('食事設定を保存'));
  const singlePage=await pageFor(STAFF);
+ await singlePage.locator('[data-tab=month]').click();
+ await singlePage.locator('#selected').selectOption(SINGLE);
+ const morning=singlePage.locator(`[data-status][data-meal="morning"][data-date="${date}"]`).locator('..');
+ assert((await morning.innerText()).includes('みそ汁のみ・1杯'));
+ if(Number(date.slice(-2))>1){
+  const beforeStart=singlePage.locator('[data-status][data-meal="morning"]').first().locator('..');
+  assert(!(await beforeStart.innerText()).includes('みそ汁のみ'),'single items are hidden on days without a scheduled meal');
+ }
+ await singlePage.locator('[data-tab=today]').click();
  const status=singlePage.locator(`[data-status][data-client="${SINGLE}"]`);
  assert((await singlePage.locator('.today-table').innerText()).includes('みそ汁のみ・1杯'));
  await status.selectOption('served');

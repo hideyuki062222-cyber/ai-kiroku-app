@@ -141,7 +141,9 @@ function monthMealCell(id,d,m){
  const review=hasExtras&&r.extra.state==='needs_review';
  const label=review?'白米量を確認':'量の変更・おかわり';
  const action=hasExtras&&canConfirmExtra(d)?`<button type="button" class="meal-rice-review" data-confirm-meal="${m}" data-client="${id}" data-date="${d}">${label}</button>`:review?'<small>白米量は要確認</small>':'';
- return `<td>${picker(id,d,m)}${kind==='regular'||r?.status==='absent'?'':`<small>${servingLabel(kind,quantity)}</small>`}${servingEditButton(id,d,m)}${action}</td>`;
+ const scheduled=r||person(id)?.is_active&&C.expected(profile(id),d,m);
+ const showSingle=scheduled&&r?.status!=='absent'&&kind!=='regular';
+ return `<td>${picker(id,d,m)}${showSingle?`<small>${servingLabel(kind,quantity)}</small>`:''}${servingEditButton(id,d,m)}${action}</td>`;
 }
 function renderMonth(){const c=person(S.selected),p=profile(S.selected);return `<section class="panel"><div class="split"><div><h2>${esc(S.month)} 月間予定表</h2><p>通常の曜日・朝昼晩をまとめて予定登録し、外出や外泊の日を欠食に変更します。</p></div><button id="fillAll" class="primary">この月の全員の予定を登録</button></div><div class="row"><label>利用者${selectPeople('selected',S.selected)}</label>${p?'<button id="fillOne">この人の予定を登録</button>':''}</div><p class="muted">未来の食事は「提供予定」「欠食」のみ登録できます。「提供済み」は当日以降に選べます。一括登録は空欄だけを埋めます。提供済み・欠食・登録済み予定は変更しません。その日だけ提供内容が異なる場合は「提供内容を変更」を選んでください。</p></section>`+(!c||!p?empty():`<div class="tablewrap"><table><thead><tr><th>日付</th><th>朝食</th><th>昼食</th><th>夕食</th></tr></thead><tbody>${C.days(S.month).map(d=>`<tr><td>${Number(d.slice(-2))}日（${'日月火水木金土'[new Date(d+'T12:00:00Z').getUTCDay()]}）</td>${C.meals.map(m=>monthMealCell(c.id,d,m)).join('')}</tr>`).join('')}</tbody></table></div>`);}
 function summary(c){const rs=billEntries().filter(r=>r.client_id===c.id),t=C.totals(rs);t.missing=0;if(c.is_active&&!displayedBill())for(const d of C.days(S.month))for(const m of C.meals)if(C.expected(profile(c.id),d,m)&&!entry(c.id,d,m))t.missing++;return {...t,client:c};}
