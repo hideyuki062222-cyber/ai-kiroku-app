@@ -35,6 +35,8 @@ try{
  await owner();
  await db.exec(fs.readFileSync('supabase/migrations/20261123110200_meal_rice_confirmation_only_when_charged.sql','utf8'));
  eq(await get(),existingExtra,'existing extra entries are not rewritten');
+ await db.exec(fs.readFileSync('supabase/migrations/20261124032400_meal_rice_charge_on_served.sql','utf8'));
+ eq(await get(),existingExtra,'automatic charging applies only to new serving records');
  await as(ST);
  await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,current_date,'evening','served')",[A,CA]);
  const free=async()=>{const x=await get(CA,'evening');return [x.state,x.actual_rice,x.rice_amount,x.rice_refill_amount,x.soup_refill_amount];};
@@ -57,7 +59,12 @@ try{
  await as(AD);const newpid=(await price(A,valid,true,pid,500))[0].id;
  await as(ST);await save(250,2,2);eq((await get()).rice_refill_amount,100,'rate changes never reprice a served meal');eq((await get()).price_id,pid);
  await as(OB);eq((await q('select count(*)::int n from public.meal_entry_extras'))[0].n,0,'other facility cannot read snapshots');await price(B,valid,true,null,70);
- await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,current_date,'morning','served')",[B,CB]);await save(300,2,0,CB);eq((await get(CB)).rice_refill_amount,140,'independent facility pricing');
+ await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,current_date,'morning','served')",[B,CB]);
+ const paid=async()=>{const p=await get(CB);return [p.state,p.actual_rice,p.rice_amount,p.rice_refill_amount,p.soup_refill_amount];};
+ eq(await paid(),['ready',null,50,0,0],'a single serving operation charges the configured portion without recording an actual weight');
+ await save(null,1,1,CB);eq(await paid(),['ready',null,50,70,30],'refill-only edits retain the first-portion charge');
+ await save(200,0,0,CB);eq(await paid(),['ready',200,0,0,0],'an actual smaller portion replaces the automatic charge');
+ await save(300,2,0,CB);eq(await paid(),['ready',300,100,140,0],'a larger portion and refills use the facility tariff');
  await as(ST);eq((await q('select id from public.meal_extra_prices where organization_id=$1',[B])).length,0);await deny(()=>q('select public.save_meal_extra($1,$2,current_date,\'morning\',1,1,250,0,0,\'\')',[B,CB]),/permission_denied/);
  await as(AD);await deny(()=>q('select public.save_meal_extra_price($1,$2,current_date-1,true,200,$3,50,30)',[A,newpid,JSON.stringify(valid)]),/invalid_effective/);
  const snap=await get();await price(A,[],false,newpid);await save(250,2,2);eq((await get()).price_id,snap.price_id,'disable does not remove previously saved charges');
@@ -67,6 +74,9 @@ try{
  // Synthetic historical tariff for closed-month tests only; no production migration seed.
  await owner();await q("insert into public.meal_extra_prices(organization_id,effective_date,enabled,free_limit,bands,rice_refill_price,soup_refill_price,created_by) values($1,$2,true,200,$3,50,30,$4)",[A,past,JSON.stringify(valid),AD]);
  await as(AD);await q("insert into public.meal_entries(organization_id,client_id,meal_date,meal,status) values($1,$2,$3,'lunch','served')",[A,CA,past]);
+ eq((await get(CA,'lunch',past)).rice_amount,50,'historic service date uses its applicable tariff');
+ await save(250,0,0,CA,'lunch',past,'実提供量の確認');
+ await save(null,0,0,CA,'lunch',past,'実提供量が不明');
  await deny(()=>q('select public.meal_bill_action($1,$2,0,true,\'確認\')',[A,past]),/unconfirmed_meals/);
  await as(ST);await deny(()=>save(250,2,2,CA,'lunch',past),/past_correction_admin_reason/);
  await deny(()=>q("update public.meal_entries set status='absent' where client_id=$1 and meal_date=$2 and meal='lunch'",[CA,past]),/past_correction_admin_reason/);

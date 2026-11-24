@@ -10,12 +10,10 @@ function extraSummary(r){
  return `追加料金 ${sum.toLocaleString()}円 ／ 白米量・おかわり`;
 }
 function canConfirmExtra(d){return !latestBill()?.is_final&&(d>=today()||admin());}
-function needsRiceConfirmation(r){
- return r?.status==='served'&&r.extra?.state==='needs_review'&&MealExtras.calculate(r.extra.tariff,r.rice_grams).rice_amount>0;
-}
+function usesConfiguredRice(r){return r.extra?.state==='ready'&&r.extra.actual_rice===null;}
 function extraForm(r,confirming=false){
  const x=r.extra,editable=canConfirmExtra(r.meal_date);
- const riceShortcut=editable&&x.actual_rice===null&&needsRiceConfirmation(r)
+ const riceShortcut=editable&&x.actual_rice===null&&MealExtras.calculate(x.tariff,r.rice_grams).rice_amount>0
   ?`<button type="button" data-confirm-rice="${r.rice_grams}">設定どおり（${r.rice_grams}g）で確定</button>`:'';
  const refills=[['rice','白米',x.rice_refills],['soup','みそ汁',x.soup_refills]].map(([key,label,count])=>
   `<label>${label}のおかわり回数<div class="refill-stepper"><button type="button" data-step="${key}" data-delta="-1" aria-label="${label}のおかわりを減らす">−</button><input name="${key}" type="number" min="0" max="100" step="1" value="${count}" required><button type="button" data-step="${key}" data-delta="1" aria-label="${label}のおかわりを増やす">＋</button></div></label>`).join('');
@@ -73,12 +71,12 @@ function bindExtraForm(f,onSaved){
  const shortcut=f.querySelector('[data-confirm-rice]');
  const preview=()=>{
   const g=grams();
-  const zeroDefault=g===null&&x.state==='ready'&&x.actual_rice===null;
-  const a=MealExtras.calculate(x.tariff,zeroDefault?r.rice_grams:g,Number(f.elements.rice.value),Number(f.elements.soup.value));
+  const useSetting=g===null&&usesConfiguredRice(r);
+  const a=MealExtras.calculate(x.tariff,useSetting?r.rice_grams:g,Number(f.elements.rice.value),Number(f.elements.soup.value));
   if(shortcut)shortcut.hidden=g!==null&&g!==Number(shortcut.dataset.confirmRice);
   f.querySelector('[data-preview]').textContent=a.state==='needs_review'
    ?'白米量が未確認か、料金区分が未設定です。追加料金は要確認になります。'
-   :`白米量 ${a.rice_amount}円 ＋ 白米おかわり ${a.rice_refill_amount}円 ＋ みそ汁 ${a.soup_refill_amount}円 ＝ ${a.total}円${a.state==='disabled'?'（料金機能は無効）':''}`;
+   :`白米量 ${a.rice_amount}円${useSetting&&a.rice_amount>0?`（設定量 ${r.rice_grams}g）`:''} ＋ 白米おかわり ${a.rice_refill_amount}円 ＋ みそ汁 ${a.soup_refill_amount}円 ＝ ${a.total}円${a.state==='disabled'?'（料金機能は無効）':''}`;
  };
  f.oninput=()=>{
   S.dirty=true;f.dataset.dirty='true';preview();
@@ -104,6 +102,7 @@ function bindExtraForm(f,onSaved){
    const summary=f.closest('details')?.querySelector('summary');
    if(summary)summary.textContent=extraSummary(r);
    if(shortcut&&x.actual_rice!==null)shortcut.remove();
+   preview();
    f.querySelector('[data-extra-stamp]').textContent='最終入力：'+x.updated_by_name+' ／ '+new Date(x.updated_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
    onSaved?.();
    const a=MealExtras.amounts(r),total=a.rice+a.riceRefill+a.soupRefill;
