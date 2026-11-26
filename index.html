@@ -76,6 +76,11 @@ body{margin:0;background:#f5f7fb;color:#222;font-family:-apple-system,BlinkMacSy
   h=h.replace('placeholder="8文字以上を推奨"','placeholder="12文字以上を推奨"');
   h=h.replace('password.length < 8','password.length < 12');
   h=h.replace('メールアドレスと8文字以上のパスワードを入力してください。','メールアドレスと12文字以上のパスワードを入力してください。');
+  h=h.replace(
+    '<div id="authStatus" class="setup-note"></div>',
+    '<p><a href="./home/password-reset/">パスワードを忘れた方</a></p><div id="authStatus" class="setup-note"></div>'
+  );
+  h=h.replace('完全無料運用：確認メールは使用しません。新規登録後、','新規登録後、');
 
   const card=`
   <section class="card hidden" id="assignmentContextCard">
