@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{
  if(!file.startsWith(serveRoot+path.sep)&&file!==serveRoot){res.writeHead(403).end();return}
  try{if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');const body=fs.readFileSync(file);res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','cache-control':'no-store'});res.end(body)}catch{res.writeHead(404).end()}
 });
-const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,PATCH,OPTIONS,HEAD','content-type':'application/json'};
+const headers={'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'GET,POST,PUT,PATCH,OPTIONS,HEAD','content-type':'application/json'};
 function matches(value,filter){
  const dot=filter.indexOf('.'),op=filter.slice(0,dot),v=filter.slice(dot+1);
  if(op==='eq')return String(value)===v;if(op==='in')return v.slice(1,-1).split(',').includes(String(value));
@@ -43,6 +43,8 @@ function matches(value,filter){
 async function scenario(browser,viewport,name){
  const tables=database(),requests=[],blocked=[],errors=[],results=[],dialogs=[];
  let allowNameWrite=false,failNameSave=false,nameWriteAttempts=0,nameWrites=0,failDirectory=false,invalidDirectory=false,failAdminRename=false,renameWrites=0;
+ const resetCalls=[];
+ let resetRequested=false, resetVerified=false, resetSaved=false, recoverySignOut=false;
  const canonicalUpdate=(org,uid,name)=>{
   tables.organization_members.find(m=>m.organization_id===org&&m.user_id===uid).staff_name=name;
   for(const row of tables.organization_staff.filter(s=>s.organization_id===org&&s.linked_user_id===uid))row.staff_name=name;
@@ -66,9 +68,31 @@ async function scenario(browser,viewport,name){
   if(url.hostname==='pagamoaxhqszojxrpxyu.supabase.co'){
    if(req.method()==='OPTIONS')return route.fulfill({status:204,headers});
    requests.push({path:url.pathname,method:req.method()});
+   if(url.pathname.endsWith('/token')&&resetSaved&&url.searchParams.get('grant_type')==='password')assert.equal(JSON.parse(req.postData()).password,'synthetic-new-password');
    if(url.pathname.endsWith('/token'))return route.fulfill({status:200,headers,body:JSON.stringify({access_token:token,token_type:'bearer',expires_in:3600,expires_at:exp,refresh_token:'synthetic-refresh',user})});
+   if(url.pathname==='/auth/v1/recover'&&req.method()==='POST'){
+    const body=JSON.parse(req.postData());assert.equal(body.email,user.email);
+    resetRequested=true;resetCalls.push('request');
+    return route.fulfill({status:200,headers,body:'{}'});
+   }
+   if(url.pathname==='/auth/v1/verify'&&req.method()==='POST'){
+    const body=JSON.parse(req.postData());assert.equal(body.email,user.email);assert.equal(body.type,'recovery');assert(resetRequested);
+    resetCalls.push('verify');
+    if(body.token!=='012345')return route.fulfill({status:403,headers,body:JSON.stringify({code:'otp_expired',msg:'Synthetic OTP mismatch'})});
+    resetVerified=true;
+    return route.fulfill({status:200,headers,body:JSON.stringify({access_token:token,token_type:'bearer',expires_in:3600,expires_at:exp,refresh_token:'synthetic-recovery-refresh',user})});
+   }
+   if(url.pathname==='/auth/v1/user'&&req.method()==='PUT'){
+    assert(resetVerified);assert.equal(req.headers().authorization,'Bearer '+token);
+    const body=JSON.parse(req.postData());assert.equal(body.password,'synthetic-new-password');assert.deepEqual(Object.keys(body),['password']);
+    resetCalls.push('update');resetSaved=true;
+    return route.fulfill({status:200,headers,body:JSON.stringify(user)});
+   }
    if(url.pathname.endsWith('/user'))return route.fulfill({status:200,headers,body:JSON.stringify(user)});
-   if(url.pathname.endsWith('/logout'))return route.fulfill({status:204,headers});
+   if(url.pathname.endsWith('/logout')){
+    if(resetSaved&&!recoverySignOut){assert.equal(url.searchParams.get('scope'),'local');recoverySignOut=true;resetCalls.push('logout');}
+    return route.fulfill({status:204,headers});
+   }
    if(allowNameWrite&&url.pathname==='/rest/v1/organization_members'&&req.method()==='PATCH'){
     const payload=JSON.parse(req.postData());assert.deepEqual(Object.keys(payload),['staff_name']);assert.equal(url.searchParams.get('user_id'),'eq.'+U);assert([A,B].some(id=>url.searchParams.get('organization_id')==='eq.'+id));nameWriteAttempts++;
     if(failNameSave){failNameSave=false;return route.fulfill({status:503,headers,body:JSON.stringify({message:'Synthetic save failure'})})}
@@ -107,7 +131,40 @@ async function scenario(browser,viewport,name){
   await page.screenshot({path:path.join(artifact,`${name}-${label}.png`),fullPage:true});
  };
  await page.goto(base,{waitUntil:'domcontentloaded'});await page.locator('#login').waitFor({state:'visible'});assert(page.url().endsWith('/home/'));
- await check('login');await page.getByLabel('メールアドレス').fill(user.email);await page.getByLabel('パスワード',{exact:true}).fill('synthetic-password');await page.locator('#loginButton').click();await page.locator('#portal').waitFor({state:'visible'});
+ await check('login');
+ if(!process.env.NEXIA_BASELINE){
+  await page.getByRole('link',{name:'パスワードを忘れた方'}).click();
+  await page.locator('#resetEmail').fill(user.email);
+  await page.getByRole('button',{name:'確認コードを送る'}).click();
+  await page.locator('#resetVerify').waitFor({state:'visible'});
+  assert.equal(await page.locator('#verifyEmail').inputValue(),user.email);
+  assert(!(await page.locator('#resetPassword').isVisible()));
+  await check('password-recovery-code');
+  await page.locator('#resetCode').fill('000000');
+  await page.getByRole('button',{name:'確認する',exact:true}).click();
+  await page.waitForFunction(()=>document.getElementById('resetStatus').textContent.includes('確認できませんでした'));
+  assert(!(await page.locator('#resetPassword').isVisible()));
+  await page.locator('#resetCode').fill('012345');
+  await page.getByRole('button',{name:'確認する',exact:true}).click();
+  await page.locator('#resetPassword').waitFor({state:'visible'});
+  assert.equal(await page.evaluate(()=>localStorage.getItem('sb-pagamoaxhqszojxrpxyu-auth-token')),null,'recovery session is kept out of ordinary browser storage');
+  await page.locator('#newPassword').fill('synthetic-new-password');
+  await page.locator('#confirmPassword').fill('synthetic-wrong-password');
+  await page.locator('#savePassword').click();
+  await page.waitForFunction(()=>document.getElementById('resetStatus').textContent.includes('同じパスワードを2回'));
+  assert.equal(resetSaved,false);
+  await page.locator('#confirmPassword').fill('synthetic-new-password');
+  const signedOut=page.waitForResponse(res=>res.url().includes('/auth/v1/logout'));
+  await page.locator('#savePassword').click();
+  await page.waitForFunction(()=>document.getElementById('resetStatus').textContent.includes('パスワードを変更しました'));
+  await signedOut;
+  assert.deepEqual(resetCalls,['request','verify','verify','update','logout']);
+  assert.equal(await page.locator('#newPassword').inputValue(),'');
+  await page.getByRole('link',{name:'ログイン画面へ戻る'}).click();
+  await page.locator('#login').waitFor({state:'visible'});
+  results.push({label:'password-recovery',codeVerified:true,nonPersistent:true});
+ }
+ await page.getByLabel('メールアドレス').fill(user.email);await page.getByLabel('パスワード',{exact:true}).fill(resetSaved?'synthetic-new-password':'synthetic-password');await page.locator('#loginButton').click();await page.locator('#portal').waitFor({state:'visible'});
  assert.equal(await page.locator('#tools a').count(),7);assert(await page.locator('#admin').isVisible());await check('home-admin');
  if(process.env.NEXIA_BASELINE){
  assert(process.env.NEXIA_BASELINE_ROOT,'Set NEXIA_BASELINE_ROOT to an extracted base commit');
@@ -219,7 +276,7 @@ for(const [label,ready] of [['今日の担当','#main'],['AI記録','#recordHist
  await page.getByRole('button',{name:'ログアウト',exact:true}).click();await page.locator('#login').waitFor({state:'visible'});assert(!(await page.locator('#portal').isVisible()));
  assert.deepEqual(blocked,[],'unexpected external calls or writes');assert.deepEqual(errors,[],'uncaught script errors');
  // Reauthentication must read the persisted name in BOTH administration pages.
- await page.getByLabel('メールアドレス').fill(user.email);await page.getByLabel('パスワード',{exact:true}).fill('synthetic-password');await page.locator('#loginButton').click();await page.locator('#portal').waitFor({state:'visible'});
+ await page.getByLabel('メールアドレス').fill(user.email);await page.getByLabel('パスワード',{exact:true}).fill(resetSaved?'synthetic-new-password':'synthetic-password');await page.locator('#loginButton').click();await page.locator('#portal').waitFor({state:'visible'});
  await page.locator('#organization').selectOption(A);await page.waitForFunction(id=>localStorage.getItem('activeOrganizationId')===id,A);
  await page.goto(base+'staff/',{waitUntil:'domcontentloaded'});await own().waitFor();assert((await own().innerText()).includes('登録した確認職員'));
  await page.goto(base+'manage/',{waitUntil:'domcontentloaded'});await managed().waitFor();assert((await managed().innerText()).includes('登録した確認職員'));
