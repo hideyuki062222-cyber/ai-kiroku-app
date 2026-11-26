@@ -84,7 +84,9 @@ async function scenario(browser,viewport,name){
    }
    if(url.pathname==='/auth/v1/user'&&req.method()==='PUT'){
     assert(resetVerified);assert.equal(req.headers().authorization,'Bearer '+token);
-    const body=JSON.parse(req.postData());assert.equal(body.password,'synthetic-new-password');assert.deepEqual(Object.keys(body),['password']);
+    const body=JSON.parse(req.postData());
+    assert.equal(body.password,'synthetic-new-password');
+    assert(Object.keys(body).every(key=>['password','code_challenge','code_challenge_method'].includes(key)));
     resetCalls.push('update');resetSaved=true;
     return route.fulfill({status:200,headers,body:JSON.stringify(user)});
    }
